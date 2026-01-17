@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Simple Animation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #1a1a2e;
+      color: white;
+    }
+    .test {
+      margin: 20px 0;
+      padding: 20px;
+      background: #16213e;
+      border-radius: 8px;
+    }
+    .animated-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00ff88;
+      transition: opacity 0.3s ease;
+    }
+    .animated-number.updating {
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Animación Simple</h1>
+
+  <div class="test">
+    <p>Número animado:</p>
+    <span class="animated-number" id="result">0.00</span>
+  </div>
+
+  <input type="number" id="input" value="100" />
+  <button onclick="updateNumber()">Actualizar</button>
+
+  <script>
+    function animateNumber(element, newValue) {
+      const currentValue = parseFloat(element.textContent.replace(',', '')) || 0;
+      const duration = 500; // ms
+      const steps = 30;
+      const increment = (newValue - currentValue) / steps;
+      let current = currentValue;
+      let step = 0;
+
+      element.classList.add('updating');
+
+      const timer = setInterval(() => {
+        step++;
+        current += increment;
+
+        if (step >= steps) {
+          current = newValue;
+          clearInterval(timer);
+          element.classList.remove('updating');
+        }
+
+        element.textContent = current.toLocaleString('es-UY', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }, duration / steps);
+    }
+
+    window.updateNumber = () => {
+      const input = document.getElementById('input');
+      const result = document.getElementById('result');
+      const value = parseFloat(input.value) || 0;
+      const calculated = value * 38.45; // ejemplo con media
+
+      animateNumber(result, calculated);
+    };
+
+    // Actualizar al cargar
+    updateNumber();
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+[build]
+  publish = "."
+
+[dev]
+  port = 8888
+
+[[edge_functions]]
+  function = "get-cotizacion"
+  path = "/api/dolar"

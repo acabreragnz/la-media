@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dólar eBROU - Calculadora</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .animated-number {
+      display: inline-block;
+      transition: opacity 0.2s ease;
+    }
+
+    .animated-number.updating {
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 p-4 flex flex-col items-center justify-center">
+  <div id="app" class="w-full max-w-md"></div>
+
+  <script>
+    const API_URL = '/api/dolar';
+
+    let state = {
+      rates: null,
+      loading: true,
+      error: null,
+      amount: '100',
+      direction: 'usdToUyu'
+    };
+
+    const formatNumber = (num) => new Intl.NumberFormat('es-UY', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    }).format(num);
+
+    const getRate = () => {
+      if (!state.rates) return 0;
+      return state.rates.media;
+    };
+
+    const calculate = () => {
+      const numAmount = parseFloat(state.amount) || 0;
+      const rate = getRate();
+      return state.direction === 'usdToUyu'
+        ? numAmount * rate
+        : numAmount / rate;
+    };
+
+    function animateNumber(element, newValue) {
+      if (!element) return;
+
+      const currentValue = parseFloat(element.textContent.replace(/[^0-9.-]/g, '')) || 0;
+      const duration = 400;
+      const steps = 20;
+      const increment = (newValue - currentValue) / steps;
+      let current = currentValue;
+      let step = 0;
+
+      element.classList.add('updating');
+
+      const timer = setInterval(() => {
+        step++;
+        current += increment;
+
+        if (step >= steps) {
+          current = newValue;
+          clearInterval(timer);
+          element.classList.remove('updating');
+        }
+
+        element.textContent = formatNumber(current);
+      }, duration / steps);
+    }
+
+    const fetchRates = async () => {
+      state.loading = true;
+      state.error = null;
+      render();
+
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error('Error al obtener cotización');
+        const data = await res.json();
+        state.rates = {
+          compra: data.detalle.compra,
+          venta: data.detalle.venta,
+          media: data.cotizacion_media,
+          timestamp: data.fecha,
+        };
+      } catch (e) {
+        state.error = e.message;
+      } finally {
+        state.loading = false;
+        render();
+      }
+    };
+
+    window.setAmount = (val) => {
+      state.amount = val;
+      updateResult();
+    };
+
+    window.swapDirection = () => {
+      // Guardar el resultado actual antes de cambiar dirección
+      const currentResult = calculate();
+
+      // Cambiar dirección
+      state.direction = state.direction === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu';
+
+      // El resultado actual se convierte en el nuevo input
+      state.amount = currentResult.toFixed(2);
+
+      render();
+    };
+
+    window.fetchRates = fetchRates;
+
+    const updateResult = () => {
+      const resultElement = document.getElementById('result-value');
+      if (resultElement) {
+        animateNumber(resultElement, calculate());
+      }
+    };
+
+    const render = () => {
+      const app = document.getElementById('app');
+
+      if (state.loading) {
+        app.innerHTML = `<div class="text-white text-xl text-center">Cargando cotización...</div>`;
+        return;
+      }
+
+      if (state.error) {
+        app.innerHTML = `
+          <div class="bg-red-500/20 border border-red-500 rounded-xl p-6 text-center">
+            <p class="text-red-300 mb-4">${state.error}</p>
+            <button onclick="fetchRates()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">Reintentar</button>
+          </div>`;
+        return;
+      }
+
+      const { rates, direction, amount } = state;
+
+      app.innerHTML = `
+        <div class="text-center mb-6">
+          <h1 class="text-3xl font-bold text-white mb-2">💵 Dólar eBROU</h1>
+          <p class="text-blue-200 text-sm">Calculadora de conversión</p>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-4 mb-4 border border-white/20">
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p class="text-blue-300 text-xs uppercase">Compra</p>
+              <p class="text-white text-xl font-semibold">$ ${formatNumber(rates.compra)}</p>
+            </div>
+            <div>
+              <p class="text-blue-300 text-xs uppercase">Media</p>
+              <p class="text-white text-xl font-semibold">$ ${formatNumber(rates.media)}</p>
+            </div>
+            <div>
+              <p class="text-blue-300 text-xs uppercase">Venta</p>
+              <p class="text-white text-xl font-semibold">$ ${formatNumber(rates.venta)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+          <div class="mb-4">
+            <label class="text-blue-200 text-sm mb-2 block">${direction === 'usdToUyu' ? 'Dólares (USD)' : 'Pesos (UYU)'}</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl">${direction === 'usdToUyu' ? '🇺🇸' : '🇺🇾'}</span>
+              <input type="number" value="${amount}" oninput="setAmount(this.value)"
+                class="w-full bg-white/10 border border-white/20 rounded-xl py-4 pl-14 pr-4 text-white text-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0">
+            </div>
+          </div>
+
+          <div class="flex justify-center mb-4">
+            <button onclick="swapDirection()" class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full transition transform hover:scale-110">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+              </svg>
+            </button>
+          </div>
+
+          <div>
+            <label class="text-blue-200 text-sm mb-2 block">${direction === 'usdToUyu' ? 'Pesos (UYU)' : 'Dólares (USD)'}</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl">${direction === 'usdToUyu' ? '🇺🇾' : '🇺🇸'}</span>
+              <div class="w-full bg-green-500/20 border border-green-500/40 rounded-xl py-4 pl-14 pr-4 text-green-300 text-2xl font-semibold">
+                ${direction === 'usdToUyu' ? '$' : 'US$'} <span class="animated-number" id="result-value">${formatNumber(calculate())}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <p class="text-blue-300/60 text-xs">Actualizado: ${new Date(rates.timestamp).toLocaleString('es-UY')}</p>
+          <button onclick="fetchRates()" class="text-blue-300 text-xs hover:text-white mt-1 underline">Actualizar cotización</button>
+        </div>`;
+
+      // Trigger initial animation
+      setTimeout(() => updateResult(), 10);
+    };
+
+    fetchRates();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"bundles":[{"asset":"c9dfd4ff359484d6075f0817e8993dd4cfe0746e6a50109f8b014e6278478cb7.eszip","format":"eszip2"}],"routes":[{"function":"get-cotizacion","pattern":"^/api/dolar/?$","excluded_patterns":[],"path":"/api/dolar"}],"post_cache_routes":[],"bundler_version":"14.9.2","layers":[],"import_map":"netlify:import-map","function_config":{}}

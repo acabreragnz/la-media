@@ -1,5 +1,7 @@
 [build]
-  publish = "."
+  command = "pnpm build"
+  publish = "dist"
 
 [dev]
+  command = "pnpm dev"
   port = 8888

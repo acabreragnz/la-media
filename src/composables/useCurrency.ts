@@ -87,7 +87,7 @@ export function useCurrency() {
     const fromFlag = direction.value === 'usdToUyu' ? '🇺🇸' : '🇺🇾'
     const toFlag = direction.value === 'usdToUyu' ? '🇺🇾' : '🇺🇸'
 
-    const message = `💱 *Conversión BROU*\n\n` +
+    const message = `*Conversión BROU*\n\n` +
       `🔄 Conversión:\n` +
       `• ${fromFlag} ${formatNumber(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumber(result)} ${toCurrency}\n\n` +
       `📊 Cotización actual:\n` +

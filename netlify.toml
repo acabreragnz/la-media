@@ -3,5 +3,5 @@
   publish = "dist"
 
 [dev]
-  command = "pnpm dev"
-  port = 8888
+  framework = "#auto"
+  targetPort = 5173

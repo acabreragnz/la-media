@@ -26,7 +26,7 @@ export function useCurrency() {
     error.value = null
 
     try {
-      const response = await fetch('http://localhost:8888/api/brou-media')
+      const response = await fetch('/api/brou-media')
 
       if (!response.ok) {
         throw new Error('Error al obtener las cotizaciones')

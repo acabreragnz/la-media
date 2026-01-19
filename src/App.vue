@@ -190,8 +190,8 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Disclaimer sutil dentro de la card -->
-            <div class="text-center text-[0.6rem] text-white/50 leading-relaxed mt-3.5 pt-3.5 border-t border-white/[0.05]">
+            <!-- Disclaimer sutil dentro de la card (solo cuando el disclaimer principal está cerrado) -->
+            <div v-if="disclaimerDismissed" class="text-center text-[0.6rem] text-white/50 leading-relaxed mt-3.5 pt-3.5 border-t border-white/[0.05]">
               ⚠️ Sitio no oficial. <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener" class="text-yellow-400/80 hover:text-yellow-400 hover:underline">Verificar en brou.com.uy</a>
             </div>
           </div>

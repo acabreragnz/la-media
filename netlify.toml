@@ -3,5 +3,6 @@
   publish = "dist"
 
 [dev]
-  framework = "#auto"
+  command = "vite"
   targetPort = 5173
+  port = 8888

@@ -15,6 +15,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  // @ts-expect-error - vitest config not recognized by vite types
   test: {
     environment: 'jsdom',
     exclude: ['**/node_modules/**', '**/dist/**', 'e2e/**'],

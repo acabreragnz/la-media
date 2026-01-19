@@ -11,7 +11,6 @@ export function useCurrency() {
   // Configurar vue-currency-input con locale uruguayo
   const { inputRef, numberValue, setValue } = useCurrencyInput({
     currency: 'USD', // Requerido por la librería
-    currencyDisplay: 'hidden', // Ocultar símbolo de moneda
     locale: 'es-UY', // Uruguay: punto como separador de miles, coma como decimal
     precision: 2,
     useGrouping: true,

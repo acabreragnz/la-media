@@ -1,24 +1,27 @@
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import { configureVueProject, defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import pluginVue from 'eslint-plugin-vue'
 import pluginPlaywright from 'eslint-plugin-playwright'
 import pluginVitest from '@vitest/eslint-plugin'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 import pluginOxlint from 'eslint-plugin-oxlint'
 
+configureVueProject({
+  rootDir: import.meta.dirname,
+})
+
 export default defineConfigWithVueTs(
+  // @ts-expect-error - pluginVue.configs type compatibility issue with defineConfigWithVueTs
   ...pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
 
   {
-    name: 'app/playwright-tests',
-    ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    ...pluginPlaywright.configs['flat/recommended'],
   },
 
   {
-    name: 'app/vitest-tests',
-    ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
+    ...pluginVitest.configs.recommended,
   },
 
   skipFormatting,

@@ -10,7 +10,6 @@ const {
   loading,
   error,
   inputRef,
-  numberValue,
   direction,
   convertedAmount,
   fetchRates,
@@ -161,9 +160,9 @@ onMounted(() => {
         <!-- Exchange Rates Display -->
         <div class="space-y-2">
           <div class="bg-white/[0.04] rounded-xl px-5 py-3.5 text-sm border border-white/[0.05]">
-            <div class="flex items-center justify-center gap-3">
+            <div class="flex items-center justify-center gap-1.5">
               <!-- Compra -->
-              <div class="flex items-center gap-1.5 text-white/70">
+              <div class="flex items-center gap-1 text-white/70">
                 <span>Compra</span>
                 <span v-if="rates" class="text-white font-semibold">
                   {{ formatNumber(rates.compra) }}
@@ -173,7 +172,7 @@ onMounted(() => {
               <span class="text-white/15 text-[0.5rem]">●</span>
 
               <!-- Media (highlighted with eBROU yellow) -->
-              <div class="flex items-center gap-1.5 bg-brou-yellow/25 px-3.5 py-2 rounded-lg -my-1 mx-1.5 border-2 border-brou-yellow/40 shadow-[0_0_20px_rgba(255,203,5,0.15)]">
+              <div class="flex items-center gap-1 bg-brou-yellow/25 px-2.5 py-2 rounded-lg -my-1 mx-0.5 border-2 border-brou-yellow/40 shadow-[0_0_20px_rgba(255,203,5,0.15)]">
                 <span class="text-white/85">Media</span>
                 <span v-if="rates" class="text-brou-yellow font-bold">
                   {{ formatNumber(rates.media) }}
@@ -183,7 +182,7 @@ onMounted(() => {
               <span class="text-white/15 text-[0.5rem]">●</span>
 
               <!-- Venta -->
-              <div class="flex items-center gap-1.5 text-white/70">
+              <div class="flex items-center gap-1 text-white/70">
                 <span>Venta</span>
                 <span v-if="rates" class="text-white font-semibold">
                   {{ formatNumber(rates.venta) }}

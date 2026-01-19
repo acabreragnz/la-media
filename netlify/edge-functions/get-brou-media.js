@@ -1,4 +1,4 @@
-export default async (request, context) => {
+export default async (request, _context) => {
   // Handle CORS preflight
   if (request.method === 'OPTIONS') {
     return new Response(null, {

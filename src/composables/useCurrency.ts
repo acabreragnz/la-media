@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useCurrencyInput } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
 
@@ -84,13 +84,17 @@ export function useCurrency() {
 
     const fromCurrency = direction.value === 'usdToUyu' ? 'USD' : 'UYU'
     const toCurrency = direction.value === 'usdToUyu' ? 'UYU' : 'USD'
+    const fromFlag = direction.value === 'usdToUyu' ? '🇺🇸' : '🇺🇾'
+    const toFlag = direction.value === 'usdToUyu' ? '🇺🇾' : '🇺🇸'
 
-    const message = `💱 Conversión de divisas BROU\n\n` +
-      `${formatNumber(inputAmount)} ${fromCurrency} = ${formatNumber(result)} ${toCurrency}\n\n` +
-      `📊 Cotización BROU:\n` +
-      `Compra: $${formatNumber(rates.value.compra)}\n` +
-      `Venta: $${formatNumber(rates.value.venta)}\n` +
-      `Media: $${formatNumber(rates.value.media)}`
+    const message = `💱 *Conversión BROU*\n\n` +
+      `🔄 Conversión:\n` +
+      `• ${fromFlag} ${formatNumber(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumber(result)} ${toCurrency}\n\n` +
+      `📊 Cotización actual:\n` +
+      `• Compra: $${formatNumber(rates.value.compra)}\n` +
+      `• Media: $${formatNumber(rates.value.media)}\n` +
+      `• Venta: $${formatNumber(rates.value.venta)}\n\n` +
+      `_Calculado con broumedia.tonicabrera.dev_`
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')

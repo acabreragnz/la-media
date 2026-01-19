@@ -1,5 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { ref } from 'vue'
 import { useCurrency } from '../useCurrency'
+
+// Mock vue-currency-input
+const mockNumberValue = ref<number | null>(null)
+const mockSetValue = vi.fn((value: number) => {
+  mockNumberValue.value = value
+})
+
+vi.mock('vue-currency-input', () => ({
+  useCurrencyInput: () => ({
+    inputRef: ref(null),
+    numberValue: mockNumberValue,
+    setValue: mockSetValue,
+  }),
+}))
 
 // Mock fetch API
 global.fetch = vi.fn()
@@ -7,23 +22,24 @@ global.fetch = vi.fn()
 describe('useCurrency', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockNumberValue.value = null
   })
 
   describe('Initial State', () => {
     it('should have correct initial state values', () => {
-      const { rates, loading, error, amount, direction } = useCurrency()
+      const { rates, loading, error, numberValue, direction } = useCurrency()
 
       expect(rates.value).toBeNull()
       expect(loading.value).toBe(false)
       expect(error.value).toBeNull()
-      expect(amount.value).toBe('100')
+      expect(numberValue.value).toBeNull()
       expect(direction.value).toBe('usdToUyu')
     })
   })
 
   describe('Conversion Logic', () => {
     it('should convert USD to UYU correctly', () => {
-      const { rates, amount, direction, convertedAmount } = useCurrency()
+      const { rates, setValue, direction, convertedAmount } = useCurrency()
 
       rates.value = {
         compra: 40.0,
@@ -31,14 +47,14 @@ describe('useCurrency', () => {
         media: 41.0,
         timestamp: '2024-01-01T00:00:00Z'
       }
-      amount.value = '100'
+      setValue(100)
       direction.value = 'usdToUyu'
 
-      expect(convertedAmount.value).toBe(4200) // 100 * 42.0
+      expect(convertedAmount.value).toBe(4100) // 100 * 41.0 (media)
     })
 
     it('should convert UYU to USD correctly', () => {
-      const { rates, amount, direction, convertedAmount } = useCurrency()
+      const { rates, setValue, direction, convertedAmount } = useCurrency()
 
       rates.value = {
         compra: 40.0,
@@ -46,14 +62,14 @@ describe('useCurrency', () => {
         media: 41.0,
         timestamp: '2024-01-01T00:00:00Z'
       }
-      amount.value = '4000'
+      setValue(4100)
       direction.value = 'uyuToUsd'
 
-      expect(convertedAmount.value).toBe(100) // 4000 / 40.0
+      expect(convertedAmount.value).toBe(100) // 4100 / 41.0 (media)
     })
 
     it('should return 0 when amount is empty', () => {
-      const { rates, amount, convertedAmount } = useCurrency()
+      const { rates, numberValue, convertedAmount } = useCurrency()
 
       rates.value = {
         compra: 40.0,
@@ -61,13 +77,13 @@ describe('useCurrency', () => {
         media: 41.0,
         timestamp: '2024-01-01T00:00:00Z'
       }
-      amount.value = ''
+      numberValue.value = null
 
       expect(convertedAmount.value).toBe(0)
     })
 
     it('should handle decimal amounts', () => {
-      const { rates, amount, direction, convertedAmount } = useCurrency()
+      const { rates, setValue, direction, convertedAmount } = useCurrency()
 
       rates.value = {
         compra: 40.0,
@@ -75,10 +91,10 @@ describe('useCurrency', () => {
         media: 41.0,
         timestamp: '2024-01-01T00:00:00Z'
       }
-      amount.value = '100.50'
+      setValue(100.50)
       direction.value = 'usdToUyu'
 
-      expect(convertedAmount.value).toBe(4221) // 100.50 * 42.0
+      expect(convertedAmount.value).toBe(4120.5) // 100.50 * 41.0 (media)
     })
   })
 
@@ -100,7 +116,7 @@ describe('useCurrency', () => {
     })
 
     it('should update amount to converted value after swap', () => {
-      const { rates, amount, direction, swapDirection } = useCurrency()
+      const { rates, setValue, numberValue, direction, swapDirection } = useCurrency()
 
       rates.value = {
         compra: 40.0,
@@ -108,12 +124,12 @@ describe('useCurrency', () => {
         media: 41.0,
         timestamp: '2024-01-01T00:00:00Z'
       }
-      amount.value = '100'
+      setValue(100)
       direction.value = 'usdToUyu'
 
       swapDirection()
 
-      expect(amount.value).toBe('4200.00')
+      expect(numberValue.value).toBe(4100) // 100 * 41.0 (media)
       expect(direction.value).toBe('uyuToUsd')
     })
   })
@@ -213,7 +229,7 @@ describe('useCurrency', () => {
     it('should open WhatsApp with formatted message', () => {
       const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
 
-      const { shareViaWhatsApp, rates, amount, direction } = useCurrency()
+      const { shareViaWhatsApp, rates, setValue, direction } = useCurrency()
 
       rates.value = {
         compra: 40.0,
@@ -221,7 +237,7 @@ describe('useCurrency', () => {
         media: 41.0,
         timestamp: '2024-01-01T00:00:00Z'
       }
-      amount.value = '100'
+      setValue(100)
       direction.value = 'usdToUyu'
 
       shareViaWhatsApp()

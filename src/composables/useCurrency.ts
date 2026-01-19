@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useCurrencyInput } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
 
@@ -76,6 +76,17 @@ export function useCurrency() {
     }).format(value)
   }
 
+  const formatNumberForWhatsApp = (value: number): string => {
+    // Formato uruguayo: punto para miles, coma para decimales
+    const formatted = new Intl.NumberFormat('es-UY', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(value)
+
+    // Si termina en ,00, lo removemos
+    return formatted.replace(/,00$/, '')
+  }
+
   const shareViaWhatsApp = () => {
     if (!rates.value || !numberValue.value) return
 
@@ -84,13 +95,17 @@ export function useCurrency() {
 
     const fromCurrency = direction.value === 'usdToUyu' ? 'USD' : 'UYU'
     const toCurrency = direction.value === 'usdToUyu' ? 'UYU' : 'USD'
+    const fromFlag = direction.value === 'usdToUyu' ? '🇺🇸' : '🇺🇾'
+    const toFlag = direction.value === 'usdToUyu' ? '🇺🇾' : '🇺🇸'
 
-    const message = `💱 Conversión de divisas BROU\n\n` +
-      `${formatNumber(inputAmount)} ${fromCurrency} = ${formatNumber(result)} ${toCurrency}\n\n` +
-      `📊 Cotización BROU:\n` +
-      `Compra: $${formatNumber(rates.value.compra)}\n` +
-      `Venta: $${formatNumber(rates.value.venta)}\n` +
-      `Media: $${formatNumber(rates.value.media)}`
+    const message = `*Conversión BROU*\n\n` +
+      `🔄 Conversión:\n` +
+      `• ${fromFlag} ${formatNumberForWhatsApp(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumberForWhatsApp(result)} ${toCurrency}\n\n` +
+      `📊 Cotización actual:\n` +
+      `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
+      `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
+      `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
+      `_Calculado con brou-media.tonicabrera.dev_`
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')

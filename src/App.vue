@@ -10,7 +10,6 @@ const {
   loading,
   error,
   inputRef,
-  numberValue,
   direction,
   convertedAmount,
   fetchRates,
@@ -161,9 +160,9 @@ onMounted(() => {
         <!-- Exchange Rates Display -->
         <div class="space-y-2">
           <div class="bg-white/[0.04] rounded-xl px-5 py-3.5 text-sm border border-white/[0.05]">
-            <div class="flex items-center justify-center gap-3">
+            <div class="flex items-center justify-center gap-1.5">
               <!-- Compra -->
-              <div class="flex items-center gap-1.5 text-white/70">
+              <div class="flex items-center gap-1 text-white/70">
                 <span>Compra</span>
                 <span v-if="rates" class="text-white font-semibold">
                   {{ formatNumber(rates.compra) }}
@@ -173,7 +172,7 @@ onMounted(() => {
               <span class="text-white/15 text-[0.5rem]">●</span>
 
               <!-- Media (highlighted with eBROU yellow) -->
-              <div class="flex items-center gap-1.5 bg-brou-yellow/25 px-3.5 py-2 rounded-lg -my-1 mx-1.5 border-2 border-brou-yellow/40 shadow-[0_0_20px_rgba(255,203,5,0.15)]">
+              <div class="flex items-center gap-1 bg-brou-yellow/25 px-2.5 py-2 rounded-lg -my-1 mx-0.5 border-2 border-brou-yellow/40 shadow-[0_0_20px_rgba(255,203,5,0.15)]">
                 <span class="text-white/85">Media</span>
                 <span v-if="rates" class="text-brou-yellow font-bold">
                   {{ formatNumber(rates.media) }}
@@ -183,7 +182,7 @@ onMounted(() => {
               <span class="text-white/15 text-[0.5rem]">●</span>
 
               <!-- Venta -->
-              <div class="flex items-center gap-1.5 text-white/70">
+              <div class="flex items-center gap-1 text-white/70">
                 <span>Venta</span>
                 <span v-if="rates" class="text-white font-semibold">
                   {{ formatNumber(rates.venta) }}
@@ -191,8 +190,8 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Disclaimer sutil dentro de la card -->
-            <div class="text-center text-[0.6rem] text-white/50 leading-relaxed mt-3.5 pt-3.5 border-t border-white/[0.05]">
+            <!-- Disclaimer sutil dentro de la card (solo cuando el disclaimer principal está cerrado) -->
+            <div v-if="disclaimerDismissed" class="text-center text-[0.6rem] text-white/50 leading-relaxed mt-3.5 pt-3.5 border-t border-white/[0.05]">
               ⚠️ Sitio no oficial. <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener" class="text-yellow-400/80 hover:text-yellow-400 hover:underline">Verificar en brou.com.uy</a>
             </div>
           </div>

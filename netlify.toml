@@ -1,9 +1,7 @@
 [build]
-  publish = "."
+  command = "pnpm build"
+  publish = "dist"
 
 [dev]
+  command = "pnpm dev"
   port = 8888
-
-[[edge_functions]]
-  function = "get-brou-media"
-  path = "/api/brou-media"

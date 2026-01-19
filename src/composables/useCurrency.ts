@@ -76,6 +76,17 @@ export function useCurrency() {
     }).format(value)
   }
 
+  const formatNumberForWhatsApp = (value: number): string => {
+    // Formato uruguayo: punto para miles, coma para decimales
+    const formatted = new Intl.NumberFormat('es-UY', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(value)
+
+    // Si termina en ,00, lo removemos
+    return formatted.replace(/,00$/, '')
+  }
+
   const shareViaWhatsApp = () => {
     if (!rates.value || !numberValue.value) return
 
@@ -89,12 +100,12 @@ export function useCurrency() {
 
     const message = `*Conversión BROU*\n\n` +
       `🔄 Conversión:\n` +
-      `• ${fromFlag} ${formatNumber(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumber(result)} ${toCurrency}\n\n` +
+      `• ${fromFlag} ${formatNumberForWhatsApp(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumberForWhatsApp(result)} ${toCurrency}\n\n` +
       `📊 Cotización actual:\n` +
-      `• Compra: $${formatNumber(rates.value.compra)}\n` +
-      `• Media: $${formatNumber(rates.value.media)}\n` +
-      `• Venta: $${formatNumber(rates.value.venta)}\n\n` +
-      `_Calculado con broumedia.tonicabrera.dev_`
+      `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
+      `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
+      `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
+      `_Calculado con brou-media.tonicabrera.dev_`
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')

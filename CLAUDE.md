@@ -12,7 +12,7 @@ This is a Vue 3 + TypeScript currency converter application that displays real-t
 # Install dependencies
 pnpm install
 
-# Development server (runs on localhost:8888 via Netlify Dev)
+# Development server (uses @netlify/vite-plugin, runs on localhost:5173)
 pnpm dev
 
 # Build for production
@@ -96,14 +96,20 @@ The backend uses a **scheduled function + caching** architecture to minimize scr
 - **Type Checking**: `vue-tsc` for Vue component type checking
 - **Testing**: Vitest for unit tests, Playwright for E2E
 - **DevTools**: `vite-plugin-vue-devtools` for Vue debugging
+- **Netlify Emulation**: `@netlify/vite-plugin` emulates Netlify platform features locally (Blobs, Edge Functions, etc.)
 
 ## Important Implementation Details
 
 ### API Integration
 
 The app fetches data from a **local endpoint** during development:
-- Development: `http://localhost:8888/api/brou-media`
+- Development: `http://localhost:5173/api/brou-media` (via `@netlify/vite-plugin`)
 - Production: The same path works via Netlify Edge Functions
+
+**Local Development Behavior:**
+- Netlify Blobs is emulated in memory (empty at startup)
+- First API call triggers scraping fallback (expected behavior)
+- Data doesn't persist between dev server restarts
 
 ### Conversion Logic
 
@@ -129,7 +135,7 @@ The `useCurrency` composable handles all conversion logic:
 
 This project is configured for **Netlify deployment**:
 - Publishes from root directory (`dist/` after build)
-- Dev server runs on port 8888 (Netlify Dev wraps Vite on port 5173)
+- Dev server uses `@netlify/vite-plugin` for native Netlify emulation in Vite
 - Edge Functions are automatically deployed from `netlify/edge-functions/*.mts`
 - Scheduled Functions are automatically deployed from `netlify/functions/*.mts`
 - Netlify Blobs is provisioned automatically (zero configuration)

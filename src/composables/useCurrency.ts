@@ -88,35 +88,24 @@ export function useCurrency() {
   }
 
   const shareViaWhatsApp = () => {
-    if (!rates.value) return
+    if (!rates.value || !numberValue.value) return
 
-    let message = ''
+    const inputAmount = numberValue.value
+    const result = convertedAmount.value
 
-    if (numberValue.value) {
-      // Con conversión
-      const inputAmount = numberValue.value
-      const result = convertedAmount.value
+    const fromCurrency = direction.value === 'usdToUyu' ? 'USD' : 'UYU'
+    const toCurrency = direction.value === 'usdToUyu' ? 'UYU' : 'USD'
+    const fromFlag = direction.value === 'usdToUyu' ? '🇺🇸' : '🇺🇾'
+    const toFlag = direction.value === 'usdToUyu' ? '🇺🇾' : '🇺🇸'
 
-      const fromCurrency = direction.value === 'usdToUyu' ? 'USD' : 'UYU'
-      const toCurrency = direction.value === 'usdToUyu' ? 'UYU' : 'USD'
-
-      message = `*Conversión BROU*\n\n` +
-        `🔄 Conversión:\n` +
-        `• ${formatNumberForWhatsApp(inputAmount)} ${fromCurrency} → ${formatNumberForWhatsApp(result)} ${toCurrency}\n\n` +
-        `📊 Cotización actual:\n` +
-        `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
-        `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
-        `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
-        `_Calculado con brou-media.tonicabrera.dev_`
-    } else {
-      // Solo cotización media
-      message = `*Cotización BROU USD/UYU*\n\n` +
-        `📊 Cotización actual:\n` +
-        `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
-        `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
-        `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
-        `_Consultado en brou-media.tonicabrera.dev_`
-    }
+    const message = `*Conversión BROU*\n\n` +
+      `🔄 Conversión:\n` +
+      `• ${fromFlag} ${formatNumberForWhatsApp(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumberForWhatsApp(result)} ${toCurrency}\n\n` +
+      `📊 Cotización actual:\n` +
+      `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
+      `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
+      `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
+      `_Calculado con brou-media.tonicabrera.dev_`
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
@@ -127,7 +116,7 @@ export function useCurrency() {
     loading,
     error,
     inputRef,
-    numberValue, // Exposed for template usage
+    numberValue,
     setValue,
     direction,
     convertedAmount,

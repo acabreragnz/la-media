@@ -8,14 +8,13 @@ export function useCurrency() {
   const error = ref<string | null>(null)
   const direction = ref<ConversionDirection>('usdToUyu')
 
-  // Configurar vue-currency-input con locale uruguayo
+  // Configurar vue-currency-input con locale uruguayo (sin símbolo de moneda visible)
   const { inputRef, numberValue, setValue } = useCurrencyInput({
-    currency: 'USD', // Requerido por la librería
+    currency: 'XXX', // Código de moneda sin símbolo - manejado manualmente en el template
     locale: 'es-UY', // Uruguay: punto como separador de miles, coma como decimal
     precision: 2,
     useGrouping: true,
     valueRange: { min: 0, max: 100000000 }, // Máximo 100 millones
-    hideCurrencySymbolOnFocus: false,
     hideGroupingSeparatorOnFocus: false,
     hideNegligibleDecimalDigitsOnFocus: false,
     autoDecimalDigits: false
@@ -88,24 +87,37 @@ export function useCurrency() {
   }
 
   const shareViaWhatsApp = () => {
-    if (!rates.value || !numberValue.value) return
+    if (!rates.value) return
 
-    const inputAmount = numberValue.value
-    const result = convertedAmount.value
+    let message = ''
 
-    const fromCurrency = direction.value === 'usdToUyu' ? 'USD' : 'UYU'
-    const toCurrency = direction.value === 'usdToUyu' ? 'UYU' : 'USD'
-    const fromFlag = direction.value === 'usdToUyu' ? '🇺🇸' : '🇺🇾'
-    const toFlag = direction.value === 'usdToUyu' ? '🇺🇾' : '🇺🇸'
+    if (numberValue.value) {
+      // Con conversión
+      const inputAmount = numberValue.value
+      const result = convertedAmount.value
 
-    const message = `*Conversión BROU*\n\n` +
-      `🔄 Conversión:\n` +
-      `• ${fromFlag} ${formatNumberForWhatsApp(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumberForWhatsApp(result)} ${toCurrency}\n\n` +
-      `📊 Cotización actual:\n` +
-      `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
-      `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
-      `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
-      `_Calculado con brou-media.tonicabrera.dev_`
+      const fromCurrency = direction.value === 'usdToUyu' ? 'USD' : 'UYU'
+      const toCurrency = direction.value === 'usdToUyu' ? 'UYU' : 'USD'
+      const fromFlag = direction.value === 'usdToUyu' ? '🇺🇸' : '🇺🇾'
+      const toFlag = direction.value === 'usdToUyu' ? '🇺🇾' : '🇺🇸'
+
+      message = `*Conversión BROU*\n\n` +
+        `🔄 Conversión:\n` +
+        `• ${fromFlag} ${formatNumberForWhatsApp(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumberForWhatsApp(result)} ${toCurrency}\n\n` +
+        `📊 Cotización actual:\n` +
+        `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
+        `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
+        `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
+        `_Calculado con brou-media.tonicabrera.dev_`
+    } else {
+      // Solo cotización
+      message = `*Cotización BROU USD/UYU*\n\n` +
+        `📊 Cotización actual:\n` +
+        `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
+        `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
+        `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
+        `_Consultado en brou-media.tonicabrera.dev_`
+    }
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')

@@ -32,6 +32,12 @@ pnpm test:unit
 
 # Run E2E tests (Playwright)
 pnpm test:e2e
+
+# Manually invoke scheduled function (for testing)
+netlify functions:invoke update-brou-rates
+
+# View Netlify Blobs content (requires Netlify CLI authentication)
+netlify blobs:get brou-rates latest
 ```
 
 ## Architecture
@@ -46,13 +52,37 @@ pnpm test:e2e
 - **src/components/CurrencyValue.vue**: Animated number display using `@number-flow/vue`
 - **src/types/currency.ts**: TypeScript type definitions for exchange rates and API responses
 
-### Backend (Netlify Edge Functions)
+### Backend Architecture (Netlify Functions + Edge Functions + Blobs)
 
-- **netlify/edge-functions/get-brou-media.js**: Edge function that scrapes BROU's website for current exchange rates
-  - Exposed at `/api/brou-media`
-  - Parses HTML using regex to extract "compra" (buy) and "venta" (sell) rates
-  - Calculates "media" (average) rate
-  - Returns JSON response with CORS headers
+The backend uses a **scheduled function + caching** architecture to minimize scraping load and improve response times:
+
+**Three-Layer System:**
+
+1. **`netlify/functions/utils/brou-scraper.mts`**: Shared scraping utility (TypeScript)
+   - Pure function that scrapes BROU website
+   - Exports `BrouRates` interface and `scrapeBrouRates()` function
+   - Used by both scheduled function and edge function (DRY principle)
+   - Parses HTML using regex to extract "compra" (buy) and "venta" (sell) rates
+
+2. **`netlify/functions/update-brou-rates.mts`**: Scheduled Function (TypeScript)
+   - Runs automatically every 15 minutes (`*/15 * * * *` cron in UTC)
+   - Scrapes BROU website using shared utility
+   - Stores results in **Netlify Blobs** (key: `'latest'`, store: `'brou-rates'`)
+   - Error handling: preserves previous data if scraping fails (doesn't overwrite Blobs)
+   - Receives `next_run` timestamp in request body
+
+3. **`netlify/edge-functions/get-brou-media.mts`**: Edge Function API (TypeScript)
+   - Exposed at `/api/brou-media`
+   - **Primary**: Reads cached data from Netlify Blobs (fast, globally distributed)
+   - **Fallback**: If Blobs empty, executes scraping directly (useful on first deploy)
+   - Returns JSON response (no CORS headers needed - same origin)
+   - May exceed 50ms limit on fallback, but acceptable for initialization
+
+**Key Design Decisions:**
+- Uses `.mts` extension (TypeScript ES modules) for all backend files
+- Shared code between functions via `utils/` directory (Netlify bundler handles imports)
+- Netlify Blobs provides eventual consistency (<60s propagation to all edges)
+- Scheduled functions have 30s execution limit, edge functions have 50ms limit
 
 ### Styling
 
@@ -77,9 +107,13 @@ The app fetches data from a **local endpoint** during development:
 
 ### Conversion Logic
 
-- **USD → UYU**: Uses the "venta" (sell) rate
-- **UYU → USD**: Uses the "compra" (buy) rate
-- Display uses the "media" (average) rate for informational purposes
+The `useCurrency` composable handles all conversion logic:
+- Uses `vue-currency-input` for formatted input with Uruguayan locale (`es-UY`)
+- **Display rate**: Shows "media" (average) from API for informational purposes
+- **Actual conversion**: Uses "media" rate for both directions (bidirectional conversion)
+- **USD → UYU**: `inputAmount * rates.media`
+- **UYU → USD**: `inputAmount / rates.media`
+- Direction swap: Updates input value with converted amount when swapping currencies
 
 ### Path Aliases
 
@@ -94,6 +128,16 @@ The app fetches data from a **local endpoint** during development:
 ## Deployment
 
 This project is configured for **Netlify deployment**:
-- Publishes from root directory
-- Dev server runs on port 8888
-- Edge Functions are automatically deployed from `netlify/edge-functions/`
+- Publishes from root directory (`dist/` after build)
+- Dev server runs on port 8888 (Netlify Dev wraps Vite on port 5173)
+- Edge Functions are automatically deployed from `netlify/edge-functions/*.mts`
+- Scheduled Functions are automatically deployed from `netlify/functions/*.mts`
+- Netlify Blobs is provisioned automatically (zero configuration)
+- Schedule defined inline via `export const config: Config = { schedule: '*/15 * * * *' }`
+- No CORS needed: frontend and backend share same origin (Netlify domain)
+
+**Post-deployment testing:**
+1. Check scheduled function logs: Netlify Dashboard → Functions → update-brou-rates → Logs
+2. Verify first scraping execution or manually trigger via "Run now" button
+3. Confirm edge function responds quickly (should read from Blobs after first scrape)
+4. Monitor that updates occur every 15 minutes

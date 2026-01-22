@@ -32,7 +32,7 @@ export function useCurrency() {
 
   // Transformar apiData a ExchangeRates
   const rates = computed<ExchangeRates | null>(() => {
-    if (!apiData.value) return null
+    if (!apiData.value?.metadata) return null
     return {
       compra: apiData.value.detalle.compra,
       venta: apiData.value.detalle.venta,

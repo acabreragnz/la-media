@@ -36,8 +36,8 @@ input[type="number"] {
 /* Force Inter Variable globally and fix mobile viewport issues */
 html, body {
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  /* Apply the gradient directly to html/body so it covers overflow areas on mobile */
-  background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
+  /* Solid dark blue background - prevents white space on mobile */
+  background: #0a0e1f;
   /* Ensure full viewport coverage */
   min-height: 100dvh;
   min-height: -webkit-fill-available;

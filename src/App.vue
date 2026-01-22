@@ -32,7 +32,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 </script>
 
 <template>
-  <div class="min-h-dvh flex justify-center p-4">
+  <div class="min-h-dvh flex justify-center p-4" style="background: linear-gradient(135deg, #08528D 0%, #0d2744 25%, #0f1a2e 50%, #0a0e1f 75%);">
     <div class="w-full max-w-[440px]">
       <!-- Loading State -->
       <div v-if="loading && !rates" class="space-y-5">

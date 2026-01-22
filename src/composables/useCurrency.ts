@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
 import { shareConversionViaWhatsApp } from '@/utils/whatsappShare'
+import { formatTimestamp } from '@/utils/formatters'
 
 export function useCurrency() {
   const direction = ref<ConversionDirection>('usdToUyu')
@@ -136,7 +137,10 @@ export function useCurrency() {
     return Math.max(0, minutes)
   })
 
-  const lastScrapedAt = computed(() => rates.value?.scraped_at ?? '--:--')
+  const lastScrapedAt = computed(() => {
+    if (!rates.value?.scraped_at) return '--:--'
+    return formatTimestamp(rates.value.scraped_at)
+  })
 
   return {
     rates,

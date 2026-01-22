@@ -278,13 +278,14 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
                 Última: {{ lastScrapedAt }}
               </span>
               <span class="text-white/30 hidden sm:inline">|</span>
+              <span class="whitespace-nowrap">Próxima: {{ nextUpdateTime }}</span>
               <span v-if="isFetching" class="flex items-center gap-1 whitespace-nowrap">
+                <span class="text-white/30 hidden sm:inline">|</span>
                 <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 Actualizando...
               </span>
-              <span v-else-if="nextUpdateTime !== '--:--'" class="whitespace-nowrap">Próxima: {{ nextUpdateTime }}</span>
             </div>
 
             <!-- Disclaimer (más corto en móviles) -->

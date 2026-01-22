@@ -11,6 +11,7 @@ export function useCurrency() {
   const {
     data: apiData,
     isPending: loading,
+    isFetching,
     isError,
     error: queryError,
     refetch
@@ -140,6 +141,7 @@ export function useCurrency() {
   return {
     rates,
     loading,
+    isFetching,
     error,
     inputRef,
     numberValue,

@@ -8,6 +8,7 @@ vi.mock('@tanstack/vue-query', () => ({
   useQuery: () => ({
     data: ref(undefined),
     isPending: ref(false),
+    isFetching: ref(false),
     isError: ref(false),
     error: ref(null),
     refetch: vi.fn()

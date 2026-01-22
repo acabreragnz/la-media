@@ -6,6 +6,7 @@ import type { ApiResponse } from '@/types/currency'
 // Mock para Vue Query
 const mockQueryData: Ref<ApiResponse | undefined> = ref(undefined)
 const mockIsPending = ref(false)
+const mockIsFetching = ref(false)
 const mockIsError = ref(false)
 const mockQueryError: Ref<Error | null> = ref(null)
 const mockRefetch = vi.fn()
@@ -15,6 +16,7 @@ vi.mock('@tanstack/vue-query', () => ({
   useQuery: () => ({
     data: mockQueryData,
     isPending: mockIsPending,
+    isFetching: mockIsFetching,
     isError: mockIsError,
     error: mockQueryError,
     refetch: mockRefetch
@@ -53,6 +55,7 @@ describe('useCurrency', () => {
     mockNumberValue.value = null
     mockQueryData.value = undefined
     mockIsPending.value = false
+    mockIsFetching.value = false
     mockIsError.value = false
     mockQueryError.value = null
   })

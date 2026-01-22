@@ -24,6 +24,11 @@ const {
 // Detectar dispositivos de baja gama
 const { isLowEndDevice } = useDeviceDetection()
 
+// Seleccionar todo el texto del input al hacer click en la card
+function selectInputText() {
+  inputRef.value?.select()
+}
+
 // Feature flags
 const DISCLAIMER_ENABLED = false
 
@@ -200,12 +205,15 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
         </div>
 
         <!-- Currency Input -->
-        <div class="bg-white/[0.05] border border-white/[0.08] rounded-[20px] p-5 flex items-center gap-4 transition-all focus-within:border-brou-blue-light/60 focus-within:bg-brou-blue/[0.06] focus-within:shadow-[0_0_30px_rgba(8,82,141,0.25)]">
+        <label
+          @click="selectInputText"
+          class="bg-white/[0.05] border border-white/[0.08] rounded-[20px] p-5 flex items-center gap-4 transition-all focus-within:border-brou-blue-light/60 focus-within:bg-brou-blue/[0.06] focus-within:shadow-[0_0_30px_rgba(8,82,141,0.25)] cursor-text"
+        >
           <span class="text-[2.25rem] leading-none">{{ direction === 'usdToUyu' ? '🇺🇸' : '🇺🇾' }}</span>
-          <div class="flex-1 flex flex-col gap-1">
-            <label class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
+          <span class="flex-1 flex flex-col gap-1">
+            <span class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
               {{ direction === 'usdToUyu' ? 'Dólares' : 'Pesos' }}
-            </label>
+            </span>
             <input
               ref="inputRef"
               type="text"
@@ -213,8 +221,8 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
               placeholder="0,00"
             />
-          </div>
-        </div>
+          </span>
+        </label>
 
         <!-- Swap Button -->
         <div class="flex justify-center my-4">

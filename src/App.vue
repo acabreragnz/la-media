@@ -41,17 +41,22 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
     <div class="w-full max-w-[440px]">
       <!-- Loading State -->
       <div v-if="loading && !rates" class="space-y-5">
-        <!-- Header skeleton -->
+        <!-- Header (siempre visible, no skeleton) -->
         <div class="text-center mb-7">
-          <div class="h-8 bg-white/[0.1] rounded-lg w-48 mx-auto animate-pulse"></div>
+          <h1 class="text-[1.6rem] font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            Media BROU
+          </h1>
         </div>
 
-        <!-- Línea amarilla decorativa -->
-        <div class="h-[2px] bg-white/[0.05] rounded animate-pulse"></div>
+        <!-- Subtle yellow accent stripe (siempre visible, no skeleton) -->
+        <div class="relative h-[2px] mb-6 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/60 to-transparent blur-[1px]"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/40 to-transparent"></div>
+        </div>
 
         <!-- Exchange Rates skeleton -->
         <div class="space-y-2">
-          <div class="bg-white/[0.04] rounded-xl px-5 py-3 border border-white/[0.05] animate-pulse">
+          <div class="bg-white/[0.04] rounded-xl px-5 py-3 border border-white/[0.05] animate-pulse relative">
             <div class="flex items-center justify-center gap-3">
               <!-- Compra skeleton -->
               <div class="flex flex-col items-center gap-1">
@@ -73,6 +78,8 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
                 <div class="h-4 bg-white/[0.1] rounded w-14"></div>
               </div>
             </div>
+            <!-- BROU link skeleton -->
+            <div class="absolute bottom-2 right-2 h-3 bg-white/[0.06] rounded w-12"></div>
           </div>
         </div>
 
@@ -106,55 +113,120 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
         <!-- Footer skeleton -->
         <div class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-4 border border-white/[0.08] animate-pulse">
           <div class="space-y-3">
-            <div class="h-3 bg-white/[0.06] rounded w-32 mx-auto"></div>
-            <div class="h-2.5 bg-white/[0.05] rounded w-36 mx-auto"></div>
-            <div class="h-10 bg-gradient-to-br from-brou-blue/30 to-brou-blue-light/30 rounded-xl"></div>
+            <!-- Stats skeleton (Última / Próxima) -->
+            <div class="h-3 bg-white/[0.06] rounded w-48 mx-auto"></div>
+            <!-- Share button skeleton -->
+            <div class="h-10 bg-brou-blue/5 border border-brou-blue-light/20 rounded-xl"></div>
           </div>
         </div>
       </div>
 
-      <!-- Error State (solo si NO hay datos) -->
-      <div v-else-if="error && !rates" class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-6 border border-white/[0.08]">
-        <div class="text-center">
-          <div class="mb-4 flex justify-center">
-            <PhWarning :size="60" class="text-yellow-500" />
-          </div>
-          <h2 class="text-xl font-bold text-white mb-2">Error al cargar cotizaciones</h2>
-          <p class="text-white/80 mb-4">{{ error }}</p>
-          <button
-            @click="() => refetch()"
-            class="bg-gradient-to-br from-brou-blue to-brou-blue-light text-white font-semibold py-2 px-6 rounded-lg transition-all hover:scale-105 shadow-[0_8px_20px_rgba(8,82,141,0.5)]"
-          >
-            Reintentar
-          </button>
-        </div>
-      </div>
-
-      <!-- Content -->
+      <!-- Content or Error State -->
       <div v-else class="space-y-5">
-        <!-- Error Banner (si hay error pero tenemos datos cached) -->
-        <div v-if="error && rates" class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 flex items-start gap-3">
-          <PhWarning :size="20" class="text-yellow-500 flex-shrink-0 mt-0.5" />
-          <div class="flex-1">
-            <p class="text-yellow-200 text-[0.8rem] font-medium mb-1">Problemas para actualizar</p>
-            <p class="text-white/70 text-[0.7rem] leading-relaxed">
-              No pudimos obtener datos actualizados del BROU. Mostrando última cotización disponible.
-            </p>
-          </div>
-          <button
-            @click="() => refetch()"
-            class="text-yellow-300 hover:text-yellow-100 text-[0.7rem] font-medium underline flex-shrink-0"
-          >
-            Reintentar
-          </button>
-        </div>
-        <!-- Header -->
+        <!-- Header (siempre visible) -->
         <div class="text-center mb-7">
           <h1 class="text-[1.6rem] font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
             Media BROU
           </h1>
         </div>
 
+        <!-- Subtle yellow accent stripe (siempre visible) -->
+        <div class="relative h-[2px] mb-6 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/60 to-transparent blur-[1px]"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/40 to-transparent"></div>
+        </div>
+
+        <!-- Error Banner (para cualquier error) -->
+        <div v-if="error" class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 flex items-start gap-3">
+          <PhWarning :size="20" class="text-yellow-500 flex-shrink-0 mt-0.5" />
+          <div class="flex-1">
+            <p class="text-yellow-200 text-[0.8rem] font-medium mb-1">
+              {{ rates ? 'Problemas para actualizar' : 'Error al cargar cotizaciones' }}
+            </p>
+            <p class="text-white/70 text-[0.7rem] leading-relaxed">
+              {{ rates ? 'No pudimos obtener datos actualizados del BROU. Mostrando última cotización disponible.' : error }}
+            </p>
+          </div>
+          <button
+            @click="() => refetch()"
+            class="text-yellow-300 hover:text-yellow-100 text-[0.7rem] font-medium underline flex-shrink-0"
+            :disabled="isFetching"
+          >
+            {{ isFetching ? 'Reintentando...' : 'Reintentar' }}
+          </button>
+        </div>
+
+        <!-- Skeletons SOLO cuando está cargando SIN error -->
+        <template v-if="!rates && !error">
+          <!-- Exchange Rates skeleton -->
+          <div class="space-y-2">
+            <div class="bg-white/[0.04] rounded-xl px-5 py-3 border border-white/[0.05] animate-pulse relative">
+              <div class="flex items-center justify-center gap-3">
+                <!-- Compra skeleton -->
+                <div class="flex flex-col items-center gap-1">
+                  <div class="h-2 bg-white/[0.08] rounded w-12"></div>
+                  <div class="h-4 bg-white/[0.1] rounded w-14"></div>
+                </div>
+                <!-- Separador -->
+                <div class="h-4 bg-white/[0.05] rounded w-1"></div>
+                <!-- Media skeleton -->
+                <div class="flex flex-col items-center gap-1">
+                  <div class="h-2.5 bg-white/[0.08] rounded w-10"></div>
+                  <div class="h-7 bg-brou-yellow/20 rounded w-16"></div>
+                </div>
+                <!-- Separador -->
+                <div class="h-4 bg-white/[0.05] rounded w-1"></div>
+                <!-- Venta skeleton -->
+                <div class="flex flex-col items-center gap-1">
+                  <div class="h-2 bg-white/[0.08] rounded w-12"></div>
+                  <div class="h-4 bg-white/[0.1] rounded w-14"></div>
+                </div>
+              </div>
+              <!-- BROU link skeleton -->
+              <div class="absolute bottom-2 right-2 h-3 bg-white/[0.06] rounded w-12"></div>
+            </div>
+          </div>
+
+          <!-- Currency Input skeleton -->
+          <div class="bg-white/[0.05] border border-white/[0.08] rounded-[20px] p-5 animate-pulse">
+            <div class="flex items-center gap-4">
+              <div class="w-9 h-9 bg-white/[0.1] rounded-full"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-3 bg-white/[0.08] rounded w-20"></div>
+                <div class="h-7 bg-white/[0.1] rounded w-32"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Swap button skeleton -->
+          <div class="flex justify-center my-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-brou-blue/50 to-brou-blue-light/50 rounded-full animate-pulse"></div>
+          </div>
+
+          <!-- Result Display skeleton -->
+          <div class="bg-gradient-to-br from-brou-blue/10 to-brou-blue-light/8 border border-brou-blue-light/20 rounded-[20px] p-5 animate-pulse">
+            <div class="flex items-center gap-4">
+              <div class="w-9 h-9 bg-white/[0.1] rounded-full"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-3 bg-white/[0.08] rounded w-20"></div>
+                <div class="h-7 bg-white/[0.1] rounded w-40"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer skeleton -->
+          <div class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-4 border border-white/[0.08] animate-pulse">
+            <div class="space-y-3">
+              <!-- Stats skeleton (Última / Próxima) -->
+              <div class="h-3 bg-white/[0.06] rounded w-48 mx-auto"></div>
+              <!-- Share button skeleton -->
+              <div class="h-10 bg-brou-blue/5 border border-brou-blue-light/20 rounded-xl"></div>
+            </div>
+          </div>
+        </template>
+
+        <!-- Contenido cuando HAY datos -->
+        <template v-else>
         <!-- Disclaimer Legal -->
         <div v-if="DISCLAIMER_ENABLED && !disclaimerDismissed" class="bg-yellow-500/10 border-l-4 border-yellow-500 rounded-lg p-4 mb-5 relative">
           <!-- Botón cerrar -->
@@ -178,12 +250,6 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               </p>
             </div>
           </div>
-        </div>
-
-        <!-- Subtle yellow accent stripe (eBROU brand) -->
-        <div class="relative h-[2px] mb-6 overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/60 to-transparent blur-[1px]"></div>
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/40 to-transparent"></div>
         </div>
 
         <!-- Exchange Rates Display -->
@@ -319,6 +385,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             </button>
           </div>
         </div>
+        </template>
       </div>
 
       <!-- Footer Credits -->

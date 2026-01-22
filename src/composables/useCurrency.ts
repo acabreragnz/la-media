@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
 import { shareConversionViaWhatsApp } from '@/utils/whatsappShare'
-import { formatTimestamp } from '@/utils/formatters'
+import { formatRelativeTime } from '@/utils/formatters'
 
 export function useCurrency() {
   const direction = ref<ConversionDirection>('usdToUyu')
@@ -115,31 +115,51 @@ export function useCurrency() {
     })
   }
 
-  // UI para countdown - basado en next_run del backend
+  // UI para countdown - basado en next_run del backend (formato inteligente)
   const nextUpdateTime = computed(() => {
     if (!nextRunFromBackend.value) return '--:--'
 
     const nextRun = new Date(nextRunFromBackend.value)
-    return nextRun.toLocaleTimeString('es-UY', {
+    const now = new Date()
+
+    // Normalizar fechas a medianoche para comparación de días
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const nextRunStart = new Date(nextRun.getFullYear(), nextRun.getMonth(), nextRun.getDate())
+    const diffDays = Math.floor((nextRunStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24))
+
+    const timeStr = nextRun.toLocaleTimeString('es-UY', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
     })
-  })
 
-  const minutesUntilRefresh = computed(() => {
-    if (!nextRunFromBackend.value) return 0
+    // Mismo día: solo hora
+    if (diffDays === 0) {
+      return timeStr
+    }
 
-    const nextRun = new Date(nextRunFromBackend.value).getTime()
-    const now = Date.now()
-    const diff = nextRun - now
-    const minutes = Math.ceil(diff / 60000)
-    return Math.max(0, minutes)
+    // Mañana
+    if (diffDays === 1) {
+      return `mañana ${timeStr}`
+    }
+
+    // Esta semana (2-6 días)
+    if (diffDays >= 2 && diffDays <= 6) {
+      const dayName = nextRun.toLocaleDateString('es-UY', { weekday: 'short' })
+      return `${dayName} ${timeStr}`
+    }
+
+    // Más de una semana: fecha corta
+    const dateStr = nextRun.toLocaleDateString('es-UY', {
+      day: 'numeric',
+      month: 'numeric'
+    })
+    return `${dateStr} ${timeStr}`
   })
 
   const lastScrapedAt = computed(() => {
     if (!rates.value?.scraped_at) return '--:--'
-    return formatTimestamp(rates.value.scraped_at)
+    return formatRelativeTime(rates.value.scraped_at)
   })
 
   return {
@@ -156,9 +176,8 @@ export function useCurrency() {
     swapDirection,
     shareViaWhatsApp,
 
-    // Countdown para UI
+    // Relative time para UI
     nextUpdateTime,
-    minutesUntilRefresh,
     lastScrapedAt
   }
 }

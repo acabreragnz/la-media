@@ -3,7 +3,7 @@ import { useLocalStorage } from '@vueuse/core'
 import { useCurrency } from '@/composables/useCurrency'
 import { useDeviceDetection } from '@/composables/useDeviceDetection'
 import CurrencyValue from '@/components/CurrencyValue.vue'
-import { PhX, PhClock, PhWarning } from '@phosphor-icons/vue'
+import { PhX, PhClock, PhWarning, PhArrowSquareOut } from '@phosphor-icons/vue'
 import { formatNumber } from '@/utils/formatters'
 
 const {
@@ -17,7 +17,6 @@ const {
   refetch,
   swapDirection,
   shareViaWhatsApp,
-  minutesUntilRefresh,
   nextUpdateTime,
   lastScrapedAt
 } = useCurrency()
@@ -189,7 +188,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 
         <!-- Exchange Rates Display -->
         <div class="space-y-2">
-          <div class="bg-white/[0.04] rounded-xl px-5 py-3 text-sm border border-white/[0.05]">
+          <div class="bg-white/[0.04] rounded-xl px-5 py-3 text-sm border border-white/[0.05] relative">
             <!-- Tres columnas: Compra • Media • Venta -->
             <div class="flex items-center justify-center gap-3">
               <!-- Compra -->
@@ -218,6 +217,17 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
                 <strong v-if="rates" class="text-white text-sm">{{ formatNumber(rates.venta) }}</strong>
               </div>
             </div>
+
+            <!-- Enlace BROU -->
+            <a
+              href="https://www.brou.com.uy/cotizaciones"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="absolute bottom-2 right-2 flex items-center gap-1 text-[0.65rem] text-white/30 hover:text-white/50 transition-colors"
+            >
+              <PhArrowSquareOut :size="12" weight="bold" />
+              <span>BROU</span>
+            </a>
           </div>
         </div>
 
@@ -289,7 +299,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             </div>
 
             <!-- Disclaimer (más corto en móviles) -->
-            <div class="text-[0.55rem] sm:text-[0.6rem] text-white/60 flex items-start justify-center gap-1 leading-tight">
+            <div v-if="DISCLAIMER_ENABLED" class="text-[0.55rem] sm:text-[0.6rem] text-white/60 flex items-start justify-center gap-1 leading-tight">
               <PhWarning :size="12" class="text-yellow-500/70 flex-shrink-0" />
               <span class="text-left sm:text-center">
                 Sitio no oficial. <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener" class="text-brou-yellow/80 hover:underline font-medium">Verificar en BROU</a>
@@ -299,7 +309,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             <!-- WhatsApp share button -->
             <button
               @click="shareViaWhatsApp"
-              class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-gradient-to-br from-brou-blue to-brou-blue-light border border-brou-blue-light/20 rounded-xl text-white text-[0.8rem] font-semibold cursor-pointer transition-all hover:scale-[1.02] hover:shadow-[0_8px_20px_rgba(8,82,141,0.5),0_0_40px_rgba(13,94,161,0.3)]"
+              class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-brou-blue/5 border border-brou-blue-light/40 rounded-xl text-white text-[0.8rem] font-semibold cursor-pointer transition-all hover:bg-brou-blue/10 hover:border-brou-blue-light/60"
               aria-label="Compartir cotización por WhatsApp"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

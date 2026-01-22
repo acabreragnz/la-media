@@ -300,11 +300,12 @@ describe('useCurrency', () => {
   })
 
   describe('Next Run UI', () => {
-    it('should calculate nextUpdateTime from backend next_run', () => {
+    it('should show only time for same day', () => {
       const { nextUpdateTime } = useCurrency()
 
-      // Simular next_run del backend
-      const nextRun = new Date('2024-01-22T15:00:00Z')
+      // Simular next_run hoy a las 15:45
+      const now = new Date()
+      const nextRun = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 45, 0)
       mockQueryData.value = {
         cotizacion_media: 41.0,
         detalle: {
@@ -313,14 +314,162 @@ describe('useCurrency', () => {
           moneda: 'USD'
         },
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
+          scraped_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
           next_run: nextRun.toISOString(),
           source: 'scheduled'
         }
       }
 
-      // Debe formatear la hora
-      expect(nextUpdateTime.value).toMatch(/\d{2}:\d{2}/)
+      // Debe formatear como hora fija (ej: "15:45")
+      expect(nextUpdateTime.value).toMatch(/^\d{2}:\d{2}$/)
+    })
+
+    it('should show "mañana HH:MM" for tomorrow', () => {
+      const { nextUpdateTime } = useCurrency()
+
+      // Simular next_run mañana a las 08:00
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      tomorrow.setHours(8, 0, 0, 0)
+
+      mockQueryData.value = {
+        cotizacion_media: 41.0,
+        detalle: {
+          compra: 40.0,
+          venta: 42.0,
+          moneda: 'USD'
+        },
+        metadata: {
+          scraped_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+          next_run: tomorrow.toISOString(),
+          source: 'scheduled'
+        }
+      }
+
+      // Debe formatear como "mañana 08:00"
+      expect(nextUpdateTime.value).toMatch(/^mañana \d{2}:\d{2}$/)
+    })
+
+    it('should show "day HH:MM" for this week', () => {
+      const { nextUpdateTime } = useCurrency()
+
+      // Simular next_run en 3 días
+      const inThreeDays = new Date()
+      inThreeDays.setDate(inThreeDays.getDate() + 3)
+      inThreeDays.setHours(10, 30, 0, 0)
+
+      mockQueryData.value = {
+        cotizacion_media: 41.0,
+        detalle: {
+          compra: 40.0,
+          venta: 42.0,
+          moneda: 'USD'
+        },
+        metadata: {
+          scraped_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+          next_run: inThreeDays.toISOString(),
+          source: 'scheduled'
+        }
+      }
+
+      // Debe formatear como "lun 10:30" o similar
+      expect(nextUpdateTime.value).toMatch(/^[a-z]{3,4}\.? \d{2}:\d{2}$/)
+    })
+
+    it('should show "mañana HH:MM" for tomorrow edge case (23:59 → 00:01)', () => {
+      const { nextUpdateTime } = useCurrency()
+
+      // Simular que es 23:59 hoy, next_run es 00:01 mañana
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      tomorrow.setHours(0, 1, 0, 0)
+
+      mockQueryData.value = {
+        cotizacion_media: 41.0,
+        detalle: {
+          compra: 40.0,
+          venta: 42.0,
+          moneda: 'USD'
+        },
+        metadata: {
+          scraped_at: new Date().toISOString(),
+          next_run: tomorrow.toISOString(),
+          source: 'scheduled'
+        }
+      }
+
+      // Debe formatear como "mañana 00:01" (no "00:01" del mismo día)
+      expect(nextUpdateTime.value).toMatch(/^mañana \d{2}:\d{2}$/)
+    })
+
+    it('should show "lun HH:MM" for Friday → Monday (weekend)', () => {
+      const { nextUpdateTime } = useCurrency()
+
+      // Crear un viernes a las 19:00
+      const friday = new Date('2024-01-26T19:00:00Z') // Viernes 26 enero 2024
+
+      // Next run: Lunes 29 enero a las 08:00
+      const monday = new Date('2024-01-29T08:00:00Z')
+
+      // Mock current date to be Friday
+      vi.setSystemTime(friday)
+
+      mockQueryData.value = {
+        cotizacion_media: 41.0,
+        detalle: {
+          compra: 40.0,
+          venta: 42.0,
+          moneda: 'USD'
+        },
+        metadata: {
+          scraped_at: friday.toISOString(),
+          next_run: monday.toISOString(),
+          source: 'scheduled'
+        }
+      }
+
+      const result = nextUpdateTime.value
+
+      // Debe formatear como "lun 08:00" (no "mañana" porque hay fin de semana)
+      expect(result).toMatch(/^lun\.? \d{2}:\d{2}$/)
+
+      // Restore real time
+      vi.useRealTimers()
+    })
+
+    it('should show "lun HH:MM" for Sunday → Monday', () => {
+      const { nextUpdateTime } = useCurrency()
+
+      // Crear un domingo a las 23:00
+      const sunday = new Date('2024-01-28T23:00:00Z') // Domingo 28 enero 2024
+
+      // Next run: Lunes 29 enero a las 08:00
+      const monday = new Date('2024-01-29T08:00:00Z')
+
+      // Mock current date to be Sunday
+      vi.setSystemTime(sunday)
+
+      mockQueryData.value = {
+        cotizacion_media: 41.0,
+        detalle: {
+          compra: 40.0,
+          venta: 42.0,
+          moneda: 'USD'
+        },
+        metadata: {
+          scraped_at: sunday.toISOString(),
+          next_run: monday.toISOString(),
+          source: 'scheduled'
+        }
+      }
+
+      const result = nextUpdateTime.value
+
+      // Debe formatear como "mañana 08:00" (domingo → lunes es mañana)
+      expect(result).toMatch(/^mañana \d{2}:\d{2}$/)
+
+      // Restore real time
+      vi.useRealTimers()
     })
 
     it('should show --:-- when next_run is null', () => {
@@ -341,29 +490,6 @@ describe('useCurrency', () => {
       }
 
       expect(nextUpdateTime.value).toBe('--:--')
-    })
-
-    it('should calculate minutesUntilRefresh correctly', () => {
-      const { minutesUntilRefresh } = useCurrency()
-
-      // Next run en 30 minutos
-      const nextRun = new Date(Date.now() + 30 * 60 * 1000)
-      mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
-        metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: nextRun.toISOString(),
-          source: 'scheduled'
-        }
-      }
-
-      expect(minutesUntilRefresh.value).toBeGreaterThanOrEqual(29)
-      expect(minutesUntilRefresh.value).toBeLessThanOrEqual(31)
     })
   })
 

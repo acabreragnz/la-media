@@ -25,7 +25,7 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
     const fromCurrency = data.direction === 'usdToUyu' ? 'Dólares' : 'Pesos'
     const toCurrency = data.direction === 'usdToUyu' ? 'Pesos' : 'Dólares'
 
-    message = `💱 Conversión de divisas BROU\n\n` +
+    message = `Media BROU - Conversión\n\n` +
       `${formatNumber(data.inputAmount)} ${fromCurrency} = ${formatNumber(data.convertedAmount)} ${toCurrency}\n\n` +
       `📊 Cotización BROU:\n` +
       `Compra: $${formatNumber(data.rates.compra)}\n` +
@@ -34,7 +34,7 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
       `🕒 Cotización del: ${formatTimestamp(data.rates.timestamp)}`
   } else {
     // Si no hay monto, solo compartir las cotizaciones
-    message = `💱 Cotización dólar BROU\n\n` +
+    message = `Media BROU - Cotización\n\n` +
       `📊 Tipos de cambio:\n` +
       `Compra: $${formatNumber(data.rates.compra)}\n` +
       `Venta: $${formatNumber(data.rates.venta)}\n` +

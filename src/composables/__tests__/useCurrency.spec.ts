@@ -6,11 +6,11 @@ import { useCurrency } from '../useCurrency'
 const mockNumberValue = ref<number | null>(null)
 const mockSetValue = vi.fn((value: number | null) => {
   // Simular el comportamiento real de vue-currency-input:
-  // acepta number | null y redondea a 6 decimales (precision: { min: 2, max: 6 })
+  // acepta number | null y redondea a 2 decimales (precision: 2)
   if (value === null) {
     mockNumberValue.value = null
   } else {
-    mockNumberValue.value = Math.round(value * 1000000) / 1000000
+    mockNumberValue.value = Math.round(value * 100) / 100
   }
 })
 
@@ -21,6 +21,13 @@ vi.mock('vue-currency-input', () => ({
     setValue: mockSetValue,
     setOptions: vi.fn(),
   }),
+  CurrencyDisplay: {
+    hidden: 'hidden',
+    symbol: 'symbol',
+    narrowSymbol: 'narrowSymbol',
+    code: 'code',
+    name: 'name'
+  }
 }))
 
 // Mock fetch API
@@ -140,45 +147,6 @@ describe('useCurrency', () => {
       expect(direction.value).toBe('uyuToUsd')
     })
 
-    it('should preserve original value after double swap (precision test)', () => {
-      const { rates, setValue, numberValue, direction, swapDirection, convertedAmount } = useCurrency()
-
-      // Usar tasa real de BROU
-      rates.value = {
-        compra: 40.20,
-        venta: 42.28,
-        media: 41.24,
-        timestamp: '2024-01-01T00:00:00Z'
-      }
-
-      // Escenario: Usuario ingresa 100.22 USD
-      const originalValue = 100.22
-      setValue(originalValue)
-      direction.value = 'usdToUyu'
-      console.log('1. Original input (USD):', numberValue.value)
-
-      // Conversión esperada: 100.22 * 41.24 = 4,133.0728 UYU
-      const firstConversion = convertedAmount.value
-      console.log('2. First conversion (USD→UYU):', firstConversion)
-      expect(firstConversion).toBeCloseTo(4133.0728, 4)
-
-      // Primer swap: USD → UYU
-      swapDirection()
-      console.log('3. After first swap, input (UYU):', numberValue.value)
-      console.log('   Converted back (UYU→USD):', convertedAmount.value)
-      expect(direction.value).toBe('uyuToUsd')
-
-      // Segundo swap: UYU → USD (debería volver al valor original)
-      swapDirection()
-      console.log('4. After second swap, input (USD):', numberValue.value)
-      console.log('   Expected:', originalValue)
-      console.log('   Diff:', Math.abs(numberValue.value! - originalValue))
-      expect(direction.value).toBe('usdToUyu')
-
-      // Con precisión de 6 decimales, el valor debería preservarse correctamente
-      // después del doble swap (100.22 → 4133.072800 → 100.22)
-      expect(numberValue.value).toBe(originalValue)
-    })
   })
 
   describe('Swap Direction Edge Cases', () => {

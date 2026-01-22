@@ -44,19 +44,11 @@ html, body {
  * white gaps when using vh units. This ensures the background covers
  * the entire viewport including areas revealed during scroll bounce.
  */
-html {
-  /* Use the darkest color from the gradient as fallback */
-  background-color: #0a0e1f;
-  /* Ensure minimum height covers dynamic viewport */
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-}
-
-body {
+html, body {
   /* Use the end color of the gradient (#08528D) as solid background
-     This ensures the bottom overflow area matches the visible gradient end */
+     This ensures any overflow area matches the visible gradient end */
   background-color: #08528D;
-  /* Ensure body fills the viewport */
+  /* Ensure full viewport coverage */
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   /* Fix for iOS Safari overscroll */

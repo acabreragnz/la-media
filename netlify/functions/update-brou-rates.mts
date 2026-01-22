@@ -7,7 +7,8 @@ import { CRON_EXPRESSION } from '../../src/config/refresh';
  * Scheduled function que actualiza cotizaciones en slots fijos: :00, :15, :30, :45
  */
 export default async (req: Request) => {
-  const { next_run } = await req.json();
+
+  const { next_run } = await parseBody(req);
 
   try {
     // Ejecutar scraping
@@ -42,6 +43,15 @@ export default async (req: Request) => {
     });
   }
 };
+
+const parseBody = async (req: Request) => {
+  try {
+    return await req.json();
+  } catch {
+    console.log('No JSON body provided or parsing failed (expected for some triggers)');
+    return { next_run: undefined };
+  }
+}
 
 export const config: Config = {
   schedule: CRON_EXPRESSION  // Generado automáticamente desde src/config/refresh.ts

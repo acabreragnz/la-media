@@ -122,6 +122,11 @@ export function useCurrency() {
     const nextRun = new Date(nextRunFromBackend.value)
     const now = new Date()
 
+    // Si next_run está en el pasado, mostrar --:--
+    if (nextRun.getTime() < now.getTime()) {
+      return '--:--'
+    }
+
     // Normalizar fechas a medianoche para comparación de días
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const nextRunStart = new Date(nextRun.getFullYear(), nextRun.getMonth(), nextRun.getDate())

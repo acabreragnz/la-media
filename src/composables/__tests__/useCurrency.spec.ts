@@ -303,9 +303,9 @@ describe('useCurrency', () => {
     it('should show only time for same day', () => {
       const { nextUpdateTime } = useCurrency()
 
-      // Simular next_run hoy a las 15:45
+      // Simular next_run hoy en el futuro (2 horas desde ahora)
       const now = new Date()
-      const nextRun = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 45, 0)
+      const nextRun = new Date(now.getTime() + 2 * 60 * 60 * 1000)
       mockQueryData.value = {
         cotizacion_media: 41.0,
         detalle: {
@@ -489,6 +489,30 @@ describe('useCurrency', () => {
         }
       }
 
+      expect(nextUpdateTime.value).toBe('--:--')
+    })
+
+    it('should show --:-- when next_run is in the past', () => {
+      const { nextUpdateTime } = useCurrency()
+
+      // Next run hace 1 hora (en el pasado)
+      const pastTime = new Date(Date.now() - 60 * 60 * 1000)
+
+      mockQueryData.value = {
+        cotizacion_media: 41.0,
+        detalle: {
+          compra: 40.0,
+          venta: 42.0,
+          moneda: 'USD'
+        },
+        metadata: {
+          scraped_at: new Date(Date.now() - 70 * 60 * 1000).toISOString(),
+          next_run: pastTime.toISOString(),
+          source: 'scheduled'
+        }
+      }
+
+      // Si next_run está en el pasado, debe mostrar --:--
       expect(nextUpdateTime.value).toBe('--:--')
     })
   })

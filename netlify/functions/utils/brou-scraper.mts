@@ -6,7 +6,6 @@ export interface BrouRates {
     venta: number;
     moneda: string;
   };
-  fecha: string;
 }
 
 /**
@@ -35,7 +34,6 @@ export async function scrapeBrouRates(): Promise<BrouRates> {
 
   return {
     cotizacion_media: media,
-    detalle: { compra, venta, moneda: "Dólar eBROU" },
-    fecha: new Date().toISOString()
+    detalle: { compra, venta, moneda: "Dólar eBROU" }
   };
 }

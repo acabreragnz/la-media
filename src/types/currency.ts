@@ -2,7 +2,7 @@ export interface ExchangeRates {
   compra: number
   venta: number
   media: number
-  timestamp: string
+  scraped_at: string
 }
 
 export interface ApiResponse {
@@ -12,15 +12,11 @@ export interface ApiResponse {
     venta: number
     moneda: string
   }
-  fecha: string
+  metadata: {
+    scraped_at: string
+    next_run: string | null
+    source: 'scheduled' | 'fallback' | 'manual'
+  }
 }
 
 export type ConversionDirection = 'usdToUyu' | 'uyuToUsd'
-
-export interface CurrencyState {
-  rates: ExchangeRates | null
-  loading: boolean
-  error: string | null
-  amount: string
-  direction: ConversionDirection
-}

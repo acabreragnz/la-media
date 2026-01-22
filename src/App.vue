@@ -13,12 +13,12 @@ const {
   inputRef,
   direction,
   convertedAmount,
-  fetchRates,
+  refetch,
   swapDirection,
   shareViaWhatsApp,
   minutesUntilRefresh,
   nextUpdateTime,
-  lastUpdateTime
+  lastScrapedAt
 } = useCurrency()
 
 // Detectar dispositivos de baja gama
@@ -122,7 +122,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
           <h2 class="text-xl font-bold text-white mb-2">Error al cargar cotizaciones</h2>
           <p class="text-white/80 mb-4">{{ error }}</p>
           <button
-            @click="fetchRates"
+            @click="() => refetch()"
             class="bg-gradient-to-br from-brou-blue to-brou-blue-light text-white font-semibold py-2 px-6 rounded-lg transition-all hover:scale-105 shadow-[0_8px_20px_rgba(8,82,141,0.5)]"
           >
             Reintentar
@@ -258,7 +258,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[0.65rem] sm:text-xs text-white/60">
               <span class="flex items-center gap-1 whitespace-nowrap">
                 <PhClock :size="12" />
-                Última: {{ lastUpdateTime }}
+                Última: {{ lastScrapedAt }}
               </span>
               <span class="text-white/30 hidden sm:inline">|</span>
               <span v-if="loading" class="flex items-center gap-1 whitespace-nowrap">

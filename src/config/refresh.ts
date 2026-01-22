@@ -1,10 +1,5 @@
 /**
  * Configuración centralizada para el sistema de auto-refresh
- *
- * IMPORTANTE: Cambiar REFRESH_INTERVAL_MINUTES actualizará automáticamente:
- * - Slots de tiempo generados
- * - Cron expression del backend
- * - Cálculos del frontend
  */
 
 // ============= CONFIGURACIÓN PRINCIPAL =============
@@ -60,17 +55,6 @@ export function generateRefreshSlots(intervalMinutes: number): number[] {
   return slots
 }
 
-/**
- * Genera el cron expression para Netlify Functions
- * Ejemplo: generateCronExpression(15) => '0,15,30,45 * * * *'
- * Ejemplo: generateCronExpression(10) => '0,10,20,30,40,50 * * * *'
- */
-export function generateCronExpression(intervalMinutes: number): string {
-  const slots = generateRefreshSlots(intervalMinutes)
-  const minutesPart = slots.join(',')
-  return `${minutesPart} * * * *`
-}
-
 // ============= EXPORTS CALCULADOS =============
 
 /**
@@ -78,29 +62,3 @@ export function generateCronExpression(intervalMinutes: number): string {
  * Usado por frontend para calcular próximo slot
  */
 export const REFRESH_SLOTS = generateRefreshSlots(REFRESH_INTERVAL_MINUTES)
-
-/**
- * Cron expression calculado automáticamente
- * Usado por backend en netlify/functions/update-brou-rates.mts
- */
-export const CRON_EXPRESSION = generateCronExpression(REFRESH_INTERVAL_MINUTES)
-
-// ============= TYPE EXPORTS =============
-
-export type RefreshConfig = {
-  intervalMinutes: number
-  delaySeconds: number
-  slots: number[]
-  cronExpression: string
-}
-
-/**
- * Configuración completa exportada como objeto
- * Útil para logging o debugging
- */
-export const REFRESH_CONFIG: RefreshConfig = {
-  intervalMinutes: REFRESH_INTERVAL_MINUTES,
-  delaySeconds: REFRESH_DELAY_SECONDS,
-  slots: REFRESH_SLOTS,
-  cronExpression: CRON_EXPRESSION
-}

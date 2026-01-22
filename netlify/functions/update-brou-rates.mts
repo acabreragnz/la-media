@@ -1,6 +1,14 @@
 import type { Config } from '@netlify/functions';
 import { getStore } from '@netlify/blobs';
-import { scrapeBrouRates } from './utils/brou-scraper.mts';
+import { scrapeBrouRates, type BrouRates } from './utils/brou-scraper.mts';
+
+export interface BrouRatesWithMetadata extends BrouRates {
+  metadata: {
+    timestamp: string; // ISO timestamp
+    next_run: string | null; // ISO timestamp
+    source: 'scheduled' | 'fallback' | 'manual';
+  }
+}
 
 /**
  * Scheduled function que actualiza cotizaciones en slots fijos: :00, :15, :30, :45
@@ -8,6 +16,7 @@ import { scrapeBrouRates } from './utils/brou-scraper.mts';
 export default async (req: Request) => {
 
   const { next_run } = await parseBody(req);
+  const nextRunIso = next_run ? new Date(next_run).toISOString() : null;
 
   try {
     // Ejecutar scraping
@@ -15,10 +24,20 @@ export default async (req: Request) => {
 
     // Guardar en Netlify Blobs
     const store = getStore('brou-rates');
-    await store.setJSON('latest', rates);
+
+    const dataToStore: BrouRatesWithMetadata = {
+      ...rates,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        next_run: nextRunIso,
+        source: 'scheduled' as const
+      }
+    }
+
+    await store.setJSON('latest', dataToStore);
 
     console.log('✅ Cotización actualizada:', rates);
-    console.log('Próxima ejecución:', next_run);
+    console.log('Próxima ejecución:', nextRunIso ?? 'No programada');
 
     return new Response(JSON.stringify({
       success: true,

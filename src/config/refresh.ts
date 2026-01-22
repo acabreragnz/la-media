@@ -21,6 +21,10 @@
  * - 15 minutos → slots: [0, 15, 30, 45]
  * - 10 minutos → slots: [0, 10, 20, 30, 40, 50]
  * - 30 minutos → slots: [0, 30]
+ *
+ * ⚠️ IMPORTANTE: Si cambias este valor, debes actualizar manualmente:
+ * - netlify/functions/update-brou-rates.mts (export const config.schedule)
+ * - netlify.toml ([functions."update-brou-rates"].schedule)
  */
 export const REFRESH_INTERVAL_MINUTES = 15
 

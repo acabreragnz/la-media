@@ -201,4 +201,60 @@ describe('shareConversionViaWhatsApp', () => {
     expect(decodedUrl).toContain('100,50')
     expect(decodedUrl).toContain('4.120,50')
   })
+
+  it('should include timestamp in message with conversion', () => {
+    const data: ConversionShareData = {
+      inputAmount: 100,
+      convertedAmount: 4100,
+      direction: 'usdToUyu',
+      rates: {
+        compra: 40.0,
+        venta: 42.0,
+        media: 41.0,
+        timestamp: '2024-01-22T14:30:00Z'
+      }
+    }
+
+    shareConversionViaWhatsApp(data)
+
+    const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
+    const decodedUrl = decodeURIComponent(callArg)
+
+    // Verificar que incluye el texto "Cotización del:"
+    expect(decodedUrl).toContain('Cotización del:')
+
+    // Verificar que incluye un formato de fecha (dd/mm/yy o similar)
+    expect(decodedUrl).toMatch(/\d{1,2}\/\d{1,2}\/\d{2,4}/)
+
+    // Verificar que incluye el emoji del reloj
+    expect(decodedUrl).toContain('🕒')
+  })
+
+  it('should include timestamp in message without conversion', () => {
+    const data: ConversionShareData = {
+      inputAmount: null,
+      convertedAmount: 0,
+      direction: 'usdToUyu',
+      rates: {
+        compra: 40.0,
+        venta: 42.0,
+        media: 41.0,
+        timestamp: '2024-01-22T14:30:00Z'
+      }
+    }
+
+    shareConversionViaWhatsApp(data)
+
+    const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
+    const decodedUrl = decodeURIComponent(callArg)
+
+    // Verificar que incluye el texto "Cotización del:"
+    expect(decodedUrl).toContain('Cotización del:')
+
+    // Verificar que incluye un formato de fecha (dd/mm/yy o similar)
+    expect(decodedUrl).toMatch(/\d{1,2}\/\d{1,2}\/\d{2,4}/)
+
+    // Verificar que incluye el emoji del reloj
+    expect(decodedUrl).toContain('🕒')
+  })
 })

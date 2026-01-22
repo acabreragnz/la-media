@@ -53,8 +53,9 @@ html {
 }
 
 body {
-  /* Match the gradient background from App.vue */
-  background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
+  /* Use the end color of the gradient (#08528D) as solid background
+     This ensures the bottom overflow area matches the visible gradient end */
+  background-color: #08528D;
   /* Ensure body fills the viewport */
   min-height: 100dvh;
   min-height: -webkit-fill-available;

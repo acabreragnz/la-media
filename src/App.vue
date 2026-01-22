@@ -114,8 +114,8 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
         </div>
       </div>
 
-      <!-- Error State -->
-      <div v-else-if="error" class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-6 border border-white/[0.08]">
+      <!-- Error State (solo si NO hay datos) -->
+      <div v-else-if="error && !rates" class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-6 border border-white/[0.08]">
         <div class="text-center">
           <div class="mb-4 flex justify-center">
             <PhWarning :size="60" class="text-yellow-500" />
@@ -133,6 +133,22 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 
       <!-- Content -->
       <div v-else class="space-y-5">
+        <!-- Error Banner (si hay error pero tenemos datos cached) -->
+        <div v-if="error && rates" class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 flex items-start gap-3">
+          <PhWarning :size="20" class="text-yellow-500 flex-shrink-0 mt-0.5" />
+          <div class="flex-1">
+            <p class="text-yellow-200 text-[0.8rem] font-medium mb-1">Problemas para actualizar</p>
+            <p class="text-white/70 text-[0.7rem] leading-relaxed">
+              No pudimos obtener datos actualizados del BROU. Mostrando última cotización disponible.
+            </p>
+          </div>
+          <button
+            @click="() => refetch()"
+            class="text-yellow-300 hover:text-yellow-100 text-[0.7rem] font-medium underline flex-shrink-0"
+          >
+            Reintentar
+          </button>
+        </div>
         <!-- Header -->
         <div class="text-center mb-7">
           <h1 class="text-[1.6rem] font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">

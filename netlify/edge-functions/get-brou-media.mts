@@ -1,6 +1,7 @@
 import type { Config, Context } from '@netlify/functions';
 import { getStore } from '@netlify/blobs';
-import { scrapeBrouRates, type BrouRates } from '../functions/utils/brou-scraper.mts';
+import { scrapeBrouRates } from '../functions/utils/brou-scraper.mts';
+import type { BrouRatesWithMetadata } from '../functions/update-brou-rates.mts';
 
 /**
  * Edge function que sirve las cotizaciones desde Netlify Blobs
@@ -18,7 +19,7 @@ export default async (_request: Request, _context: Context) => {
   try {
     // Intentar leer desde Blobs (rápido, cached en edge)
     const store = getStore('brou-rates');
-    const cachedRates = await store.get('latest', { type: 'json' }) as BrouRates | null;
+    const cachedRates = await store.get('latest', { type: 'json' }) as BrouRatesWithMetadata | null;
 
     if (cachedRates) {
       return new Response(JSON.stringify(cachedRates), {
@@ -33,8 +34,18 @@ export default async (_request: Request, _context: Context) => {
     // Fallback: si Blobs está vacío, hacer scraping directo
     console.warn('⚠️ Blobs vacío, ejecutando scraping de fallback');
     const rates = await scrapeBrouRates();
+    const dataToStore: BrouRatesWithMetadata = {
+      ...rates,
+      metadata: {
+        scraped_at: new Date().toISOString(),
+        next_run: null,
+        source: 'fallback' as const
+      }
+    }
 
-    return new Response(JSON.stringify(rates), {
+    await store.setJSON('latest', dataToStore);
+
+    return new Response(JSON.stringify(dataToStore), {
       headers: {
         'Content-Type': 'application/json',
         // No cachear respuestas de fallback (pueden ser errores temporales)

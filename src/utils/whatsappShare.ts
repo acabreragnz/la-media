@@ -31,7 +31,7 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
       `Compra: $${formatNumber(data.rates.compra)}\n` +
       `Venta: $${formatNumber(data.rates.venta)}\n` +
       `Media: $${formatNumber(data.rates.media)}\n` +
-      `🕒 Cotización del: ${formatTimestamp(data.rates.timestamp)}`
+      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}`
   } else {
     // Si no hay monto, solo compartir las cotizaciones
     message = `Media BROU - Cotización\n\n` +
@@ -39,7 +39,7 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
       `Compra: $${formatNumber(data.rates.compra)}\n` +
       `Venta: $${formatNumber(data.rates.venta)}\n` +
       `Media: $${formatNumber(data.rates.media)}\n` +
-      `🕒 Cotización del: ${formatTimestamp(data.rates.timestamp)}`
+      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}`
   }
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`

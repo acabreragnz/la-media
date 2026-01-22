@@ -22,3 +22,34 @@ export function formatTimestamp(timestamp: string): string {
     hour12: false
   })
 }
+
+/**
+ * Formats a timestamp as relative time using Intl.RelativeTimeFormat
+ * Works for both past and future timestamps
+ * Examples:
+ * - "hace 5 minutos" (past)
+ * - "en 15 minutos" (future)
+ * - "hace 2 horas" / "en 2 horas"
+ * - "ayer" / "mañana"
+ */
+export function formatRelativeTime(timestamp: string): string {
+  const date = new Date(timestamp)
+  const now = new Date()
+  const diff = date.getTime() - now.getTime() // positive = future, negative = past
+  const seconds = Math.floor(Math.abs(diff) / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+
+  const rtf = new Intl.RelativeTimeFormat('es-UY', { numeric: 'always', style: 'short' })
+
+  if (days >= 1) {
+    return rtf.format(diff > 0 ? days : -days, 'day')
+  } else if (hours >= 1) {
+    return rtf.format(diff > 0 ? hours : -hours, 'hour')
+  } else if (minutes >= 1) {
+    return rtf.format(diff > 0 ? minutes : -minutes, 'minute')
+  } else {
+    return rtf.format(diff > 0 ? seconds : -seconds, 'second')
+  }
+}

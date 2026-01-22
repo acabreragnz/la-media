@@ -37,7 +37,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.0,
         venta: 42.0,
         media: 41.0,
-        timestamp: '2024-01-01T00:00:00Z'
+        scraped_at: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -53,7 +53,7 @@ describe('shareConversionViaWhatsApp', () => {
     const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
     const decodedUrl = decodeURIComponent(callArg)
 
-    expect(decodedUrl).toContain('Cotización dólar BROU')
+    expect(decodedUrl).toContain('Media BROU - Cotización')
     expect(decodedUrl).toContain('Compra: $40,00')
     expect(decodedUrl).toContain('Venta: $42,00')
     expect(decodedUrl).toContain('Media: $41,00')
@@ -69,7 +69,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.0,
         venta: 42.0,
         media: 41.0,
-        timestamp: '2024-01-01T00:00:00Z'
+        scraped_at: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -91,7 +91,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.0,
         venta: 42.0,
         media: 41.0,
-        timestamp: '2024-01-01T00:00:00Z'
+        scraped_at: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -113,7 +113,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.0,
         venta: 42.0,
         media: 41.0,
-        timestamp: '2024-01-01T00:00:00Z'
+        scraped_at: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -139,7 +139,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.0,
         venta: 42.0,
         media: 41.0,
-        timestamp: '2024-01-01T00:00:00Z'
+        scraped_at: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -165,7 +165,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.0,
         venta: 42.0,
         media: 41.0,
-        timestamp: '2024-01-01T00:00:00Z'
+        scraped_at: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -189,7 +189,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.5,
         venta: 42.5,
         media: 41.0,
-        timestamp: '2024-01-01T00:00:00Z'
+        scraped_at: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -211,7 +211,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.0,
         venta: 42.0,
         media: 41.0,
-        timestamp: '2024-01-22T14:30:00Z'
+        scraped_at: '2024-01-22T14:30:00Z'
       }
     }
 
@@ -239,7 +239,7 @@ describe('shareConversionViaWhatsApp', () => {
         compra: 40.0,
         venta: 42.0,
         media: 41.0,
-        timestamp: '2024-01-22T14:30:00Z'
+        scraped_at: '2024-01-22T14:30:00Z'
       }
     }
 

@@ -3,22 +3,22 @@ import { useLocalStorage } from '@vueuse/core'
 import { useCurrency } from '@/composables/useCurrency'
 import { useDeviceDetection } from '@/composables/useDeviceDetection'
 import CurrencyValue from '@/components/CurrencyValue.vue'
-import { PhX, PhClock, PhWarning } from '@phosphor-icons/vue'
+import { PhX, PhClock, PhWarning, PhArrowSquareOut } from '@phosphor-icons/vue'
 import { formatNumber } from '@/utils/formatters'
 
 const {
   rates,
   loading,
+  isFetching,
   error,
   inputRef,
   direction,
   convertedAmount,
-  fetchRates,
+  refetch,
   swapDirection,
   shareViaWhatsApp,
-  minutesUntilRefresh,
   nextUpdateTime,
-  lastUpdateTime
+  lastScrapedAt
 } = useCurrency()
 
 // Detectar dispositivos de baja gama
@@ -113,8 +113,8 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
         </div>
       </div>
 
-      <!-- Error State -->
-      <div v-else-if="error" class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-6 border border-white/[0.08]">
+      <!-- Error State (solo si NO hay datos) -->
+      <div v-else-if="error && !rates" class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-6 border border-white/[0.08]">
         <div class="text-center">
           <div class="mb-4 flex justify-center">
             <PhWarning :size="60" class="text-yellow-500" />
@@ -122,7 +122,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
           <h2 class="text-xl font-bold text-white mb-2">Error al cargar cotizaciones</h2>
           <p class="text-white/80 mb-4">{{ error }}</p>
           <button
-            @click="fetchRates"
+            @click="() => refetch()"
             class="bg-gradient-to-br from-brou-blue to-brou-blue-light text-white font-semibold py-2 px-6 rounded-lg transition-all hover:scale-105 shadow-[0_8px_20px_rgba(8,82,141,0.5)]"
           >
             Reintentar
@@ -132,6 +132,22 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 
       <!-- Content -->
       <div v-else class="space-y-5">
+        <!-- Error Banner (si hay error pero tenemos datos cached) -->
+        <div v-if="error && rates" class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 flex items-start gap-3">
+          <PhWarning :size="20" class="text-yellow-500 flex-shrink-0 mt-0.5" />
+          <div class="flex-1">
+            <p class="text-yellow-200 text-[0.8rem] font-medium mb-1">Problemas para actualizar</p>
+            <p class="text-white/70 text-[0.7rem] leading-relaxed">
+              No pudimos obtener datos actualizados del BROU. Mostrando última cotización disponible.
+            </p>
+          </div>
+          <button
+            @click="() => refetch()"
+            class="text-yellow-300 hover:text-yellow-100 text-[0.7rem] font-medium underline flex-shrink-0"
+          >
+            Reintentar
+          </button>
+        </div>
         <!-- Header -->
         <div class="text-center mb-7">
           <h1 class="text-[1.6rem] font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
@@ -172,7 +188,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 
         <!-- Exchange Rates Display -->
         <div class="space-y-2">
-          <div class="bg-white/[0.04] rounded-xl px-5 py-3 text-sm border border-white/[0.05]">
+          <div class="bg-white/[0.04] rounded-xl px-5 py-3 text-sm border border-white/[0.05] relative">
             <!-- Tres columnas: Compra • Media • Venta -->
             <div class="flex items-center justify-center gap-3">
               <!-- Compra -->
@@ -201,6 +217,17 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
                 <strong v-if="rates" class="text-white text-sm">{{ formatNumber(rates.venta) }}</strong>
               </div>
             </div>
+
+            <!-- Enlace BROU -->
+            <a
+              href="https://www.brou.com.uy/cotizaciones"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="absolute bottom-2 right-2 flex items-center gap-1 text-[0.65rem] text-white/30 hover:text-white/50 transition-colors"
+            >
+              <PhArrowSquareOut :size="12" weight="bold" />
+              <span>BROU</span>
+            </a>
           </div>
         </div>
 
@@ -258,21 +285,21 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[0.65rem] sm:text-xs text-white/60">
               <span class="flex items-center gap-1 whitespace-nowrap">
                 <PhClock :size="12" />
-                Última: {{ lastUpdateTime }}
+                Última: {{ lastScrapedAt }}
               </span>
               <span class="text-white/30 hidden sm:inline">|</span>
-              <span v-if="loading" class="flex items-center gap-1 whitespace-nowrap">
+              <span class="whitespace-nowrap">Próxima: {{ nextUpdateTime }}</span>
+              <span v-if="isFetching" class="flex items-center gap-1 whitespace-nowrap">
+                <span class="text-white/30 hidden sm:inline">|</span>
                 <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 Actualizando...
               </span>
-              <span v-else-if="minutesUntilRefresh > 0" class="whitespace-nowrap">Próxima: {{ nextUpdateTime }}</span>
-              <span v-else class="whitespace-nowrap">Actualizando...</span>
             </div>
 
             <!-- Disclaimer (más corto en móviles) -->
-            <div class="text-[0.55rem] sm:text-[0.6rem] text-white/60 flex items-start justify-center gap-1 leading-tight">
+            <div v-if="DISCLAIMER_ENABLED" class="text-[0.55rem] sm:text-[0.6rem] text-white/60 flex items-start justify-center gap-1 leading-tight">
               <PhWarning :size="12" class="text-yellow-500/70 flex-shrink-0" />
               <span class="text-left sm:text-center">
                 Sitio no oficial. <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener" class="text-brou-yellow/80 hover:underline font-medium">Verificar en BROU</a>
@@ -282,7 +309,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             <!-- WhatsApp share button -->
             <button
               @click="shareViaWhatsApp"
-              class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-gradient-to-br from-brou-blue to-brou-blue-light border border-brou-blue-light/20 rounded-xl text-white text-[0.8rem] font-semibold cursor-pointer transition-all hover:scale-[1.02] hover:shadow-[0_8px_20px_rgba(8,82,141,0.5),0_0_40px_rgba(13,94,161,0.3)]"
+              class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-brou-blue/5 border border-brou-blue-light/40 rounded-xl text-white text-[0.8rem] font-semibold cursor-pointer transition-all hover:bg-brou-blue/10 hover:border-brou-blue-light/60"
               aria-label="Compartir cotización por WhatsApp"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

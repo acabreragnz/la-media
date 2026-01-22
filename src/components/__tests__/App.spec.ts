@@ -1,5 +1,19 @@
 import { describe, it, expect, vi } from 'vitest'
+import { ref } from 'vue'
 import { CurrencyDisplay } from 'vue-currency-input'
+
+// Mock Vue Query
+vi.mock('@tanstack/vue-query', () => ({
+  VueQueryPlugin: {},
+  useQuery: () => ({
+    data: ref(undefined),
+    isPending: ref(false),
+    isFetching: ref(false),
+    isError: ref(false),
+    error: ref(null),
+    refetch: vi.fn()
+  })
+}))
 
 // Mock to capture useCurrencyInput calls
 const mockUseCurrencyInput = vi.fn()

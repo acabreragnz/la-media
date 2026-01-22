@@ -1,16 +1,59 @@
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
 import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
-import { useAutoRefresh } from './useAutoRefresh'
-import { REFRESH_SLOTS, REFRESH_INTERVAL_MINUTES } from '@/config/refresh'
 import { shareConversionViaWhatsApp } from '@/utils/whatsappShare'
+import { formatRelativeTime } from '@/utils/formatters'
 
 export function useCurrency() {
-  const rates = ref<ExchangeRates | null>(null)
-  const loading = ref(false)
-  const error = ref<string | null>(null)
   const direction = ref<ConversionDirection>('usdToUyu')
-  const currentSlot = ref<Date | null>(null) // Último slot confirmado con datos
+
+  // Vue Query para fetching automático
+  const {
+    data: apiData,
+    isPending: loading,
+    isFetching,
+    isError,
+    error: queryError,
+    refetch
+  } = useQuery({
+    queryKey: ['brou-rates'],
+    queryFn: async (): Promise<ApiResponse> => {
+      const response = await fetch('/api/brou-media')
+      if (!response.ok) {
+        throw new Error('Error al obtener las cotizaciones')
+      }
+      return response.json()
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    refetchInterval: 15 * 60 * 1000, // 15 minutos
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: 3
+  })
+
+  // Transformar apiData a ExchangeRates
+  const rates = computed<ExchangeRates | null>(() => {
+    if (!apiData.value?.metadata) return null
+    return {
+      compra: apiData.value.detalle.compra,
+      venta: apiData.value.detalle.venta,
+      media: apiData.value.cotizacion_media,
+      scraped_at: apiData.value.metadata.scraped_at
+    }
+  })
+
+  // Extraer next_run del backend
+  const nextRunFromBackend = computed<string | null>(() =>
+    apiData.value?.metadata?.next_run ?? null
+  )
+
+  // Error transformado a string
+  const error = computed<string | null>(() =>
+    isError.value && queryError.value
+      ? queryError.value.message
+      : null
+  )
 
   // Configuración centralizada de vue-currency-input
   const currencyInputConfig = {
@@ -24,33 +67,6 @@ export function useCurrency() {
     autoDecimalDigits: false
   } as const
 
-  /**
-   * Calcula el slot de tiempo actual basado en la hora
-   * Devuelve el slot inmediatamente anterior o igual a la hora actual
-   */
-  function getCurrentSlotTime(): Date {
-    const now = new Date()
-    const minute = now.getMinutes()
-
-    // Encontrar el slot anterior o igual
-    let slotMinute = REFRESH_SLOTS[0] // Default al primer slot
-
-    for (const slot of REFRESH_SLOTS) {
-      if (minute >= slot) {
-        slotMinute = slot
-      } else {
-        break
-      }
-    }
-
-    const slotTime = new Date(now)
-    slotTime.setMinutes(slotMinute as number)
-    slotTime.setSeconds(0)
-    slotTime.setMilliseconds(0)
-
-    return slotTime
-  }
-
   // Configurar vue-currency-input con locale uruguayo
   const { inputRef, numberValue, setValue, setOptions } = useCurrencyInput({
     currency: 'USD',
@@ -63,70 +79,6 @@ export function useCurrency() {
       ...currencyInputConfig,
       currency: newDirection === 'usdToUyu' ? 'USD' : 'UYU'
     })
-  })
-
-  const fetchRates = async () => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const response = await fetch('/api/brou-media')
-
-      if (!response.ok) {
-        throw new Error('Error al obtener las cotizaciones')
-      }
-
-      const data: ApiResponse = await response.json()
-
-      rates.value = {
-        compra: data.detalle.compra,
-        venta: data.detalle.venta,
-        media: data.cotizacion_media,
-        timestamp: data.fecha
-      }
-
-      // ✅ Solo avanzar currentSlot después de fetch exitoso
-      currentSlot.value = getCurrentSlotTime()
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error desconocido'
-      // ❌ NO actualizar currentSlot en error
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // Setup auto-refresh con slots fijos
-  const { minutesUntilRefresh } = useAutoRefresh(fetchRates)
-
-  // Última actualización: timestamp real del backend
-  const lastUpdateTime = computed(() => {
-    if (!rates.value?.timestamp) return '--:--'
-
-    const timestamp = new Date(rates.value.timestamp)
-    return timestamp.toLocaleTimeString('es-UY', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    })
-  })
-
-  // Próxima actualización: currentSlot + intervalo configurado
-  const nextUpdateTime = computed(() => {
-    if (!currentSlot.value) return '--:--'
-
-    const nextSlot = new Date(currentSlot.value)
-    nextSlot.setMinutes(nextSlot.getMinutes() + REFRESH_INTERVAL_MINUTES)
-
-    return nextSlot.toLocaleTimeString('es-UY', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    })
-  })
-
-  // Fetch inicial
-  onMounted(() => {
-    fetchRates()
   })
 
   const convertedAmount = computed(() => {
@@ -163,22 +115,69 @@ export function useCurrency() {
     })
   }
 
+  // UI para countdown - basado en next_run del backend (formato inteligente)
+  const nextUpdateTime = computed(() => {
+    if (!nextRunFromBackend.value) return '--:--'
+
+    const nextRun = new Date(nextRunFromBackend.value)
+    const now = new Date()
+
+    // Normalizar fechas a medianoche para comparación de días
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const nextRunStart = new Date(nextRun.getFullYear(), nextRun.getMonth(), nextRun.getDate())
+    const diffDays = Math.floor((nextRunStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24))
+
+    const timeStr = nextRun.toLocaleTimeString('es-UY', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    })
+
+    // Mismo día: solo hora
+    if (diffDays === 0) {
+      return timeStr
+    }
+
+    // Mañana
+    if (diffDays === 1) {
+      return `mañana ${timeStr}`
+    }
+
+    // Esta semana (2-6 días)
+    if (diffDays >= 2 && diffDays <= 6) {
+      const dayName = nextRun.toLocaleDateString('es-UY', { weekday: 'short' })
+      return `${dayName} ${timeStr}`
+    }
+
+    // Más de una semana: fecha corta
+    const dateStr = nextRun.toLocaleDateString('es-UY', {
+      day: 'numeric',
+      month: 'numeric'
+    })
+    return `${dateStr} ${timeStr}`
+  })
+
+  const lastScrapedAt = computed(() => {
+    if (!rates.value?.scraped_at) return '--:--'
+    return formatRelativeTime(rates.value.scraped_at)
+  })
+
   return {
     rates,
     loading,
+    isFetching,
     error,
     inputRef,
     numberValue,
     setValue,
     direction,
     convertedAmount,
-    fetchRates,
+    refetch,
     swapDirection,
     shareViaWhatsApp,
 
-    // Countdown para UI
-    minutesUntilRefresh,
+    // Relative time para UI
     nextUpdateTime,
-    lastUpdateTime
+    lastScrapedAt
   }
 }

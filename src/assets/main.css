@@ -36,18 +36,8 @@ input[type="number"] {
 /* Force Inter Variable globally and fix mobile viewport issues */
 html, body {
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/*
- * Fix for mobile viewport white space issue
- * On iOS/Android, the browser UI (address bar, navigation) can cause
- * white gaps when using vh units. This ensures the background covers
- * the entire viewport including areas revealed during scroll bounce.
- */
-html, body {
   /* Apply the gradient directly to html/body so it covers overflow areas on mobile */
   background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
-  background-attachment: fixed;
   /* Ensure full viewport coverage */
   min-height: 100dvh;
   min-height: -webkit-fill-available;

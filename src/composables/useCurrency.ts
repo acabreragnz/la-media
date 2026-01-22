@@ -1,5 +1,5 @@
 import { ref, computed, onMounted, watch } from 'vue'
-import { useCurrencyInput } from 'vue-currency-input'
+import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
 import { useAutoRefresh } from './useAutoRefresh'
 import { REFRESH_SLOTS, REFRESH_INTERVAL_MINUTES } from '@/config/refresh'
@@ -11,6 +11,18 @@ export function useCurrency() {
   const error = ref<string | null>(null)
   const direction = ref<ConversionDirection>('usdToUyu')
   const currentSlot = ref<Date | null>(null) // Último slot confirmado con datos
+
+  // Configuración centralizada de vue-currency-input
+  const currencyInputConfig = {
+    locale: 'es-UY', // Uruguay: punto como separador de miles, coma como decimal
+    currencyDisplay: CurrencyDisplay.hidden, // Ocultar símbolo de moneda
+    precision: 2, // Siempre 2 decimales para mejor UX
+    useGrouping: true,
+    valueRange: { min: 0, max: 100000000 }, // Máximo 100 millones
+    hideGroupingSeparatorOnFocus: false,
+    hideNegligibleDecimalDigitsOnFocus: false,
+    autoDecimalDigits: false
+  } as const
 
   /**
    * Calcula el slot de tiempo actual basado en la hora
@@ -42,23 +54,14 @@ export function useCurrency() {
   // Configurar vue-currency-input con locale uruguayo
   const { inputRef, numberValue, setValue, setOptions } = useCurrencyInput({
     currency: 'USD',
-    locale: 'es-UY', // Uruguay: punto como separador de miles, coma como decimal
-    currencyDisplay: 'hidden', // Ocultar símbolo de moneda
-    precision: { min: 2, max: 6 }, // Permitir hasta 6 decimales internos, mostrar mínimo 2
-    useGrouping: true,
-    valueRange: { min: 0, max: 100000000 }, // Máximo 100 millones
-    hideGroupingSeparatorOnFocus: false,
-    hideNegligibleDecimalDigitsOnFocus: true, // Ocultar decimales no significativos en display
-    autoDecimalDigits: false
+    ...currencyInputConfig
   })
 
   // Hacer reactiva la moneda según la dirección
   watch(direction, (newDirection) => {
     setOptions({
-      currency: newDirection === 'usdToUyu' ? 'USD' : 'UYU',
-      locale: 'es-UY', // Forzar locale uruguayo siempre
-      currencyDisplay: 'hidden', // Mantener símbolo oculto al cambiar dirección
-      hideGroupingSeparatorOnFocus: false // Mantener separadores visibles siempre
+      ...currencyInputConfig,
+      currency: newDirection === 'usdToUyu' ? 'USD' : 'UYU'
     })
   })
 
@@ -132,39 +135,20 @@ export function useCurrency() {
     const inputAmount = numberValue.value
     if (isNaN(inputAmount)) return 0
 
-    if (direction.value === 'usdToUyu') {
-      return inputAmount * rates.value.media
-    } else {
-      return inputAmount / rates.value.media
-    }
-  })
-
-  /**
-   * Amount to use when swapping direction.
-   * Returns null when input is empty to preserve empty state.
-   * Different from convertedAmount which returns 0 for UI display.
-   */
-  const swapAmount = computed((): number | null => {
-    // Preserve null for empty input
-    if (numberValue.value === null) return null
-
-    if (!rates.value) return null
-
-    const inputAmount = numberValue.value
-    if (isNaN(inputAmount)) return null
-
-    if (direction.value === 'usdToUyu') {
-      return inputAmount * rates.value.media
-    } else {
-      return inputAmount / rates.value.media
-    }
+    return direction.value === 'usdToUyu'
+      ? inputAmount * rates.value.media
+      : inputAmount / rates.value.media
   })
 
   const swapDirection = () => {
-    // Swap de dirección y actualizar el valor
-    const newAmount = swapAmount.value
+    // Si el input está vacío, solo cambiar dirección
+    if (numberValue.value === null) {
+      direction.value = direction.value === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu'
+      return
+    }
+
+    const newAmount = convertedAmount.value
     direction.value = direction.value === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu'
-    // Usar setValue para actualizar el input formateado
     setValue(newAmount)
   }
 

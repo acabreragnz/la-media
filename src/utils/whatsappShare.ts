@@ -1,5 +1,5 @@
 import type { ExchangeRates, ConversionDirection } from '@/types/currency'
-import { formatNumber } from './formatters'
+import { formatNumber, formatTimestamp } from './formatters'
 
 export interface ConversionShareData {
   inputAmount: number | null
@@ -30,14 +30,16 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
       `📊 Cotización BROU:\n` +
       `Compra: $${formatNumber(data.rates.compra)}\n` +
       `Venta: $${formatNumber(data.rates.venta)}\n` +
-      `Media: $${formatNumber(data.rates.media)}`
+      `Media: $${formatNumber(data.rates.media)}\n` +
+      `🕒 Cotización del: ${formatTimestamp(data.rates.timestamp)}`
   } else {
     // Si no hay monto, solo compartir las cotizaciones
     message = `💱 Cotización dólar BROU\n\n` +
       `📊 Tipos de cambio:\n` +
       `Compra: $${formatNumber(data.rates.compra)}\n` +
       `Venta: $${formatNumber(data.rates.venta)}\n` +
-      `Media: $${formatNumber(data.rates.media)}`
+      `Media: $${formatNumber(data.rates.media)}\n` +
+      `🕒 Cotización del: ${formatTimestamp(data.rates.timestamp)}`
   }
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`

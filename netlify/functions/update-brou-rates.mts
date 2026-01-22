@@ -53,5 +53,5 @@ const parseBody = async (req: Request) => {
 }
 
 export const config: Config = {
-  schedule: '0,15,30,45 * * * *'  // Cada 15 minutos - SYNC: debe coincidir con src/config/refresh.ts (REFRESH_INTERVAL_MINUTES=15)
+  schedule: '0,15,30,45 11-22 * * 1-5'  // Cada 15 minutos, lunes a viernes, 8-19h Uruguay (UTC-3 → 11-22 UTC)
 };

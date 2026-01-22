@@ -24,7 +24,8 @@
  *
  * ⚠️ IMPORTANTE: Si cambias este valor, debes actualizar manualmente:
  * - netlify/functions/update-brou-rates.mts (export const config.schedule)
- * - netlify.toml ([functions."update-brou-rates"].schedule)
+ *
+ * ℹ️ HORARIO: La función scheduled corre lunes a viernes, 8-19h Uruguay (UTC-3)
  */
 export const REFRESH_INTERVAL_MINUTES = 15
 

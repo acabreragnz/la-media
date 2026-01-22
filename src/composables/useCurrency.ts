@@ -1,24 +1,68 @@
-import { ref, computed } from 'vue'
-import { useCurrencyInput } from 'vue-currency-input'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
+import { useAutoRefresh } from './useAutoRefresh'
+import { REFRESH_SLOTS, REFRESH_INTERVAL_MINUTES } from '@/config/refresh'
+import { shareConversionViaWhatsApp } from '@/utils/whatsappShare'
 
 export function useCurrency() {
   const rates = ref<ExchangeRates | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
   const direction = ref<ConversionDirection>('usdToUyu')
+  const currentSlot = ref<Date | null>(null) // Último slot confirmado con datos
 
-  // Configurar vue-currency-input con locale uruguayo
-  const { inputRef, numberValue, setValue } = useCurrencyInput({
-    currency: 'USD', // Requerido por la librería
+  // Configuración centralizada de vue-currency-input
+  const currencyInputConfig = {
     locale: 'es-UY', // Uruguay: punto como separador de miles, coma como decimal
-    precision: 2,
+    currencyDisplay: CurrencyDisplay.hidden, // Ocultar símbolo de moneda
+    precision: 2, // Siempre 2 decimales para mejor UX
     useGrouping: true,
     valueRange: { min: 0, max: 100000000 }, // Máximo 100 millones
-    hideCurrencySymbolOnFocus: false,
     hideGroupingSeparatorOnFocus: false,
     hideNegligibleDecimalDigitsOnFocus: false,
     autoDecimalDigits: false
+  } as const
+
+  /**
+   * Calcula el slot de tiempo actual basado en la hora
+   * Devuelve el slot inmediatamente anterior o igual a la hora actual
+   */
+  function getCurrentSlotTime(): Date {
+    const now = new Date()
+    const minute = now.getMinutes()
+
+    // Encontrar el slot anterior o igual
+    let slotMinute = REFRESH_SLOTS[0] // Default al primer slot
+
+    for (const slot of REFRESH_SLOTS) {
+      if (minute >= slot) {
+        slotMinute = slot
+      } else {
+        break
+      }
+    }
+
+    const slotTime = new Date(now)
+    slotTime.setMinutes(slotMinute as number)
+    slotTime.setSeconds(0)
+    slotTime.setMilliseconds(0)
+
+    return slotTime
+  }
+
+  // Configurar vue-currency-input con locale uruguayo
+  const { inputRef, numberValue, setValue, setOptions } = useCurrencyInput({
+    currency: 'USD',
+    ...currencyInputConfig
+  })
+
+  // Hacer reactiva la moneda según la dirección
+  watch(direction, (newDirection) => {
+    setOptions({
+      ...currencyInputConfig,
+      currency: newDirection === 'usdToUyu' ? 'USD' : 'UYU'
+    })
   })
 
   const fetchRates = async () => {
@@ -40,13 +84,50 @@ export function useCurrency() {
         media: data.cotizacion_media,
         timestamp: data.fecha
       }
+
+      // ✅ Solo avanzar currentSlot después de fetch exitoso
+      currentSlot.value = getCurrentSlotTime()
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error desconocido'
-      rates.value = null
+      // ❌ NO actualizar currentSlot en error
     } finally {
       loading.value = false
     }
   }
+
+  // Setup auto-refresh con slots fijos
+  const { minutesUntilRefresh } = useAutoRefresh(fetchRates)
+
+  // Última actualización: timestamp real del backend
+  const lastUpdateTime = computed(() => {
+    if (!rates.value?.timestamp) return '--:--'
+
+    const timestamp = new Date(rates.value.timestamp)
+    return timestamp.toLocaleTimeString('es-UY', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    })
+  })
+
+  // Próxima actualización: currentSlot + intervalo configurado
+  const nextUpdateTime = computed(() => {
+    if (!currentSlot.value) return '--:--'
+
+    const nextSlot = new Date(currentSlot.value)
+    nextSlot.setMinutes(nextSlot.getMinutes() + REFRESH_INTERVAL_MINUTES)
+
+    return nextSlot.toLocaleTimeString('es-UY', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    })
+  })
+
+  // Fetch inicial
+  onMounted(() => {
+    fetchRates()
+  })
 
   const convertedAmount = computed(() => {
     if (!rates.value || !numberValue.value) return 0
@@ -54,61 +135,32 @@ export function useCurrency() {
     const inputAmount = numberValue.value
     if (isNaN(inputAmount)) return 0
 
-    if (direction.value === 'usdToUyu') {
-      return inputAmount * rates.value.media
-    } else {
-      return inputAmount / rates.value.media
-    }
+    return direction.value === 'usdToUyu'
+      ? inputAmount * rates.value.media
+      : inputAmount / rates.value.media
   })
 
   const swapDirection = () => {
-    // Swap de dirección y actualizar el valor
+    // Si el input está vacío, solo cambiar dirección
+    if (numberValue.value === null) {
+      direction.value = direction.value === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu'
+      return
+    }
+
     const newAmount = convertedAmount.value
     direction.value = direction.value === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu'
-    // Usar setValue para actualizar el input formateado
     setValue(newAmount)
   }
 
-  const formatNumber = (value: number): string => {
-    return new Intl.NumberFormat('es-UY', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value)
-  }
-
-  const formatNumberForWhatsApp = (value: number): string => {
-    // Formato uruguayo: punto para miles, coma para decimales
-    const formatted = new Intl.NumberFormat('es-UY', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(value)
-
-    // Si termina en ,00, lo removemos
-    return formatted.replace(/,00$/, '')
-  }
-
   const shareViaWhatsApp = () => {
-    if (!rates.value || !numberValue.value) return
+    if (!rates.value) return
 
-    const inputAmount = numberValue.value
-    const result = convertedAmount.value
-
-    const fromCurrency = direction.value === 'usdToUyu' ? 'USD' : 'UYU'
-    const toCurrency = direction.value === 'usdToUyu' ? 'UYU' : 'USD'
-    const fromFlag = direction.value === 'usdToUyu' ? '🇺🇸' : '🇺🇾'
-    const toFlag = direction.value === 'usdToUyu' ? '🇺🇾' : '🇺🇸'
-
-    const message = `*Conversión BROU*\n\n` +
-      `🔄 Conversión:\n` +
-      `• ${fromFlag} ${formatNumberForWhatsApp(inputAmount)} ${fromCurrency} → ${toFlag} ${formatNumberForWhatsApp(result)} ${toCurrency}\n\n` +
-      `📊 Cotización actual:\n` +
-      `• Compra: $${formatNumberForWhatsApp(rates.value.compra)}\n` +
-      `• Media: $${formatNumberForWhatsApp(rates.value.media)}\n` +
-      `• Venta: $${formatNumberForWhatsApp(rates.value.venta)}\n\n` +
-      `_Calculado con brou-media.tonicabrera.dev_`
-
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, '_blank')
+    shareConversionViaWhatsApp({
+      inputAmount: numberValue.value || null,
+      convertedAmount: convertedAmount.value,
+      direction: direction.value,
+      rates: rates.value
+    })
   }
 
   return {
@@ -122,7 +174,11 @@ export function useCurrency() {
     convertedAmount,
     fetchRates,
     swapDirection,
-    formatNumber,
-    shareViaWhatsApp
+    shareViaWhatsApp,
+
+    // Countdown para UI
+    minutesUntilRefresh,
+    nextUpdateTime,
+    lastUpdateTime
   }
 }

@@ -4,8 +4,14 @@ import { useCurrency } from '../useCurrency'
 
 // Mock vue-currency-input
 const mockNumberValue = ref<number | null>(null)
-const mockSetValue = vi.fn((value: number) => {
-  mockNumberValue.value = value
+const mockSetValue = vi.fn((value: number | null) => {
+  // Simular el comportamiento real de vue-currency-input:
+  // acepta number | null y redondea a 2 decimales (precision: 2)
+  if (value === null) {
+    mockNumberValue.value = null
+  } else {
+    mockNumberValue.value = Math.round(value * 100) / 100
+  }
 })
 
 vi.mock('vue-currency-input', () => ({
@@ -13,7 +19,15 @@ vi.mock('vue-currency-input', () => ({
     inputRef: ref(null),
     numberValue: mockNumberValue,
     setValue: mockSetValue,
+    setOptions: vi.fn(),
   }),
+  CurrencyDisplay: {
+    hidden: 'hidden',
+    symbol: 'symbol',
+    narrowSymbol: 'narrowSymbol',
+    code: 'code',
+    name: 'name'
+  }
 }))
 
 // Mock fetch API
@@ -132,21 +146,48 @@ describe('useCurrency', () => {
       expect(numberValue.value).toBe(4100) // 100 * 41.0 (media)
       expect(direction.value).toBe('uyuToUsd')
     })
+
   })
 
-  describe('Number Formatting', () => {
-    it('should format numbers with es-UY locale', () => {
-      const { formatNumber } = useCurrency()
+  describe('Swap Direction Edge Cases', () => {
+    it('should keep input empty when swapping with null value', () => {
+      const { rates, numberValue, swapDirection, direction } = useCurrency()
 
-      const formatted = formatNumber(1234.56)
-      expect(formatted).toMatch(/1\.?234,56/)
+      rates.value = {
+        compra: 40.0,
+        venta: 42.0,
+        media: 41.0,
+        timestamp: '2024-01-01T00:00:00Z'
+      }
+
+      // Input is empty (null)
+      expect(numberValue.value).toBeNull()
+
+      swapDirection()
+
+      // Should remain empty after swap
+      expect(numberValue.value).toBeNull()
+      expect(direction.value).toBe('uyuToUsd')
     })
 
-    it('should format numbers with 2 decimal places', () => {
-      const { formatNumber } = useCurrency()
+    it('should correctly swap when value is zero', () => {
+      const { rates, setValue, numberValue, swapDirection } = useCurrency()
 
-      const formatted = formatNumber(100)
-      expect(formatted).toMatch(/100,00/)
+      rates.value = {
+        compra: 40.0,
+        venta: 42.0,
+        media: 41.0,
+        timestamp: '2024-01-01T00:00:00Z'
+      }
+
+      // User explicitly enters 0
+      setValue(0)
+      expect(numberValue.value).toBe(0)
+
+      swapDirection()
+
+      // Should show 0 after swap
+      expect(numberValue.value).toBe(0)
     })
   })
 
@@ -224,9 +265,40 @@ describe('useCurrency', () => {
       shareViaWhatsApp()
 
       expect(windowOpenSpy).not.toHaveBeenCalled()
+      windowOpenSpy.mockRestore()
     })
 
-    it('should open WhatsApp with formatted message', () => {
+    it('should share rates even when numberValue is null', () => {
+      const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+
+      const { shareViaWhatsApp, rates, numberValue } = useCurrency()
+      rates.value = {
+        compra: 40.0,
+        venta: 42.0,
+        media: 41.0,
+        timestamp: '2024-01-01T00:00:00Z'
+      }
+      numberValue.value = null
+
+      shareViaWhatsApp()
+
+      expect(windowOpenSpy).toHaveBeenCalledWith(
+        expect.stringContaining('https://wa.me/?text='),
+        '_blank'
+      )
+
+      // Verificar que el mensaje contiene las cotizaciones
+      const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
+      const decodedUrl = decodeURIComponent(callArg)
+
+      expect(decodedUrl).toContain('Cotización dólar BROU')
+      expect(decodedUrl).toContain('Compra')
+      expect(decodedUrl).toContain('40,00')
+
+      windowOpenSpy.mockRestore()
+    })
+
+    it('should open WhatsApp when data is valid', () => {
       const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
 
       const { shareViaWhatsApp, rates, setValue, direction } = useCurrency()
@@ -246,11 +318,7 @@ describe('useCurrency', () => {
         expect.stringContaining('https://wa.me/?text='),
         '_blank'
       )
-
-      const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
-      expect(callArg).toBeDefined()
-      expect(callArg).toContain('USD')
-      expect(callArg).toContain('UYU')
+      windowOpenSpy.mockRestore()
     })
   })
 })

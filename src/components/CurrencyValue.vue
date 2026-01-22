@@ -6,7 +6,7 @@ interface Props {
   prefix?: string
 }
 
-const { value, prefix = '$' } = defineProps<Props>()
+const { value, prefix = '' } = defineProps<Props>()
 </script>
 
 <template>

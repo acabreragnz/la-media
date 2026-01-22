@@ -25,6 +25,7 @@
     "@netlify/functions": "5.1.2",
     "@number-flow/vue": "0.4.8",
     "@phosphor-icons/vue": "2.2.1",
+    "@sentry/vue": "10.36.0",
     "@tailwindcss/vite": "4.1.18",
     "@vueuse/core": "14.1.0",
     "tailwindcss": "4.1.18",

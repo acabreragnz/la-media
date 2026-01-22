@@ -5,6 +5,14 @@ import { scrapeBrouRates, type BrouRates } from '../functions/utils/brou-scraper
 /**
  * Edge function que sirve las cotizaciones desde Netlify Blobs
  * Fallback: scraping directo si Blobs está vacío
+ *
+ * Estrategia de caching:
+ * - Respuestas exitosas desde Blobs: 5 minutos (s-maxage=300)
+ * - Respuestas de fallback: sin cache (pueden ser errores temporales)
+ * - Respuestas de error: sin cache
+ *
+ * Los datos se actualizan cada 15 minutos, así que un cache de 5 min
+ * balancea performance con frescura de datos.
  */
 export default async (_request: Request, _context: Context) => {
   try {
@@ -14,7 +22,11 @@ export default async (_request: Request, _context: Context) => {
 
     if (cachedRates) {
       return new Response(JSON.stringify(cachedRates), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          // Cache por 5 minutos en el edge (datos se actualizan cada 15 min)
+          'Cache-Control': 'public, s-maxage=300, max-age=0, must-revalidate'
+        }
       });
     }
 
@@ -23,7 +35,11 @@ export default async (_request: Request, _context: Context) => {
     const rates = await scrapeBrouRates();
 
     return new Response(JSON.stringify(rates), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        // No cachear respuestas de fallback (pueden ser errores temporales)
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+      }
     });
 
   } catch (error) {
@@ -31,11 +47,16 @@ export default async (_request: Request, _context: Context) => {
 
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        // No cachear respuestas de error
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+      }
     });
   }
 };
 
 export const config: Config = {
   path: '/api/brou-media',
+  cache: 'manual', // Habilitar control manual de cache mediante headers
 };

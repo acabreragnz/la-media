@@ -7,7 +7,14 @@ import { CRON_EXPRESSION } from '../../src/config/refresh';
  * Scheduled function que actualiza cotizaciones en slots fijos: :00, :15, :30, :45
  */
 export default async (req: Request) => {
-  const { next_run } = await req.json();
+  // Parse request body defensively - may be empty or invalid JSON
+  let next_run: string | undefined;
+  try {
+    const body = await req.json();
+    next_run = body?.next_run;
+  } catch {
+    // Request body is empty or not valid JSON - this is OK for scheduled functions
+  }
 
   try {
     // Ejecutar scraping

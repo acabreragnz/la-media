@@ -33,7 +33,31 @@ input[type="number"] {
   appearance: textfield;
 }
 
-/* Force Inter Variable globally */
+/* Force Inter Variable globally and fix mobile viewport issues */
 html, body {
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/*
+ * Fix for mobile viewport white space issue
+ * On iOS/Android, the browser UI (address bar, navigation) can cause
+ * white gaps when using vh units. This ensures the background covers
+ * the entire viewport including areas revealed during scroll bounce.
+ */
+html {
+  /* Use the darkest color from the gradient as fallback */
+  background-color: #0a0e1f;
+  /* Ensure minimum height covers dynamic viewport */
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+
+body {
+  /* Match the gradient background from App.vue */
+  background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
+  /* Ensure body fills the viewport */
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  /* Fix for iOS Safari overscroll */
+  overscroll-behavior-y: none;
 }

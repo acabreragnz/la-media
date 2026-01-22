@@ -20,6 +20,9 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
 
   let message: string
 
+  // Obtener URL de la aplicación (funciona en dev y production)
+  const appUrl = window.location.origin
+
   // Si hay un monto, incluir la conversión
   if (data.inputAmount) {
     const fromCurrency = data.direction === 'usdToUyu' ? 'Dólares' : 'Pesos'
@@ -31,7 +34,8 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
       `Compra: $${formatNumber(data.rates.compra)}\n` +
       `Venta: $${formatNumber(data.rates.venta)}\n` +
       `Media: $${formatNumber(data.rates.media)}\n` +
-      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}`
+      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}\n\n` +
+      `🔗 ${appUrl}`
   } else {
     // Si no hay monto, solo compartir las cotizaciones
     message = `Media BROU - Cotización\n\n` +
@@ -39,7 +43,8 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
       `Compra: $${formatNumber(data.rates.compra)}\n` +
       `Venta: $${formatNumber(data.rates.venta)}\n` +
       `Media: $${formatNumber(data.rates.media)}\n` +
-      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}`
+      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}\n\n` +
+      `🔗 ${appUrl}`
   }
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`

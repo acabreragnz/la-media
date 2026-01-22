@@ -135,7 +135,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
         <!-- Header -->
         <div class="text-center mb-7">
           <h1 class="text-[1.6rem] font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-            Media dólar eBROU
+            Media BROU
           </h1>
         </div>
 

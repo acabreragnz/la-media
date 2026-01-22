@@ -32,7 +32,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 </script>
 
 <template>
-  <div class="min-h-dvh flex justify-center p-4" style="background: linear-gradient(135deg, #08528D 0%, #0d2744 25%, #0f1a2e 50%, #0a0e1f 75%);">
+  <div class="min-h-dvh flex justify-center p-4 app-gradient">
     <div class="w-full max-w-[440px]">
       <!-- Loading State -->
       <div v-if="loading && !rates" class="space-y-5">
@@ -299,3 +299,17 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Gradiente mobile: azul BROU en diagonal superior derecha */
+.app-gradient {
+  background: linear-gradient(to top right, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
+}
+
+/* Gradiente desktop: original de rama main */
+@media (min-width: 768px) {
+  .app-gradient {
+    background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
+  }
+}
+</style>

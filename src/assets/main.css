@@ -37,8 +37,7 @@ input[type="number"] {
 html, body {
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   /* Solid dark blue background - prevents white space on mobile */
-  background: #0a0e1f;
-  /* Ensure full viewport coverage */
+  background: hsl(228, 52% , 12%);                                                                                                           /* Ensure full viewport coverage */
   min-height: 100dvh;
   min-height: -webkit-fill-available;
   /* Fix for iOS Safari overscroll */

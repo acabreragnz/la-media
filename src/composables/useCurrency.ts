@@ -4,11 +4,12 @@ import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
 import { shareConversionViaWhatsApp } from '@/utils/whatsappShare'
 import { formatRelativeTime } from '@/utils/formatters'
+import { REFRESH_DELAY_SECONDS } from '@/config/refresh'
 
 export function useCurrency() {
   const direction = ref<ConversionDirection>('usdToUyu')
 
-  // Vue Query para fetching automático
+  // Vue Query con refetchInterval dinámico basado en next_run del backend
   const {
     data: apiData,
     isPending: loading,
@@ -26,7 +27,28 @@ export function useCurrency() {
       return response.json()
     },
     staleTime: 5 * 60 * 1000, // 5 minutos
-    refetchInterval: 15 * 60 * 1000, // 15 minutos
+    refetchInterval: (query) => {
+      // Acceder a los datos desde el query
+      const data = query.state.data as ApiResponse | undefined
+      const nextRun = data?.metadata?.next_run
+
+      if (!nextRun) {
+        // Sin next_run, usar intervalo por defecto de 15 minutos
+        return 15 * 60 * 1000
+      }
+
+      const nextRunTime = new Date(nextRun).getTime()
+      const now = Date.now()
+      const msUntilNextRun = nextRunTime - now
+
+      // Si next_run está en el pasado o muy cerca, refetch inmediatamente
+      if (msUntilNextRun <= 0) {
+        return 1000 // 1 segundo
+      }
+
+      // Agregar delay del backend (de la constante de configuración)
+      return msUntilNextRun + (REFRESH_DELAY_SECONDS * 1000)
+    },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     retry: 3

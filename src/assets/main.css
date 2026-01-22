@@ -33,7 +33,13 @@ input[type="number"] {
   appearance: textfield;
 }
 
-/* Force Inter Variable globally */
+/* Force Inter Variable globally and fix mobile viewport issues */
 html, body {
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Solid dark blue background - prevents white space on mobile */
+  background: hsl(228, 52% , 12%);                                                                                                           /* Ensure full viewport coverage */
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  /* Fix for iOS Safari overscroll */
+  overscroll-behavior-y: none;
 }

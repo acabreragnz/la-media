@@ -6,7 +6,7 @@ import { scrapeBrouRates, type BrouRates } from '../functions/utils/brou-scraper
  * Edge function que sirve las cotizaciones desde Netlify Blobs
  * Fallback: scraping directo si Blobs está vacío
  */
-export default async (request: Request, context: Context) => {
+export default async (_request: Request, _context: Context) => {
   try {
     // Intentar leer desde Blobs (rápido, cached en edge)
     const store = getStore('brou-rates');

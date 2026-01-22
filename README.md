@@ -71,3 +71,23 @@ pnpm test:e2e --debug
 ```sh
 pnpm lint
 ```
+
+## Netlify Functions
+
+### Manually Invoke Scheduled Function
+
+To test the scheduled function that updates BROU rates:
+
+```sh
+# IMPORTANT: pnpm dev must be running first
+# Must specify --port 5173 (Vite's port) instead of default 8888
+netlify functions:invoke update-brou-rates --port 5173
+```
+
+### View Netlify Blobs
+
+To inspect the cached exchange rates:
+
+```sh
+netlify blobs:get brou-rates latest
+```

@@ -20,9 +20,11 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "5.2.8",
     "@netlify/blobs": "10.5.0",
     "@netlify/functions": "5.1.2",
     "@number-flow/vue": "0.4.8",
+    "@phosphor-icons/vue": "2.2.1",
     "@tailwindcss/vite": "4.1.18",
     "@vueuse/core": "14.1.0",
     "tailwindcss": "4.1.18",

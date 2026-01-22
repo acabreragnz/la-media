@@ -1,9 +1,10 @@
 import type { Config } from '@netlify/functions';
 import { getStore } from '@netlify/blobs';
 import { scrapeBrouRates } from './utils/brou-scraper.mts';
+import { CRON_EXPRESSION } from '../../src/config/refresh';
 
 /**
- * Scheduled function que actualiza cotizaciones cada 15 minutos
+ * Scheduled function que actualiza cotizaciones en slots fijos: :00, :15, :30, :45
  */
 export default async (req: Request) => {
   const { next_run } = await req.json();
@@ -43,5 +44,5 @@ export default async (req: Request) => {
 };
 
 export const config: Config = {
-  schedule: '*/15 * * * *'
+  schedule: CRON_EXPRESSION  // Generado automáticamente desde src/config/refresh.ts
 };

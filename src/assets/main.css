@@ -17,8 +17,8 @@
   /* WhatsApp green */
   --color-whatsapp: #25d366;
 
-  /* Font family */
-  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Font family - Using Inter Variable Font for optimal performance */
+  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Custom utilities for number input styling (hide spin arrows) */
@@ -31,4 +31,9 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+/* Force Inter Variable globally */
+html, body {
+  font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }

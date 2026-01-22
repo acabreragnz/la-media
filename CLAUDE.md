@@ -33,8 +33,9 @@ pnpm test:unit
 # Run E2E tests (Playwright)
 pnpm test:e2e
 
-# Manually invoke scheduled function (for testing)
-netlify functions:invoke update-brou-rates
+# Manually invoke scheduled function (for testing, requires pnpm dev running)
+# IMPORTANT: Must specify --port 5173 (Vite's port) instead of default 8888
+netlify functions:invoke update-brou-rates --port 5173
 
 # View Netlify Blobs content (requires Netlify CLI authentication)
 netlify blobs:get brou-rates latest

@@ -204,7 +204,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
           <span class="text-[2.25rem] leading-none">{{ direction === 'usdToUyu' ? '🇺🇸' : '🇺🇾' }}</span>
           <div class="flex-1 flex flex-col gap-1">
             <label class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
-              {{ direction === 'usdToUyu' ? 'Dólares (USD)' : 'Pesos (UYU)' }}
+              {{ direction === 'usdToUyu' ? 'Dólares' : 'Pesos' }}
             </label>
             <input
               ref="inputRef"
@@ -234,7 +234,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
           <span class="text-[2.25rem] leading-none">{{ direction === 'usdToUyu' ? '🇺🇾' : '🇺🇸' }}</span>
           <div class="flex-1 flex flex-col gap-1">
             <label class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
-              {{ direction === 'usdToUyu' ? 'Pesos (UYU)' : 'Dólares (USD)' }}
+              {{ direction === 'usdToUyu' ? 'Pesos' : 'Dólares' }}
             </label>
             <div class="text-white text-[1.75rem] font-semibold tracking-tight">
               <CurrencyValue v-if="!isLowEndDevice" :value="convertedAmount" />
@@ -266,7 +266,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             <!-- Disclaimer -->
             <div class="text-[0.6rem] text-white/60 flex items-center justify-center gap-1">
               <PhWarning :size="12" class="text-yellow-500/70 flex-shrink-0" />
-              <span>No oficial. <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener" class="text-brou-yellow/80 hover:underline">Verificar en brou.com.uy</a></span>
+              <span>Sitio no oficial. Datos pueden estar desactualizados. <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener" class="text-brou-yellow/80 hover:underline">Verificar en BROU</a></span>
             </div>
 
             <!-- WhatsApp share button -->

@@ -45,9 +45,9 @@ html, body {
  * the entire viewport including areas revealed during scroll bounce.
  */
 html, body {
-  /* Use the end color of the gradient (#08528D) as solid background
-     This ensures any overflow area matches the visible gradient end */
-  background-color: #08528D;
+  /* Apply the gradient directly to html/body so it covers overflow areas on mobile */
+  background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
+  background-attachment: fixed;
   /* Ensure full viewport coverage */
   min-height: 100dvh;
   min-height: -webkit-fill-available;

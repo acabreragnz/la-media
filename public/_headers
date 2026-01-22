@@ -1,0 +1,11 @@
+# Security Headers
+# Protección contra XSS, clickjacking, y otros ataques comunes
+# Content Security Policy permite: self, inline scripts (Vite), Ahrefs, PostHog, Sentry
+
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://analytics.ahrefs.com https://us.i.posthog.com https://o313399.ingest.us.sentry.io; connect-src 'self' https://www.brou.com.uy https://us.i.posthog.com https://o313399.ingest.us.sentry.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'

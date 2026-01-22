@@ -42,8 +42,11 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
       <!-- Loading State -->
       <div v-if="loading && !rates" class="space-y-5">
         <!-- Header (siempre visible, no skeleton) -->
-        <div class="text-center mb-7">
-          <h1 class="text-[1.6rem] font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+        <div class="flex items-center justify-center gap-3 mb-7">
+          <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
+            <img src="/brou-logo.webp" alt="BROU" class="h-10 w-auto" />
+          </a>
+          <h1 class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
             Media BROU
           </h1>
         </div>
@@ -124,8 +127,11 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
       <!-- Content or Error State -->
       <div v-else class="space-y-5">
         <!-- Header (siempre visible) -->
-        <div class="text-center mb-7">
-          <h1 class="text-[1.6rem] font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+        <div class="flex items-center justify-center gap-3 mb-7">
+          <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
+            <img src="/brou-logo.webp" alt="BROU" class="h-10 w-auto" />
+          </a>
+          <h1 class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
             Media BROU
           </h1>
         </div>

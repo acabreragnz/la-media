@@ -37,7 +37,7 @@ export default async (_request: Request, _context: Context) => {
     const dataToStore: BrouRatesWithMetadata = {
       ...rates,
       metadata: {
-        timestamp: new Date().toISOString(),
+        scraped_at: new Date().toISOString(),
         next_run: null,
         source: 'fallback' as const
       }

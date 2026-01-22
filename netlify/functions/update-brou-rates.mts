@@ -4,7 +4,7 @@ import { scrapeBrouRates, type BrouRates } from './utils/brou-scraper.mts';
 
 export interface BrouRatesWithMetadata extends BrouRates {
   metadata: {
-    timestamp: string; // ISO timestamp
+    scraped_at: string; // ISO timestamp
     next_run: string | null; // ISO timestamp
     source: 'scheduled' | 'fallback' | 'manual';
   }
@@ -28,7 +28,7 @@ export default async (req: Request) => {
     const dataToStore: BrouRatesWithMetadata = {
       ...rates,
       metadata: {
-        timestamp: new Date().toISOString(),
+        scraped_at: new Date().toISOString(),
         next_run: nextRunIso,
         source: 'scheduled' as const
       }

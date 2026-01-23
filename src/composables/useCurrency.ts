@@ -193,6 +193,11 @@ export function useCurrency() {
     })
   }
 
+  // Cambiar la dirección manualmente (para cuando el input recibe focus)
+  const setDirection = (newDirection: ConversionDirection) => {
+    direction.value = newDirection
+  }
+
   // Computed para obtener input y output según direction (para WhatsApp share)
   const inputAmount = computed(() =>
     direction.value === 'usdToUyu' ? usdValue.value : uyuValue.value
@@ -279,6 +284,7 @@ export function useCurrency() {
     setUyuValue,
     // Direction y conversión
     direction,
+    setDirection,
     inputAmount,
     convertedAmount,
     refetch,

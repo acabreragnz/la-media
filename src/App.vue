@@ -12,6 +12,7 @@ const {
   usdInputRef,
   uyuInputRef,
   direction,
+  setDirection,
   refetch,
   swapDirection,
   shareViaWhatsApp,
@@ -29,9 +30,17 @@ function selectUyuInput() {
 }
 
 // Scroll al input cuando recibe focus (para que el teclado no lo tape en mobile)
-function scrollToInput(event: FocusEvent) {
+function onUsdFocus(event: FocusEvent) {
+  setDirection('usdToUyu')
   const target = event.target as HTMLElement
-  // Pequeño delay para esperar que el teclado aparezca
+  setTimeout(() => {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, 300)
+}
+
+function onUyuFocus(event: FocusEvent) {
+  setDirection('uyuToUsd')
+  const target = event.target as HTMLElement
   setTimeout(() => {
     target.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, 300)
@@ -338,7 +347,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               autofocus
               class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
               placeholder="0,00"
-              @focus="scrollToInput"
+              @focus="onUsdFocus"
             />
           </span>
         </label>
@@ -372,7 +381,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               type="text"
               class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
               placeholder="0,00"
-              @focus="scrollToInput"
+              @focus="onUyuFocus"
             />
           </span>
         </label>

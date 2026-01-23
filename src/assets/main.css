@@ -43,3 +43,36 @@ html, body {
   /* Fix for iOS Safari overscroll */
   overscroll-behavior-y: none;
 }
+
+/* Dynamic bank theming via CSS custom properties */
+:root {
+  --bank-primary: #005ca8;
+  --bank-primary-light: #0b64a0;
+  --bank-accent: #FFCB05;
+  --bank-gradient-from: #08528D;
+  --bank-gradient-to: #0d2744;
+}
+
+[data-bank="brou"] {
+  --bank-primary: #005ca8;
+  --bank-primary-light: #0b64a0;
+  --bank-accent: #FFCB05;
+  --bank-gradient-from: #08528D;
+  --bank-gradient-to: #0d2744;
+}
+
+[data-bank="itau"] {
+  --bank-primary: #EC7000;
+  --bank-primary-light: #FF8C1A;
+  --bank-accent: #003399;
+  --bank-gradient-from: #EC7000;
+  --bank-gradient-to: #1a1a2e;
+}
+
+[data-bank="santander"] {
+  --bank-primary: #EC0000;
+  --bank-primary-light: #FF1A1A;
+  --bank-accent: #FFFFFF;
+  --bank-gradient-from: #EC0000;
+  --bank-gradient-to: #1a1a2e;
+}

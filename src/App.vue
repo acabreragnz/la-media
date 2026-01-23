@@ -2,9 +2,11 @@
 import { useLocalStorage } from '@vueuse/core'
 import { useCurrency } from '@/composables/useCurrency'
 import { useDeviceDetection } from '@/composables/useDeviceDetection'
+import { useBank } from '@/composables/useBank'
 import CurrencyValue from '@/components/CurrencyValue.vue'
 import { PhX, PhClock, PhWarning, PhArrowSquareOut } from '@phosphor-icons/vue'
 import { formatNumber } from '@/utils/formatters'
+import { bankList } from '@/config/banks'
 
 const {
   rates,
@@ -20,6 +22,8 @@ const {
   nextUpdateTime,
   lastScrapedAt
 } = useCurrency()
+
+const { currentBank, selectBank, selectedBankCode } = useBank()
 
 // Detectar dispositivos de baja gama
 const { isLowEndDevice } = useDeviceDetection()
@@ -37,24 +41,24 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 </script>
 
 <template>
-  <div class="min-h-dvh flex justify-center p-4 app-gradient">
+  <div class="min-h-dvh flex justify-center p-4 app-gradient" :data-bank="currentBank.code">
     <div class="w-full max-w-[440px]">
       <!-- Loading State -->
       <div v-if="loading && !rates" class="space-y-5">
         <!-- Header (siempre visible, no skeleton) -->
         <div class="flex items-center justify-center gap-3 mb-7">
-          <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
-            <img src="/brou-logo.webp" alt="BROU" class="h-10 w-auto" />
+          <a :href="currentBank.url" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
+            <img :src="currentBank.logo" :alt="currentBank.name" class="h-10 w-auto" />
           </a>
           <h1 class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-            Media BROU
+            Media {{ currentBank.name }}
           </h1>
         </div>
 
-        <!-- Subtle yellow accent stripe (siempre visible, no skeleton) -->
+        <!-- Subtle accent stripe (siempre visible, no skeleton) -->
         <div class="relative h-[2px] mb-6 overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/60 to-transparent blur-[1px]"></div>
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/40 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--bank-accent)]/60 to-transparent blur-[1px]"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--bank-accent)]/40 to-transparent"></div>
         </div>
 
         <!-- Exchange Rates skeleton -->
@@ -128,18 +132,18 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
       <div v-else class="space-y-5">
         <!-- Header (siempre visible) -->
         <div class="flex items-center justify-center gap-3 mb-7">
-          <a href="https://www.brou.com.uy/cotizaciones" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
-            <img src="/brou-logo.webp" alt="BROU" class="h-10 w-auto" />
+          <a :href="currentBank.url" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
+            <img :src="currentBank.logo" :alt="currentBank.name" class="h-10 w-auto" />
           </a>
           <h1 class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-            Media BROU
+            Media {{ currentBank.name }}
           </h1>
         </div>
 
-        <!-- Subtle yellow accent stripe (siempre visible) -->
+        <!-- Subtle accent stripe (siempre visible) -->
         <div class="relative h-[2px] mb-6 overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/60 to-transparent blur-[1px]"></div>
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brou-yellow/40 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--bank-accent)]/60 to-transparent blur-[1px]"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--bank-accent)]/40 to-transparent"></div>
         </div>
 
         <!-- Error Banner (para cualquier error) -->
@@ -274,8 +278,8 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 
               <!-- Media (centro, destacado) -->
               <div class="flex flex-col items-center">
-                <span class="text-brou-yellow/80 text-xs uppercase tracking-wider font-medium">Media</span>
-                <span v-if="rates" class="text-brou-yellow font-bold text-2xl">
+                <span class="text-[var(--bank-accent)]/80 text-xs uppercase tracking-wider font-medium">Media</span>
+                <span v-if="rates" class="text-[var(--bank-accent)] font-bold text-2xl">
                   {{ formatNumber(rates.media) }}
                 </span>
               </div>
@@ -290,15 +294,15 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               </div>
             </div>
 
-            <!-- Enlace BROU -->
+            <!-- Enlace al banco -->
             <a
-              href="https://www.brou.com.uy/cotizaciones"
+              :href="currentBank.url"
               target="_blank"
               rel="noopener noreferrer"
               class="absolute bottom-2 right-2 flex items-center gap-1 text-[0.65rem] text-white/30 hover:text-white/50 transition-colors"
             >
               <PhArrowSquareOut :size="12" weight="bold" />
-              <span>BROU</span>
+              <span>{{ currentBank.name }}</span>
             </a>
           </div>
         </div>
@@ -327,7 +331,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
         <div class="flex justify-center my-4">
           <button
             @click="swapDirection"
-            class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-brou-blue to-brou-blue-light rounded-full border-none cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-[0_8px_20px_rgba(8,82,141,0.5),0_0_40px_rgba(13,94,161,0.3)] hover:shadow-[0_12px_30px_rgba(8,82,141,0.7),0_0_60px_rgba(13,94,161,0.5)]"
+            class="swap-button flex items-center justify-center w-12 h-12 rounded-full border-none cursor-pointer transition-all hover:scale-110 active:scale-95"
             aria-label="Intercambiar monedas"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5.5 h-5.5 text-white transition-transform duration-400 ease-out" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -337,7 +341,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
         </div>
 
         <!-- Result Display -->
-        <div class="bg-gradient-to-br from-brou-blue/10 to-brou-blue-light/8 border border-brou-blue-light/20 rounded-[20px] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_0_40px_rgba(8,82,141,0.15)] flex items-center gap-4">
+        <div class="result-display rounded-[20px] p-5 flex items-center gap-4">
           <span class="text-[2.25rem] leading-none">{{ direction === 'usdToUyu' ? '🇺🇾' : '🇺🇸' }}</span>
           <div class="flex-1 flex flex-col gap-1">
             <label class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
@@ -391,6 +395,22 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             </button>
           </div>
         </div>
+        <!-- Bank Selector Tabs -->
+        <div class="flex justify-center gap-2 mt-6">
+          <button
+            v-for="bank in bankList"
+            :key="bank.code"
+            @click="selectBank(bank.code)"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            :class="[
+              selectedBankCode === bank.code
+                ? 'bg-[var(--bank-primary)] text-white shadow-lg'
+                : 'bg-white/[0.08] text-white/70 hover:bg-white/[0.12] hover:text-white'
+            ]"
+          >
+            {{ bank.name }}
+          </button>
+        </div>
         </template>
       </div>
 
@@ -409,15 +429,38 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 </template>
 
 <style scoped>
-/* Gradiente mobile: azul BROU en diagonal superior derecha */
+/* Gradiente mobile: usa CSS variables del banco */
 .app-gradient {
-  background: linear-gradient(to top right, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
+  background: linear-gradient(to top right, #0a0e1f 0%, #0f1a2e 30%, var(--bank-gradient-to) 60%, var(--bank-gradient-from) 100%);
+  transition: background 0.4s ease-in-out;
 }
 
-/* Gradiente desktop: original de rama main */
+/* Gradiente desktop */
 @media (min-width: 768px) {
   .app-gradient {
-    background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528D 100%);
+    background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, var(--bank-gradient-to) 60%, var(--bank-gradient-from) 100%);
   }
+}
+
+/* Swap button con colores dinámicos */
+.swap-button {
+  background: linear-gradient(to bottom right, var(--bank-primary), var(--bank-primary-light));
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--bank-primary) 50%, transparent),
+              0 0 40px color-mix(in srgb, var(--bank-primary-light) 30%, transparent);
+}
+
+.swap-button:hover {
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--bank-primary) 70%, transparent),
+              0 0 60px color-mix(in srgb, var(--bank-primary-light) 50%, transparent);
+}
+
+/* Result display con colores dinámicos */
+.result-display {
+  background: linear-gradient(to bottom right,
+    color-mix(in srgb, var(--bank-primary) 10%, transparent),
+    color-mix(in srgb, var(--bank-primary-light) 8%, transparent));
+  border: 1px solid color-mix(in srgb, var(--bank-primary-light) 20%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+              0 0 40px color-mix(in srgb, var(--bank-primary) 15%, transparent);
 }
 </style>

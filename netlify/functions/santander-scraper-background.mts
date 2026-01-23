@@ -197,23 +197,32 @@ export default async (req: Request) => {
     console.log("\n🖱️  Paso 5: Haciendo click en botón Ingresar (primera pantalla)...");
     const supernetStart = Date.now();
 
-    // Click y esperar navegación en paralelo (el click dispara la navegación)
+    console.log("   → Haciendo click en submit...");
+
+    // Click y esperar navegación a Supernet (puede tardar, dar 20s de timeout)
     await Promise.all([
-      page.waitForNavigation({ timeout: 10000, waitUntil: 'domcontentloaded' }),
+      page.waitForNavigation({ timeout: 20000, waitUntil: 'domcontentloaded' }),
       page.click("#santander-login-persona-form button[type='submit']")
     ]);
 
-    console.log("   ✓ Click ejecutado y navegación completada");
+    console.log("   ✓ Navegación completada");
     console.log(`✅ Supernet cargado en ${Date.now() - supernetStart}ms`);
     console.log("📍 URL actual:", page.url());
 
-    console.log("\n✏️  Paso 6: Esperando formulario de contraseña en Supernet...");
-    // Esperar solo 1 segundo para que cargue el formulario dinámico
-    await page.waitForTimeout(1000);
+    // Verificar que estamos en Supernet
+    if (!page.url().includes('supernet.santander.com.uy')) {
+      throw new Error(`URL inesperada después del login: ${page.url()}`);
+    }
+    console.log("   ✓ Confirmado: Estamos en Supernet");
+
+    console.log("\n✏️  Paso 6: Esperando formulario de contraseña en Supernet (SPA)...");
+    // Supernet es una SPA (Single Page App), puede tardar en cargar el formulario
+    console.log("   → Esperando a que la SPA cargue el formulario de password...");
+    await page.waitForTimeout(3000);
 
     console.log("   → Buscando campo de contraseña...");
     const passwordSelector = 'input[type="password"]';
-    await page.waitForSelector(passwordSelector, { timeout: 5000 });
+    await page.waitForSelector(passwordSelector, { timeout: 10000 });
     console.log("   ✓ Campo de password encontrado");
 
     await page.fill(passwordSelector, PASSWORD);
@@ -223,13 +232,15 @@ export default async (req: Request) => {
     const finalLoginStart = Date.now();
     const loginButtonSelector = 'button[type="submit"]';
 
-    // Click y esperar navegación en paralelo
+    console.log("   → Haciendo click en login...");
+
+    // Click y esperar navegación (puede tardar, la SPA carga el dashboard)
     await Promise.all([
-      page.waitForNavigation({ timeout: 10000, waitUntil: 'domcontentloaded' }),
+      page.waitForNavigation({ timeout: 20000, waitUntil: 'domcontentloaded' }),
       page.click(loginButtonSelector)
     ]);
 
-    console.log("   ✓ Click ejecutado y login completado");
+    console.log("   ✓ Login completado");
     console.log(`✅ Acceso a banca en ${Date.now() - finalLoginStart}ms`);
     console.log("📍 URL final:", page.url());
 

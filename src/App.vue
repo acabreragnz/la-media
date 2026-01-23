@@ -396,12 +396,20 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
 
       <!-- Footer Credits -->
       <div class="text-center mt-6 text-white/60 text-[0.8rem]">
-        Hecho con 💙 por
-        <a href="https://github.com/acabreragnz"
+        <div>
+          Hecho con 💙 por
+          <a href="https://github.com/acabreragnz"
+             target="_blank"
+             rel="noopener"
+             class="text-brou-blue-light/90 no-underline font-medium transition-colors hover:text-brou-yellow hover:underline decoration-brou-yellow decoration-2">
+            @acabreragnz
+          </a>
+        </div>
+        <a href="https://matecito.co/acabreragnz"
            target="_blank"
            rel="noopener"
-           class="text-brou-blue-light/90 no-underline font-medium transition-colors hover:text-brou-yellow hover:underline decoration-brou-yellow decoration-2">
-          @acabreragnz
+           class="inline-flex items-center gap-1 mt-1.5 text-white/40 text-[0.7rem] transition-colors hover:text-brou-yellow">
+          Invitame un 🧉
         </a>
       </div>
     </div>

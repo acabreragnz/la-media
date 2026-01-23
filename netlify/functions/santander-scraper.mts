@@ -63,7 +63,7 @@ export default async (req: Request) => {
 
     console.log(`✅ Navegador lanzado en ${Date.now() - launchStart}ms`);
 
-    console.log("\n🌐 Paso 2: Navegando a login.santander.com.uy...");
+    console.log("\n🌐 Paso 2: Navegando a www.santander.com.uy/home...");
 
     // Crear contexto de navegador con configuración anti-bot
     const context = await browser.newContext({
@@ -127,7 +127,7 @@ export default async (req: Request) => {
 
     const navStart = Date.now();
 
-    await page.goto("https://login.santander.com.uy/", {
+    await page.goto("https://www.santander.com.uy/home", {
       waitUntil: "networkidle",
       timeout: 20000,
     });

@@ -197,20 +197,79 @@ export default async (req: Request) => {
     console.log("\n🖱️  Paso 5: Haciendo click en botón Ingresar (primera pantalla)...");
     const supernetStart = Date.now();
 
-    // El redirect a Supernet es mediante JavaScript después de una validación AJAX
-    // No es navegación directa del formulario
-    console.log("   → Haciendo click en submit (sin esperar navegación directa)...");
-    await page.click("#santander-login-persona-form button[type='submit']");
-    console.log("   ✓ Click ejecutado");
+    // DEBUG: Analizar el estado del formulario antes del click
+    console.log("\n🔍 DEBUG: Analizando botones del formulario...");
+    const formHtml = await page.$eval('#santander-login-persona-form', el => el.outerHTML);
+    console.log("📄 HTML del formulario (primeros 1000 chars):");
+    console.log(formHtml.substring(0, 1000));
 
-    console.log("   → Esperando redirect JavaScript a Supernet...");
-    // Esperar a que JavaScript haga el redirect (monitorear cambio de URL)
-    await page.waitForFunction(
-      () => window.location.href.includes('supernet.santander.com.uy'),
-      { timeout: 30000 }
+    // Buscar TODOS los botones en el formulario
+    const allButtons = await page.$$eval('#santander-login-persona-form button', buttons =>
+      buttons.map(btn => ({
+        type: btn.getAttribute('type'),
+        text: btn.textContent?.trim(),
+        classes: btn.className,
+        disabled: btn.disabled,
+        visible: btn.offsetParent !== null
+      }))
     );
+    console.log("   → Botones encontrados en el formulario:", JSON.stringify(allButtons, null, 2));
 
-    console.log("   ✓ Redirect detectado");
+    // Verificar si el botón submit existe y es visible
+    const submitButton = await page.$('#santander-login-persona-form button[type="submit"]');
+    if (!submitButton) {
+      console.log("   ❌ No se encontró botón con type='submit'");
+
+      // Intentar buscar cualquier botón
+      const anyButton = await page.$('#santander-login-persona-form button');
+      if (anyButton) {
+        console.log("   → Pero sí hay un botón genérico, intentaré usarlo");
+      }
+    } else {
+      const isVisible = await submitButton.isVisible();
+      const isEnabled = await submitButton.isEnabled();
+      console.log(`   → Botón submit: visible=${isVisible}, enabled=${isEnabled}`);
+    }
+
+    // Intentar hacer click
+    console.log("\n   → Intentando click en botón...");
+    try {
+      await page.click("#santander-login-persona-form button[type='submit']", { timeout: 5000 });
+      console.log("   ✓ Click ejecutado");
+    } catch (clickError) {
+      console.log("   ❌ Error al hacer click con selector submit:", clickError.message);
+
+      // Intentar con el primer botón del formulario
+      console.log("   → Intentando click en primer botón del formulario...");
+      await page.click("#santander-login-persona-form button", { timeout: 5000 });
+      console.log("   ✓ Click ejecutado en primer botón");
+    }
+
+    console.log("\n   → Esperando redirect JavaScript a Supernet...");
+    console.log("   → URL actual antes de esperar:", page.url());
+
+    // Esperar a que JavaScript haga el redirect (monitorear cambio de URL)
+    try {
+      await page.waitForFunction(
+        () => window.location.href.includes('supernet.santander.com.uy'),
+        { timeout: 30000 }
+      );
+      console.log("   ✓ Redirect detectado");
+    } catch (redirectError) {
+      console.log("   ❌ No se detectó redirect a Supernet");
+      console.log("   → URL actual:", page.url());
+
+      // Capturar lo que haya en la página ahora
+      const currentHtml = await page.content();
+      console.log("   → HTML actual (primeros 1000 chars):");
+      console.log(currentHtml.substring(0, 1000));
+
+      // Buscar mensajes de error
+      const hasError = currentHtml.toLowerCase().includes('error') || currentHtml.toLowerCase().includes('incorrecto');
+      console.log("   → ¿Hay mensaje de error?:", hasError);
+
+      throw new Error("No se pudo completar el redirect a Supernet");
+    }
 
     // Esperar a que la página de Supernet cargue
     await page.waitForLoadState('domcontentloaded', { timeout: 10000 });

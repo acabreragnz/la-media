@@ -200,8 +200,8 @@ export default async (req: Request) => {
     // DEBUG: Analizar el estado del formulario antes del click
     console.log("\n🔍 DEBUG: Analizando botones del formulario...");
     const formHtml = await page.$eval('#santander-login-persona-form', el => el.outerHTML);
-    console.log("📄 HTML del formulario (primeros 1000 chars):");
-    console.log(formHtml.substring(0, 1000));
+    console.log("📄 HTML del formulario COMPLETO (length:", formHtml.length, "chars)");
+    console.log(formHtml);
 
     // Buscar TODOS los botones en el formulario
     const allButtons = await page.$$eval('#santander-login-persona-form button', buttons =>
@@ -213,37 +213,84 @@ export default async (req: Request) => {
         visible: btn.offsetParent !== null
       }))
     );
-    console.log("   → Botones encontrados en el formulario:", JSON.stringify(allButtons, null, 2));
+    console.log("   → Botones encontrados DENTRO del formulario:", JSON.stringify(allButtons, null, 2));
 
-    // Verificar si el botón submit existe y es visible
-    const submitButton = await page.$('#santander-login-persona-form button[type="submit"]');
-    if (!submitButton) {
-      console.log("   ❌ No se encontró botón con type='submit'");
+    // Buscar botones FUERA del formulario que puedan estar asociados
+    console.log("\n🔍 DEBUG: Buscando botones fuera del formulario...");
+    const allPageButtons = await page.$$eval('button', buttons =>
+      buttons.map((btn, idx) => ({
+        index: idx,
+        type: btn.getAttribute('type'),
+        text: btn.textContent?.trim(),
+        form: btn.getAttribute('form'),
+        classes: btn.className,
+        visible: btn.offsetParent !== null
+      })).filter(btn => btn.text?.includes('Ingresar') || btn.text?.includes('Continuar') || btn.text?.includes('Enviar'))
+    );
+    console.log("   → Botones en toda la página con texto relevante:", JSON.stringify(allPageButtons, null, 2));
 
-      // Intentar buscar cualquier botón
-      const anyButton = await page.$('#santander-login-persona-form button');
-      if (anyButton) {
-        console.log("   → Pero sí hay un botón genérico, intentaré usarlo");
+    // Buscar también inputs de tipo submit
+    const submitInputs = await page.$$eval('input[type="submit"]', inputs =>
+      inputs.map(input => ({
+        value: input.getAttribute('value'),
+        form: input.getAttribute('form'),
+        classes: input.className,
+        visible: input.offsetParent !== null
+      }))
+    );
+    console.log("   → Inputs submit encontrados:", JSON.stringify(submitInputs, null, 2));
+
+    // Determinar qué elemento usar para submit
+    console.log("\n   → Determinando cómo hacer submit...");
+
+    let submitSuccess = false;
+    let submitMethod = "";
+
+    // Opción 1: Intentar botón submit dentro del formulario
+    const submitBtn = await page.$('#santander-login-persona-form button[type="submit"]');
+    if (submitBtn) {
+      console.log("   → Opción 1: Botón submit encontrado en formulario");
+      await submitBtn.click();
+      submitMethod = "button[type=submit] dentro del form";
+      submitSuccess = true;
+    }
+
+    // Opción 2: Input submit
+    if (!submitSuccess) {
+      const submitInput = await page.$('#santander-login-persona-form input[type="submit"]');
+      if (submitInput) {
+        console.log("   → Opción 2: Input submit encontrado");
+        await submitInput.click();
+        submitMethod = "input[type=submit]";
+        submitSuccess = true;
       }
-    } else {
-      const isVisible = await submitButton.isVisible();
-      const isEnabled = await submitButton.isEnabled();
-      console.log(`   → Botón submit: visible=${isVisible}, enabled=${isEnabled}`);
     }
 
-    // Intentar hacer click
-    console.log("\n   → Intentando click en botón...");
-    try {
-      await page.click("#santander-login-persona-form button[type='submit']", { timeout: 5000 });
-      console.log("   ✓ Click ejecutado");
-    } catch (clickError) {
-      console.log("   ❌ Error al hacer click con selector submit:", clickError.message);
-
-      // Intentar con el primer botón del formulario
-      console.log("   → Intentando click en primer botón del formulario...");
-      await page.click("#santander-login-persona-form button", { timeout: 5000 });
-      console.log("   ✓ Click ejecutado en primer botón");
+    // Opción 3: Cualquier botón en el formulario
+    if (!submitSuccess) {
+      const anyBtn = await page.$('#santander-login-persona-form button');
+      if (anyBtn) {
+        console.log("   → Opción 3: Usando primer botón del formulario");
+        await anyBtn.click();
+        submitMethod = "primer button del form";
+        submitSuccess = true;
+      }
     }
+
+    // Opción 4: Submit directo del formulario (sin botón)
+    if (!submitSuccess) {
+      console.log("   → Opción 4: Submit directo del formulario via JavaScript");
+      await page.evaluate(() => {
+        const form = document.getElementById('santander-login-persona-form') as HTMLFormElement;
+        if (form) {
+          form.submit();
+        }
+      });
+      submitMethod = "form.submit() directo";
+      submitSuccess = true;
+    }
+
+    console.log(`   ✓ Submit ejecutado via: ${submitMethod}`);
 
     console.log("\n   → Esperando redirect JavaScript a Supernet...");
     console.log("   → URL actual antes de esperar:", page.url());

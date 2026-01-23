@@ -28,6 +28,15 @@ function selectUyuInput() {
   uyuInputRef.value?.select()
 }
 
+// Scroll al input cuando recibe focus (para que el teclado no lo tape en mobile)
+function scrollToInput(event: FocusEvent) {
+  const target = event.target as HTMLElement
+  // Pequeño delay para esperar que el teclado aparezca
+  setTimeout(() => {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, 300)
+}
+
 // Feature flags
 const DISCLAIMER_ENABLED = false
 
@@ -329,6 +338,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               autofocus
               class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
               placeholder="0,00"
+              @focus="scrollToInput"
             />
           </span>
         </label>
@@ -362,6 +372,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               type="text"
               class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
               placeholder="0,00"
+              @focus="scrollToInput"
             />
           </span>
         </label>

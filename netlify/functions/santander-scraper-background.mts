@@ -330,10 +330,55 @@ export default async (req: Request) => {
     console.log("   → Esperando a que la SPA cargue el formulario de password...");
     await page.waitForTimeout(3000);
 
-    console.log("   → Buscando campo de contraseña...");
+    // DEBUG: Capturar el estado de la página de Supernet
+    console.log("\n🔍 DEBUG: Analizando página de Supernet...");
+    const supernetHtml = await page.content();
+    console.log("📄 HTML de Supernet (length:", supernetHtml.length, "chars)");
+    console.log("📄 HTML (primeros 2000 chars):");
+    console.log(supernetHtml.substring(0, 2000));
+
+    // Buscar todos los inputs en la página
+    const allInputs = await page.$$eval('input', inputs =>
+      inputs.map(input => ({
+        type: input.getAttribute('type'),
+        id: input.id,
+        name: input.getAttribute('name'),
+        placeholder: input.getAttribute('placeholder'),
+        visible: input.offsetParent !== null
+      }))
+    );
+    console.log("   → Todos los inputs encontrados:", JSON.stringify(allInputs, null, 2));
+
+    console.log("\n   → Buscando campo de contraseña...");
     const passwordSelector = 'input[type="password"]';
-    await page.waitForSelector(passwordSelector, { timeout: 10000 });
-    console.log("   ✓ Campo de password encontrado");
+
+    try {
+      await page.waitForSelector(passwordSelector, { timeout: 10000 });
+      console.log("   ✓ Campo de password encontrado");
+    } catch (error) {
+      console.log("   ❌ No se encontró input[type=password]");
+      console.log("   → Intentando buscar por placeholder o name...");
+
+      // Intentar otros selectores posibles
+      const possibleSelectors = [
+        'input[placeholder*="ontraseña"]',
+        'input[placeholder*="assword"]',
+        'input[name*="password"]',
+        'input[name*="pass"]',
+        'input[id*="password"]',
+        'input[id*="pass"]',
+      ];
+
+      for (const selector of possibleSelectors) {
+        const found = await page.$(selector);
+        if (found) {
+          console.log(`   ✓ Encontrado con selector alternativo: ${selector}`);
+          break;
+        }
+      }
+
+      throw error;
+    }
 
     await page.fill(passwordSelector, PASSWORD);
     console.log("   ✓ Password ingresado");

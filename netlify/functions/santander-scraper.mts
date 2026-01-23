@@ -67,6 +67,29 @@ export default async (req: Request) => {
     console.log(`✅ Página cargada en ${Date.now() - navStart}ms`);
     console.log("📍 URL actual:", page.url());
 
+    // DEBUG: Capturar HTML de la página para ver qué elementos existen
+    console.log("\n🔍 DEBUG: Analizando estructura de la página...");
+    const pageContent = await page.content();
+    console.log("📄 HTML length:", pageContent.length, "caracteres");
+
+    // Buscar el formulario en el HTML
+    const hasForm = pageContent.includes('santander-login-persona-form');
+    const hasDocField = pageContent.includes('edit-document');
+    console.log("   → ¿Existe #santander-login-persona-form?", hasForm);
+    console.log("   → ¿Existe #edit-document?", hasDocField);
+
+    // Extraer y mostrar algunos IDs de formularios que existan
+    const formIdMatches = pageContent.match(/id=["']([^"']*form[^"']*)["']/gi);
+    if (formIdMatches) {
+      console.log("   → Formularios encontrados:", formIdMatches.slice(0, 5));
+    }
+
+    // Extraer inputs de tipo text
+    const inputMatches = pageContent.match(/input[^>]*id=["']([^"']*)["'][^>]*type=["']text["']/gi);
+    if (inputMatches) {
+      console.log("   → Inputs de texto encontrados:", inputMatches.slice(0, 3));
+    }
+
     console.log("\n✏️  Paso 3: Rellenando formulario de login (Paso 1/2 - Documento)...");
 
     // Esperar a que el formulario de login esté visible

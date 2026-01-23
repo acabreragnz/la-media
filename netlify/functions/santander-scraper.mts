@@ -67,33 +67,62 @@ export default async (req: Request) => {
     console.log(`✅ Página cargada en ${Date.now() - navStart}ms`);
     console.log("📍 URL actual:", page.url());
 
-    console.log("\n✏️  Paso 3: Rellenando formulario de login...");
-    console.log("   → Buscando campo de documento...");
-    await page.fill("input#doc", DOCUMENTO);
-    console.log("   ✓ Documento ingresado");
+    console.log("\n✏️  Paso 3: Rellenando formulario de login (Paso 1/2 - Documento)...");
 
-    console.log("   → Buscando campo de password...");
-    await page.fill('input[type="password"]', PASSWORD);
+    // Esperar a que el formulario de login esté visible
+    await page.waitForSelector("#santander-login-persona-form", { timeout: 5000 });
+    console.log("   ✓ Formulario de login detectado");
+
+    console.log("   → Ingresando documento...");
+    await page.fill("#edit-document", DOCUMENTO);
+    console.log("   ✓ Documento ingresado:", DOCUMENTO);
+
+    console.log("\n🖱️  Paso 4: Haciendo click en botón Ingresar (primera pantalla)...");
+    await page.click("#santander-login-persona-form button[type='submit']");
+    console.log("   ✓ Click ejecutado en submit");
+
+    console.log("\n⏳ Paso 5: Esperando carga de Supernet...");
+    const supernetStart = Date.now();
+
+    // Esperar navegación a Supernet (puede ser https://supernet.santander.com.uy o similar)
+    await page.waitForLoadState("networkidle", { timeout: 10000 });
+    console.log(`✅ Página cargada en ${Date.now() - supernetStart}ms`);
+    console.log("📍 URL actual:", page.url());
+
+    console.log("\n✏️  Paso 6: Esperando formulario de contraseña en Supernet...");
+    // TODO: Necesito ver el HTML de la página de Supernet para los selectores correctos
+    // Por ahora espero 3 segundos para que cargue el formulario dinámico
+    await page.waitForTimeout(3000);
+
+    console.log("   → Buscando campo de contraseña...");
+    // TODO: Ajustar este selector cuando veas el HTML de Supernet
+    const passwordSelector = 'input[type="password"]';
+    await page.waitForSelector(passwordSelector, { timeout: 5000 });
+    console.log("   ✓ Campo de password encontrado");
+
+    await page.fill(passwordSelector, PASSWORD);
     console.log("   ✓ Password ingresado");
 
-    console.log("\n🖱️  Paso 4: Haciendo click en botón de login...");
-    await page.click("button#btn-login");
-    console.log("   ✓ Click ejecutado");
+    console.log("\n🖱️  Paso 7: Haciendo click en botón de login final...");
+    // TODO: Ajustar este selector cuando veas el HTML de Supernet
+    const loginButtonSelector = 'button[type="submit"]';
+    await page.click(loginButtonSelector);
+    console.log("   ✓ Click ejecutado en login final");
 
-    console.log("\n⏳ Paso 5: Esperando redirección a /home...");
-    const loginStart = Date.now();
-    await page.waitForURL("**/home", { timeout: 5000 });
-    console.log(`✅ Redirección completada en ${Date.now() - loginStart}ms`);
+    console.log("\n⏳ Paso 8: Esperando acceso a la banca...");
+    const finalLoginStart = Date.now();
+    await page.waitForLoadState("networkidle", { timeout: 10000 });
+    console.log(`✅ Login completado en ${Date.now() - finalLoginStart}ms`);
     console.log("📍 URL final:", page.url());
 
     console.log("\n✅ LOGIN EXITOSO");
 
     // TODO: Aquí implementar la lógica de captura
-    console.log("\n📊 Paso 6: Extrayendo datos...");
+    console.log("\n📊 Paso 9: Extrayendo datos...");
     console.log("   ⚠️  TODO: Implementar extracción de saldo y transacciones");
 
     // TODO: Guardar en Blobs
-    console.log("\n💾 Paso 7: Guardando en Netlify Blobs...");
+    console.log("\n💾 Paso 10: Guardando en Netlify Blobs...");
     console.log("   ⚠️  TODO: Implementar guardado en Blobs");
 
     const totalTime = Date.now() - startTime;

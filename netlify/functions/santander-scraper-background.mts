@@ -197,48 +197,15 @@ export default async (req: Request) => {
     console.log("\n🖱️  Paso 5: Haciendo click en botón Ingresar (primera pantalla)...");
     const supernetStart = Date.now();
 
-    // DEBUG: Analizar el estado del formulario antes del click
-    console.log("\n🔍 DEBUG: Analizando botones del formulario...");
-    const formHtml = await page.$eval('#santander-login-persona-form', el => el.outerHTML);
-    console.log("📄 HTML del formulario COMPLETO (length:", formHtml.length, "chars)");
-    console.log(formHtml);
-
-    // Buscar TODOS los botones en el formulario
-    const allButtons = await page.$$eval('#santander-login-persona-form button', buttons =>
-      buttons.map(btn => ({
-        type: btn.getAttribute('type'),
-        text: btn.textContent?.trim(),
-        classes: btn.className,
-        disabled: btn.disabled,
-        visible: btn.offsetParent !== null
-      }))
-    );
-    console.log("   → Botones encontrados DENTRO del formulario:", JSON.stringify(allButtons, null, 2));
-
-    // Buscar botones FUERA del formulario que puedan estar asociados
-    console.log("\n🔍 DEBUG: Buscando botones fuera del formulario...");
-    const allPageButtons = await page.$$eval('button', buttons =>
-      buttons.map((btn, idx) => ({
-        index: idx,
-        type: btn.getAttribute('type'),
-        text: btn.textContent?.trim(),
-        form: btn.getAttribute('form'),
-        classes: btn.className,
-        visible: btn.offsetParent !== null
-      })).filter(btn => btn.text?.includes('Ingresar') || btn.text?.includes('Continuar') || btn.text?.includes('Enviar'))
-    );
-    console.log("   → Botones en toda la página con texto relevante:", JSON.stringify(allPageButtons, null, 2));
-
-    // Buscar también inputs de tipo submit
+    // Buscar inputs de tipo submit
     const submitInputs = await page.$$eval('input[type="submit"]', inputs =>
       inputs.map(input => ({
         value: input.getAttribute('value'),
-        form: input.getAttribute('form'),
-        classes: input.className,
         visible: input.offsetParent !== null
       }))
     );
-    console.log("   → Inputs submit encontrados:", JSON.stringify(submitInputs, null, 2));
+    const visibleSubmits = submitInputs.filter(s => s.visible);
+    console.log(`   → Inputs submit visibles encontrados: ${visibleSubmits.length}`);
 
     // Determinar qué elemento usar para submit
     console.log("\n   → Determinando cómo hacer submit...");
@@ -338,24 +305,12 @@ export default async (req: Request) => {
 
     console.log("   ✓ SPA montada (inputs detectados en el DOM)");
 
-    // DEBUG: Capturar el estado de la página de Supernet
-    console.log("\n🔍 DEBUG: Analizando página de Supernet...");
-    const supernetHtml = await page.content();
-    console.log("📄 HTML de Supernet (length:", supernetHtml.length, "chars)");
-    console.log("📄 HTML (primeros 2000 chars):");
-    console.log(supernetHtml.substring(0, 2000));
-
-    // Buscar todos los inputs en la página
-    const allInputs = await page.$$eval('input', inputs =>
-      inputs.map(input => ({
-        type: input.getAttribute('type'),
-        id: input.id,
-        name: input.getAttribute('name'),
-        placeholder: input.getAttribute('placeholder'),
-        visible: input.offsetParent !== null
-      }))
+    // Verificar que hay inputs en la página
+    const inputCount = await page.$$eval('input', inputs => inputs.length);
+    const passwordInputs = await page.$$eval('input[type="password"]', inputs =>
+      inputs.filter(input => input.offsetParent !== null).length
     );
-    console.log("   → Todos los inputs encontrados:", JSON.stringify(allInputs, null, 2));
+    console.log(`   → Total inputs: ${inputCount}, Password inputs visibles: ${passwordInputs}`);
 
     console.log("\n   → Buscando campo de contraseña...");
     const passwordSelector = 'input[type="password"]';
@@ -394,19 +349,7 @@ export default async (req: Request) => {
     console.log("\n🖱️  Paso 7: Haciendo click en botón de login final...");
     const finalLoginStart = Date.now();
 
-    // DEBUG: Buscar todos los botones en la página
-    console.log("\n🔍 DEBUG: Buscando botones de login en Supernet...");
-    const allButtons = await page.$$eval('button', buttons =>
-      buttons.map(btn => ({
-        text: btn.textContent?.trim(),
-        type: btn.getAttribute('type'),
-        classes: btn.className,
-        visible: btn.offsetParent !== null
-      })).filter(btn => btn.visible)
-    );
-    console.log("   → Botones visibles:", JSON.stringify(allButtons, null, 2));
-
-    console.log("\n   → Haciendo click en botón de login...");
+    console.log("   → Haciendo click en botón submit...");
     const urlBefore = page.url();
 
     // En una SPA, el click NO dispara navegación, solo cambia el estado interno

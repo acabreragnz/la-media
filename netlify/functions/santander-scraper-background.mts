@@ -197,22 +197,26 @@ export default async (req: Request) => {
     console.log("\n🖱️  Paso 5: Haciendo click en botón Ingresar (primera pantalla)...");
     const supernetStart = Date.now();
 
-    console.log("   → Haciendo click en submit...");
+    // El redirect a Supernet es mediante JavaScript después de una validación AJAX
+    // No es navegación directa del formulario
+    console.log("   → Haciendo click en submit (sin esperar navegación directa)...");
+    await page.click("#santander-login-persona-form button[type='submit']");
+    console.log("   ✓ Click ejecutado");
 
-    // Click y esperar navegación a Supernet (puede tardar, dar 20s de timeout)
-    await Promise.all([
-      page.waitForNavigation({ timeout: 20000, waitUntil: 'domcontentloaded' }),
-      page.click("#santander-login-persona-form button[type='submit']")
-    ]);
+    console.log("   → Esperando redirect JavaScript a Supernet...");
+    // Esperar a que JavaScript haga el redirect (monitorear cambio de URL)
+    await page.waitForFunction(
+      () => window.location.href.includes('supernet.santander.com.uy'),
+      { timeout: 30000 }
+    );
 
-    console.log("   ✓ Navegación completada");
+    console.log("   ✓ Redirect detectado");
+
+    // Esperar a que la página de Supernet cargue
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
+
     console.log(`✅ Supernet cargado en ${Date.now() - supernetStart}ms`);
     console.log("📍 URL actual:", page.url());
-
-    // Verificar que estamos en Supernet
-    if (!page.url().includes('supernet.santander.com.uy')) {
-      throw new Error(`URL inesperada después del login: ${page.url()}`);
-    }
     console.log("   ✓ Confirmado: Estamos en Supernet");
 
     console.log("\n✏️  Paso 6: Esperando formulario de contraseña en Supernet (SPA)...");

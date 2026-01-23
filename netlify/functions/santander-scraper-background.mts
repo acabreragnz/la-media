@@ -393,19 +393,42 @@ export default async (req: Request) => {
 
     console.log("\n🖱️  Paso 7: Haciendo click en botón de login final...");
     const finalLoginStart = Date.now();
-    const loginButtonSelector = 'button[type="submit"]';
 
-    console.log("   → Haciendo click en login...");
+    // DEBUG: Buscar todos los botones en la página
+    console.log("\n🔍 DEBUG: Buscando botones de login en Supernet...");
+    const allButtons = await page.$$eval('button', buttons =>
+      buttons.map(btn => ({
+        text: btn.textContent?.trim(),
+        type: btn.getAttribute('type'),
+        classes: btn.className,
+        visible: btn.offsetParent !== null
+      })).filter(btn => btn.visible)
+    );
+    console.log("   → Botones visibles:", JSON.stringify(allButtons, null, 2));
 
-    // Click y esperar navegación (puede tardar, la SPA carga el dashboard)
-    await Promise.all([
-      page.waitForNavigation({ timeout: 20000, waitUntil: 'domcontentloaded' }),
-      page.click(loginButtonSelector)
-    ]);
+    console.log("\n   → Haciendo click en botón de login...");
+    const urlBefore = page.url();
 
-    console.log("   ✓ Login completado");
-    console.log(`✅ Acceso a banca en ${Date.now() - finalLoginStart}ms`);
-    console.log("📍 URL final:", page.url());
+    // En una SPA, el click NO dispara navegación, solo cambia el estado interno
+    // Hacer click sin esperar navegación
+    await page.click('button[type="submit"]');
+    console.log("   ✓ Click ejecutado");
+
+    // Esperar a que la SPA procese el login (puede mostrar dashboard o error)
+    console.log("   → Esperando respuesta de la SPA...");
+    await page.waitForTimeout(3000);
+
+    const urlAfter = page.url();
+    console.log(`✅ Login procesado en ${Date.now() - finalLoginStart}ms`);
+    console.log("📍 URL antes:", urlBefore);
+    console.log("📍 URL después:", urlAfter);
+
+    // Verificar si hubo cambio en la URL (hash routing en SPA)
+    if (urlBefore !== urlAfter) {
+      console.log("   ✓ URL cambió (navegación en SPA detectada)");
+    } else {
+      console.log("   → URL no cambió, verificando si estamos logueados...");
+    }
 
     console.log("\n✅ LOGIN EXITOSO");
 

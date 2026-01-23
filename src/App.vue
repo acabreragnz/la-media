@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { useLocalStorage } from '@vueuse/core'
 import { useCurrency } from '@/composables/useCurrency'
-import { useDeviceDetection } from '@/composables/useDeviceDetection'
-import CurrencyValue from '@/components/CurrencyValue.vue'
 import { PhX, PhClock, PhWarning, PhArrowSquareOut } from '@phosphor-icons/vue'
 import { formatNumber } from '@/utils/formatters'
 
@@ -11,9 +9,9 @@ const {
   loading,
   isFetching,
   error,
-  inputRef,
+  usdInputRef,
+  uyuInputRef,
   direction,
-  convertedAmount,
   refetch,
   swapDirection,
   shareViaWhatsApp,
@@ -21,12 +19,13 @@ const {
   lastScrapedAt
 } = useCurrency()
 
-// Detectar dispositivos de baja gama
-const { isLowEndDevice } = useDeviceDetection()
-
 // Seleccionar todo el texto del input al hacer click en la card
-function selectInputText() {
-  inputRef.value?.select()
+function selectUsdInput() {
+  usdInputRef.value?.select()
+}
+
+function selectUyuInput() {
+  uyuInputRef.value?.select()
 }
 
 // Feature flags
@@ -303,18 +302,29 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
           </div>
         </div>
 
-        <!-- Currency Input -->
+        <!-- Dynamic Rate Display -->
+        <div v-if="rates" class="text-center text-white/50 text-sm py-1">
+          <span v-if="direction === 'usdToUyu'">
+            1 USD = <span class="text-brou-yellow font-medium">{{ formatNumber(rates.media) }}</span> UYU
+          </span>
+          <span v-else>
+            1 UYU = <span class="text-brou-yellow font-medium">{{ formatNumber(1 / rates.media) }}</span> USD
+          </span>
+        </div>
+
+        <!-- USD Input -->
         <label
-          @click="selectInputText"
+          @click="selectUsdInput"
           class="bg-white/[0.05] border border-white/[0.08] rounded-[20px] p-5 flex items-center gap-4 transition-all focus-within:border-brou-blue-light/60 focus-within:bg-brou-blue/[0.06] focus-within:shadow-[0_0_30px_rgba(8,82,141,0.25)] cursor-text"
+          :class="{ 'ring-2 ring-brou-yellow/30': direction === 'usdToUyu' }"
         >
-          <span class="text-[2.25rem] leading-none">{{ direction === 'usdToUyu' ? '🇺🇸' : '🇺🇾' }}</span>
+          <span class="text-[2.25rem] leading-none">🇺🇸</span>
           <span class="flex-1 flex flex-col gap-1">
             <span class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
-              {{ direction === 'usdToUyu' ? 'Dólares' : 'Pesos' }}
+              Dólares
             </span>
             <input
-              ref="inputRef"
+              ref="usdInputRef"
               type="text"
               autofocus
               class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
@@ -328,7 +338,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
           <button
             @click="swapDirection"
             class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-brou-blue to-brou-blue-light rounded-full border-none cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-[0_8px_20px_rgba(8,82,141,0.5),0_0_40px_rgba(13,94,161,0.3)] hover:shadow-[0_12px_30px_rgba(8,82,141,0.7),0_0_60px_rgba(13,94,161,0.5)]"
-            aria-label="Intercambiar monedas"
+            aria-label="Intercambiar valores"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5.5 h-5.5 text-white transition-transform duration-400 ease-out" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
@@ -336,19 +346,25 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
           </button>
         </div>
 
-        <!-- Result Display -->
-        <div class="bg-gradient-to-br from-brou-blue/10 to-brou-blue-light/8 border border-brou-blue-light/20 rounded-[20px] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_0_40px_rgba(8,82,141,0.15)] flex items-center gap-4">
-          <span class="text-[2.25rem] leading-none">{{ direction === 'usdToUyu' ? '🇺🇾' : '🇺🇸' }}</span>
-          <div class="flex-1 flex flex-col gap-1">
-            <label class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
-              {{ direction === 'usdToUyu' ? 'Pesos' : 'Dólares' }}
-            </label>
-            <div class="text-white text-[1.75rem] font-semibold tracking-tight">
-              <CurrencyValue v-if="!isLowEndDevice" :value="convertedAmount" />
-              <span v-else>{{ formatNumber(convertedAmount) }}</span>
-            </div>
-          </div>
-        </div>
+        <!-- UYU Input -->
+        <label
+          @click="selectUyuInput"
+          class="bg-white/[0.05] border border-white/[0.08] rounded-[20px] p-5 flex items-center gap-4 transition-all focus-within:border-brou-blue-light/60 focus-within:bg-brou-blue/[0.06] focus-within:shadow-[0_0_30px_rgba(8,82,141,0.25)] cursor-text"
+          :class="{ 'ring-2 ring-brou-yellow/30': direction === 'uyuToUsd' }"
+        >
+          <span class="text-[2.25rem] leading-none">🇺🇾</span>
+          <span class="flex-1 flex flex-col gap-1">
+            <span class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
+              Pesos
+            </span>
+            <input
+              ref="uyuInputRef"
+              type="text"
+              class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
+              placeholder="0,00"
+            />
+          </span>
+        </label>
 
         <!-- Footer -->
         <div class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-3 sm:p-4">

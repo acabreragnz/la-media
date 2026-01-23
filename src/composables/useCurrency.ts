@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import type { ExchangeRates, ApiResponse, ConversionDirection } from '@/types/currency'
@@ -7,6 +7,7 @@ import { formatRelativeTime } from '@/utils/formatters'
 import { REFRESH_DELAY_SECONDS } from '@/config/refresh'
 
 export function useCurrency() {
+  // Direction indica cuál es el "source" para mostrar el rate
   const direction = ref<ConversionDirection>('usdToUyu')
 
   // Vue Query con refetchInterval dinámico basado en next_run del backend
@@ -89,48 +90,123 @@ export function useCurrency() {
     autoDecimalDigits: false
   } as const
 
-  // Configurar vue-currency-input con locale uruguayo
-  const { inputRef, numberValue, setValue, setOptions } = useCurrencyInput({
+  // Dual input: USD y UYU
+  const {
+    inputRef: usdInputRef,
+    numberValue: usdValue,
+    setValue: setUsdValue
+  } = useCurrencyInput({
     currency: 'USD',
     ...currencyInputConfig
   })
 
-  // Hacer reactiva la moneda según la dirección
-  watch(direction, (newDirection) => {
-    setOptions({
-      ...currencyInputConfig,
-      currency: newDirection === 'usdToUyu' ? 'USD' : 'UYU'
-    })
+  const {
+    inputRef: uyuInputRef,
+    numberValue: uyuValue,
+    setValue: setUyuValue
+  } = useCurrencyInput({
+    currency: 'UYU',
+    ...currencyInputConfig
   })
 
-  const convertedAmount = computed(() => {
-    if (!rates.value || !numberValue.value) return 0
+  // Flag para evitar loops infinitos en los watches
+  const isUpdating = ref(false)
 
-    const inputAmount = numberValue.value
-    if (isNaN(inputAmount)) return 0
+  // Cuando USD cambia, actualizar UYU
+  watch(usdValue, (newVal) => {
+    if (isUpdating.value) return
 
-    return direction.value === 'usdToUyu'
-      ? inputAmount * rates.value.media
-      : inputAmount / rates.value.media
-  })
+    // Marcar como source activo
+    direction.value = 'usdToUyu'
 
-  const swapDirection = () => {
-    // Si el input está vacío, solo cambiar dirección
-    if (numberValue.value === null) {
-      direction.value = direction.value === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu'
+    if (newVal === null || !rates.value) {
+      isUpdating.value = true
+      setUyuValue(null)
+      nextTick(() => {
+        isUpdating.value = false
+      })
       return
     }
 
-    const newAmount = convertedAmount.value
+    isUpdating.value = true
+    setUyuValue(newVal * rates.value.media)
+    nextTick(() => {
+      isUpdating.value = false
+    })
+  })
+
+  // Cuando UYU cambia, actualizar USD
+  watch(uyuValue, (newVal) => {
+    if (isUpdating.value) return
+
+    // Marcar como source activo
+    direction.value = 'uyuToUsd'
+
+    if (newVal === null || !rates.value) {
+      isUpdating.value = true
+      setUsdValue(null)
+      nextTick(() => {
+        isUpdating.value = false
+      })
+      return
+    }
+
+    isUpdating.value = true
+    setUsdValue(newVal / rates.value.media)
+    nextTick(() => {
+      isUpdating.value = false
+    })
+  })
+
+  // Recalcular cuando cambian los rates
+  watch(rates, (newRates) => {
+    if (!newRates || isUpdating.value) return
+
+    isUpdating.value = true
+
+    if (direction.value === 'usdToUyu' && usdValue.value !== null) {
+      setUyuValue(usdValue.value * newRates.media)
+    } else if (direction.value === 'uyuToUsd' && uyuValue.value !== null) {
+      setUsdValue(uyuValue.value / newRates.media)
+    }
+
+    nextTick(() => {
+      isUpdating.value = false
+    })
+  })
+
+  // El swap intercambia los valores y cambia la dirección
+  const swapDirection = () => {
+    const tempUsd = usdValue.value
+    const tempUyu = uyuValue.value
+
+    isUpdating.value = true
+
+    setUsdValue(tempUyu)
+    setUyuValue(tempUsd)
+
+    // Cambiar la dirección
     direction.value = direction.value === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu'
-    setValue(newAmount)
+
+    nextTick(() => {
+      isUpdating.value = false
+    })
   }
+
+  // Computed para obtener input y output según direction (para WhatsApp share)
+  const inputAmount = computed(() =>
+    direction.value === 'usdToUyu' ? usdValue.value : uyuValue.value
+  )
+
+  const convertedAmount = computed(() =>
+    direction.value === 'usdToUyu' ? uyuValue.value ?? 0 : usdValue.value ?? 0
+  )
 
   const shareViaWhatsApp = () => {
     if (!rates.value) return
 
     shareConversionViaWhatsApp({
-      inputAmount: numberValue.value || null,
+      inputAmount: inputAmount.value,
       convertedAmount: convertedAmount.value,
       direction: direction.value,
       rates: rates.value
@@ -194,10 +270,16 @@ export function useCurrency() {
     loading,
     isFetching,
     error,
-    inputRef,
-    numberValue,
-    setValue,
+    // Dual input refs
+    usdInputRef,
+    usdValue,
+    setUsdValue,
+    uyuInputRef,
+    uyuValue,
+    setUyuValue,
+    // Direction y conversión
     direction,
+    inputAmount,
     convertedAmount,
     refetch,
     swapDirection,

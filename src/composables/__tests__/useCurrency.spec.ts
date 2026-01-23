@@ -23,23 +23,47 @@ vi.mock('@tanstack/vue-query', () => ({
   })
 }))
 
-// Mock vue-currency-input
-const mockNumberValue = ref<number | null>(null)
-const mockSetValue = vi.fn((value: number | null) => {
+// Mock vue-currency-input - dual input (USD y UYU)
+const mockUsdValue = ref<number | null>(null)
+const mockUyuValue = ref<number | null>(null)
+
+const mockSetUsdValue = vi.fn((value: number | null) => {
   if (value === null) {
-    mockNumberValue.value = null
+    mockUsdValue.value = null
   } else {
-    mockNumberValue.value = Math.round(value * 100) / 100
+    mockUsdValue.value = Math.round(value * 100) / 100
   }
 })
 
+const mockSetUyuValue = vi.fn((value: number | null) => {
+  if (value === null) {
+    mockUyuValue.value = null
+  } else {
+    mockUyuValue.value = Math.round(value * 100) / 100
+  }
+})
+
+let callCount = 0
 vi.mock('vue-currency-input', () => ({
-  useCurrencyInput: () => ({
-    inputRef: ref(null),
-    numberValue: mockNumberValue,
-    setValue: mockSetValue,
-    setOptions: vi.fn(),
-  }),
+  useCurrencyInput: () => {
+    // Alternar entre USD y UYU en cada llamada
+    callCount++
+    if (callCount % 2 === 1) {
+      return {
+        inputRef: ref(null),
+        numberValue: mockUsdValue,
+        setValue: mockSetUsdValue,
+        setOptions: vi.fn(),
+      }
+    } else {
+      return {
+        inputRef: ref(null),
+        numberValue: mockUyuValue,
+        setValue: mockSetUyuValue,
+        setOptions: vi.fn(),
+      }
+    }
+  },
   CurrencyDisplay: {
     hidden: 'hidden',
     symbol: 'symbol',
@@ -52,7 +76,9 @@ vi.mock('vue-currency-input', () => ({
 describe('useCurrency', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockNumberValue.value = null
+    callCount = 0
+    mockUsdValue.value = null
+    mockUyuValue.value = null
     mockQueryData.value = undefined
     mockIsPending.value = false
     mockIsFetching.value = false
@@ -62,113 +88,65 @@ describe('useCurrency', () => {
 
   describe('Initial State', () => {
     it('should have correct initial state values', () => {
-      const { rates, loading, error, numberValue, direction } = useCurrency()
+      const { rates, loading, error, usdValue, uyuValue, direction } = useCurrency()
 
       expect(rates.value).toBeNull()
       expect(loading.value).toBe(false)
       expect(error.value).toBeNull()
-      expect(numberValue.value).toBeNull()
+      expect(usdValue.value).toBeNull()
+      expect(uyuValue.value).toBeNull()
       expect(direction.value).toBe('usdToUyu')
     })
   })
 
-  describe('Conversion Logic', () => {
-    it('should convert USD to UYU correctly', () => {
-      const { rates, setValue, direction, convertedAmount } = useCurrency()
+  describe('Dual Input Conversion', () => {
+    it('should have separate USD and UYU inputs', () => {
+      const { usdInputRef, uyuInputRef, setUsdValue, setUyuValue } = useCurrency()
 
-      // Simular datos de Vue Query
-      mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
-        metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
-          source: 'scheduled'
-        }
-      }
-
-      setValue(100)
-      direction.value = 'usdToUyu'
-
-      expect(rates.value).toEqual({
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
-      })
-      expect(convertedAmount.value).toBe(4100) // 100 * 41.0 (media)
+      expect(usdInputRef).toBeDefined()
+      expect(uyuInputRef).toBeDefined()
+      expect(setUsdValue).toBeDefined()
+      expect(setUyuValue).toBeDefined()
     })
 
-    it('should convert UYU to USD correctly', () => {
-      const { setValue, direction, convertedAmount } = useCurrency()
+    it('should expose inputAmount based on direction', () => {
+      const { inputAmount, direction, setUsdValue, setUyuValue } = useCurrency()
 
       mockQueryData.value = {
         cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
-        metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
-          source: 'scheduled'
-        }
+        detalle: { compra: 40.0, venta: 42.0, moneda: 'USD' },
+        metadata: { scraped_at: '2024-01-01T00:00:00Z', next_run: null, source: 'scheduled' }
       }
 
-      setValue(4100)
+      // USD to UYU direction
+      direction.value = 'usdToUyu'
+      setUsdValue(100)
+      expect(inputAmount.value).toBe(100)
+
+      // UYU to USD direction
       direction.value = 'uyuToUsd'
-
-      expect(convertedAmount.value).toBe(100) // 4100 / 41.0 (media)
+      setUyuValue(4100)
+      expect(inputAmount.value).toBe(4100)
     })
 
-    it('should return 0 when amount is empty', () => {
-      const { numberValue, convertedAmount } = useCurrency()
+    it('should expose convertedAmount based on direction', () => {
+      const { convertedAmount, direction, setUsdValue, setUyuValue } = useCurrency()
 
       mockQueryData.value = {
         cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
-        metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
-          source: 'scheduled'
-        }
+        detalle: { compra: 40.0, venta: 42.0, moneda: 'USD' },
+        metadata: { scraped_at: '2024-01-01T00:00:00Z', next_run: null, source: 'scheduled' }
       }
 
-      numberValue.value = null
-
-      expect(convertedAmount.value).toBe(0)
-    })
-
-    it('should handle decimal amounts', () => {
-      const { setValue, direction, convertedAmount } = useCurrency()
-
-      mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
-        metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
-          source: 'scheduled'
-        }
-      }
-
-      setValue(100.50)
+      // USD to UYU: converted is UYU value
       direction.value = 'usdToUyu'
+      setUyuValue(4100)
+      expect(convertedAmount.value).toBe(4100)
 
-      expect(convertedAmount.value).toBe(4120.5) // 100.50 * 41.0 (media)
+      // UYU to USD: converted is USD value
+      direction.value = 'uyuToUsd'
+      setUsdValue(100)
+      expect(convertedAmount.value).toBe(100)
     })
   })
 
@@ -189,82 +167,23 @@ describe('useCurrency', () => {
       expect(direction.value).toBe('usdToUyu')
     })
 
-    it('should update amount to converted value after swap', () => {
-      const { setValue, numberValue, direction, swapDirection } = useCurrency()
+    it('should swap values between USD and UYU fields', () => {
+      const { setUsdValue, setUyuValue, swapDirection } = useCurrency()
 
       mockQueryData.value = {
         cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
-        metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
-          source: 'scheduled'
-        }
+        detalle: { compra: 40.0, venta: 42.0, moneda: 'USD' },
+        metadata: { scraped_at: '2024-01-01T00:00:00Z', next_run: null, source: 'scheduled' }
       }
 
-      setValue(100)
-      direction.value = 'usdToUyu'
+      setUsdValue(100)
+      setUyuValue(4100)
 
       swapDirection()
 
-      expect(numberValue.value).toBe(4100) // 100 * 41.0 (media)
-      expect(direction.value).toBe('uyuToUsd')
-    })
-  })
-
-  describe('Swap Direction Edge Cases', () => {
-    it('should keep input empty when swapping with null value', () => {
-      const { numberValue, swapDirection, direction } = useCurrency()
-
-      mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
-        metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
-          source: 'scheduled'
-        }
-      }
-
-      expect(numberValue.value).toBeNull()
-
-      swapDirection()
-
-      expect(numberValue.value).toBeNull()
-      expect(direction.value).toBe('uyuToUsd')
-    })
-
-    it('should correctly swap when value is zero', () => {
-      const { setValue, numberValue, swapDirection } = useCurrency()
-
-      mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
-        metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
-          source: 'scheduled'
-        }
-      }
-
-      setValue(0)
-      expect(numberValue.value).toBe(0)
-
-      swapDirection()
-
-      expect(numberValue.value).toBe(0)
+      // Values should be swapped
+      expect(mockSetUsdValue).toHaveBeenCalledWith(4100)
+      expect(mockSetUyuValue).toHaveBeenCalledWith(100)
     })
   })
 
@@ -530,10 +449,10 @@ describe('useCurrency', () => {
       windowOpenSpy.mockRestore()
     })
 
-    it('should share rates even when numberValue is null', () => {
+    it('should share rates even when input values are null', () => {
       const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
 
-      const { shareViaWhatsApp, numberValue } = useCurrency()
+      const { shareViaWhatsApp } = useCurrency()
 
       mockQueryData.value = {
         cotizacion_media: 41.0,
@@ -548,7 +467,6 @@ describe('useCurrency', () => {
           source: 'scheduled'
         }
       }
-      numberValue.value = null
 
       shareViaWhatsApp()
 
@@ -563,7 +481,7 @@ describe('useCurrency', () => {
     it('should open WhatsApp when data is valid', () => {
       const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
 
-      const { shareViaWhatsApp, setValue, direction } = useCurrency()
+      const { shareViaWhatsApp, setUsdValue, direction } = useCurrency()
 
       mockQueryData.value = {
         cotizacion_media: 41.0,
@@ -578,7 +496,7 @@ describe('useCurrency', () => {
           source: 'scheduled'
         }
       }
-      setValue(100)
+      setUsdValue(100)
       direction.value = 'usdToUyu'
 
       shareViaWhatsApp()

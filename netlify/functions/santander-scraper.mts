@@ -53,9 +53,12 @@ export default async (req: Request) => {
         "--no-sandbox",
         "--disable-setuid-sandbox",
         "--disable-blink-features=AutomationControlled",
+        "--disable-web-security",
+        "--disable-features=IsolateOrigins,site-per-process",
+        "--disable-dev-shm-usage",
       ],
       executablePath: await chromiumPack.executablePath(),
-      headless: true,
+      headless: chromiumPack.headless,
     });
 
     console.log(`✅ Navegador lanzado en ${Date.now() - launchStart}ms`);
@@ -82,9 +85,41 @@ export default async (req: Request) => {
 
     // Ocultar que estamos usando webdriver
     await context.addInitScript(() => {
-      Object.defineProperty(navigator, 'webdriver', { get: () => false });
-      Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
-      Object.defineProperty(navigator, 'languages', { get: () => ['es-UY', 'es', 'en'] });
+      // Ocultar webdriver
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => false,
+      });
+
+      // Simular plugins reales
+      Object.defineProperty(navigator, 'plugins', {
+        get: () => [
+          { name: 'Chrome PDF Plugin' },
+          { name: 'Chrome PDF Viewer' },
+          { name: 'Native Client' },
+        ],
+      });
+
+      // Configurar idiomas
+      Object.defineProperty(navigator, 'languages', {
+        get: () => ['es-UY', 'es', 'en-US'],
+      });
+
+      // Agregar chrome object
+      if (!window.chrome) {
+        window.chrome = {
+          runtime: {},
+        };
+      }
+
+      // Ocultar automation
+      delete navigator.__proto__.webdriver;
+
+      // Simular permisos
+      const originalQuery = window.navigator.permissions.query;
+      window.navigator.permissions.query = (parameters) =>
+        parameters.name === 'notifications'
+          ? Promise.resolve({ state: Notification.permission })
+          : originalQuery(parameters);
     });
 
     const page = await context.newPage();
@@ -100,10 +135,21 @@ export default async (req: Request) => {
     console.log(`✅ Página cargada en ${Date.now() - navStart}ms`);
     console.log("📍 URL actual:", page.url());
 
+    // Esperar un poco más para que JavaScript se ejecute
+    console.log("\n⏳ Esperando 3 segundos para que JavaScript cargue el contenido...");
+    await page.waitForTimeout(3000);
+
     // DEBUG: Capturar HTML de la página para ver qué elementos existen
     console.log("\n🔍 DEBUG: Analizando estructura de la página...");
     const pageContent = await page.content();
     console.log("📄 HTML length:", pageContent.length, "caracteres");
+
+    // Si el HTML es pequeño, mostrarlo completo
+    if (pageContent.length < 500) {
+      console.log("\n⚠️  HTML COMPLETO (página muy pequeña):");
+      console.log(pageContent);
+      console.log("\n");
+    }
 
     // Buscar el formulario en el HTML
     const hasForm = pageContent.includes('santander-login-persona-form');

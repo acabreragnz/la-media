@@ -326,9 +326,17 @@ export default async (req: Request) => {
     console.log("   ✓ Confirmado: Estamos en Supernet");
 
     console.log("\n✏️  Paso 6: Esperando formulario de contraseña en Supernet (SPA)...");
-    // Supernet es una SPA (Single Page App), puede tardar en cargar el formulario
-    console.log("   → Esperando a que la SPA cargue el formulario de password...");
-    await page.waitForTimeout(3000);
+    // Supernet es una SPA (Single Page App) - el HTML inicial está vacío
+    // Necesitamos esperar a que JavaScript monte el formulario
+    console.log("   → Esperando a que la SPA monte el DOM (esperar a que aparezca algún input)...");
+
+    // Esperar hasta que aparezca CUALQUIER input en la página (señal de que la SPA montó)
+    await page.waitForFunction(
+      () => document.querySelectorAll('input').length > 0,
+      { timeout: 20000 }
+    );
+
+    console.log("   ✓ SPA montada (inputs detectados en el DOM)");
 
     // DEBUG: Capturar el estado de la página de Supernet
     console.log("\n🔍 DEBUG: Analizando página de Supernet...");

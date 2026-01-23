@@ -320,16 +320,6 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
           </div>
         </div>
 
-        <!-- Dynamic Rate Display -->
-        <div v-if="rates" class="text-center text-white/50 text-sm py-1">
-          <span v-if="direction === 'usdToUyu'">
-            1 USD = <span class="text-brou-yellow font-medium">{{ formatNumber(rates.media) }}</span> UYU
-          </span>
-          <span v-else>
-            1 UYU = <span class="text-brou-yellow font-medium">{{ formatNumber(1 / rates.media) }}</span> USD
-          </span>
-        </div>
-
         <!-- USD Input -->
         <label
           @click="selectUsdInput"
@@ -385,6 +375,16 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
             />
           </span>
         </label>
+
+        <!-- Dynamic Rate Display -->
+        <div v-if="rates" class="text-center text-white/50 text-sm py-2">
+          <span v-if="direction === 'usdToUyu'">
+            1 USD = <span class="text-brou-yellow font-medium">{{ formatNumber(rates.media) }}</span> UYU
+          </span>
+          <span v-else>
+            1 UYU = <span class="text-brou-yellow font-medium">{{ formatNumber(1 / rates.media) }}</span> USD
+          </span>
+        </div>
 
         <!-- Footer -->
         <div class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-3 sm:p-4">

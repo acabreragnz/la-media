@@ -169,17 +169,43 @@ export default async (req: Request) => {
       console.log("   → Inputs de texto encontrados:", inputMatches.slice(0, 3));
     }
 
-    console.log("\n✏️  Paso 3: Rellenando formulario de login (Paso 1/2 - Documento)...");
+    console.log("\n✏️  Paso 3: Expandiendo formulario de login...");
 
-    // Esperar a que el formulario de login esté visible
-    await page.waitForSelector("#santander-login-persona-form", { timeout: 5000 });
-    console.log("   ✓ Formulario de login detectado");
+    // El formulario está dentro de un Bootstrap collapse, usar JavaScript para expandirlo
+    try {
+      console.log("   → Expandiendo collapse con JavaScript...");
+      await page.evaluate(() => {
+        // Encontrar el elemento collapse
+        const collapseElement = document.getElementById('collapseLogin');
+        if (collapseElement) {
+          // Remover la clase 'collapse' para que se muestre
+          collapseElement.classList.remove('collapse');
+          collapseElement.classList.add('show');
+          console.log('Collapse expandido mediante manipulación de clases');
+        } else {
+          console.log('No se encontró #collapseLogin');
+        }
+      });
+      console.log("   ✓ Collapse expandido");
+
+      // Esperar un poco para que el DOM se actualice
+      await page.waitForTimeout(500);
+
+    } catch (error) {
+      console.log("   ⚠️  Error al expandir formulario:", error);
+    }
+
+    console.log("\n✏️  Paso 4: Rellenando formulario de login (Paso 1/2 - Documento)...");
+
+    // Ahora el formulario debería estar visible
+    await page.waitForSelector("#santander-login-persona-form", { timeout: 5000, state: 'visible' });
+    console.log("   ✓ Formulario de login detectado y visible");
 
     console.log("   → Ingresando documento...");
     await page.fill("#edit-document", DOCUMENTO);
     console.log("   ✓ Documento ingresado:", DOCUMENTO);
 
-    console.log("\n🖱️  Paso 4: Haciendo click en botón Ingresar (primera pantalla)...");
+    console.log("\n🖱️  Paso 5: Haciendo click en botón Ingresar (primera pantalla)...");
     await page.click("#santander-login-persona-form button[type='submit']");
     console.log("   ✓ Click ejecutado en submit");
 

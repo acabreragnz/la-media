@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import { useCurrency } from '@/composables/useCurrency'
 import { PhX, PhClock, PhWarning, PhArrowSquareOut } from '@phosphor-icons/vue'
@@ -20,18 +21,29 @@ const {
   lastScrapedAt
 } = useCurrency()
 
-// Seleccionar todo el texto del input al hacer click en la card
+// Track si el input ya tuvo su selección inicial después del focus
+const usdHadInitialSelect = ref(false)
+const uyuHadInitialSelect = ref(false)
+
+// Seleccionar todo el texto del input al hacer click en la card (solo si no tuvo selección inicial)
 function selectUsdInput() {
-  usdInputRef.value?.select()
+  if (!usdHadInitialSelect.value) {
+    usdInputRef.value?.select()
+    usdHadInitialSelect.value = true
+  }
 }
 
 function selectUyuInput() {
-  uyuInputRef.value?.select()
+  if (!uyuHadInitialSelect.value) {
+    uyuInputRef.value?.select()
+    uyuHadInitialSelect.value = true
+  }
 }
 
 // Scroll al input cuando recibe focus (para que el teclado no lo tape en mobile)
 function onUsdFocus(event: FocusEvent) {
   setDirection('usdToUyu')
+  usdHadInitialSelect.value = false // Reset para permitir selección en el próximo click
   const target = event.target as HTMLElement
   setTimeout(() => {
     target.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -40,10 +52,20 @@ function onUsdFocus(event: FocusEvent) {
 
 function onUyuFocus(event: FocusEvent) {
   setDirection('uyuToUsd')
+  uyuHadInitialSelect.value = false // Reset para permitir selección en el próximo click
   const target = event.target as HTMLElement
   setTimeout(() => {
     target.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, 300)
+}
+
+// Reset en blur para que el próximo focus vuelva a seleccionar todo
+function onUsdBlur() {
+  usdHadInitialSelect.value = false
+}
+
+function onUyuBlur() {
+  uyuHadInitialSelect.value = false
 }
 
 // Feature flags
@@ -338,6 +360,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
               placeholder="0,00"
               @focus="onUsdFocus"
+              @blur="onUsdBlur"
             />
           </span>
         </label>
@@ -372,6 +395,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
               class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
               placeholder="0,00"
               @focus="onUyuFocus"
+              @blur="onUyuBlur"
             />
           </span>
         </label>

@@ -409,7 +409,7 @@ const disclaimerDismissed = useLocalStorage('broumedia_disclaimer_dismissed', fa
            target="_blank"
            rel="noopener"
            class="inline-flex items-center gap-1 mt-1.5 text-white/40 text-[0.7rem] transition-colors hover:text-brou-yellow">
-          Invitame un 🧉
+          🧉 Ayudame con el dominio
         </a>
       </div>
     </div>

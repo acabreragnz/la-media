@@ -1,22 +1,24 @@
-import type { ConversionDirection, ExchangeRateDisplay } from '@/types/currency'
+import type { ConversionDirection } from '@/types/currency'
+import type { ExchangeRateRecord } from '@shared/types/exchange-rates.mts'
 import { formatNumber, formatTimestamp } from './formatters'
 
 export interface ConversionShareData {
   inputAmount: number | null
   convertedAmount: number
   direction: ConversionDirection
-  rates: ExchangeRateDisplay
+  rates: ExchangeRateRecord
+  bankName: string
 }
 
 /**
  * Formats exchange rates information (DRY helper)
  */
-function formatRatesInfo(rates: ExchangeRateDisplay): string {
+function formatRatesInfo(rates: ExchangeRateRecord): string {
   return `📊 Tipos de cambio:\n` +
     `Compra: $${formatNumber(rates.buy)}\n` +
     `Venta: $${formatNumber(rates.sell)}\n` +
     `Media: $${formatNumber(rates.average)}\n` +
-    `🕒 Cotización del: ${formatTimestamp(rates.scrapedAt)}`
+    `🕒 Cotización del: ${formatTimestamp(rates.metadata.scrapedAt)}`
 }
 
 /**
@@ -39,13 +41,13 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
     const fromCurrency = data.direction === 'usdToUyu' ? 'Dólares' : 'Pesos'
     const toCurrency = data.direction === 'usdToUyu' ? 'Pesos' : 'Dólares'
 
-    message = `Media BROU - Conversión\n\n` +
+    message = `Media ${data.bankName} - Conversión\n\n` +
       `${formatNumber(data.inputAmount)} ${fromCurrency} = ${formatNumber(data.convertedAmount)} ${toCurrency}\n\n` +
       `${ratesInfo}\n\n` +
       `🔗 ${appUrl}`
   } else {
     // Rates only
-    message = `Media BROU - Cotización\n\n` +
+    message = `Media ${data.bankName} - Cotización\n\n` +
       `${ratesInfo}\n\n` +
       `🔗 ${appUrl}`
   }

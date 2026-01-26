@@ -141,7 +141,8 @@ export function createCurrencyComposable(config: CurrencyConfig) {
       inputAmount: numberValue.value || null,
       convertedAmount: convertedAmount.value,
       direction: direction.value,
-      rates: rates.value
+      rates: rates.value,
+      bankName: config.bankName
     })
   }
 
@@ -193,8 +194,8 @@ export function createCurrencyComposable(config: CurrencyConfig) {
   })
 
   const lastScrapedAt = computed(() => {
-    if (!rates.value?.scrapedAt) return '--:--'
-    return formatRelativeTime(rates.value.scrapedAt)
+    if (!rates.value?.metadata.scrapedAt) return '--:--'
+    return formatRelativeTime(rates.value.metadata.scrapedAt)
   })
 
   return {

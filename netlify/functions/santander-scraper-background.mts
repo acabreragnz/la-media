@@ -1,5 +1,6 @@
 import { chromium } from "playwright-core";
 import chromiumPack from "@sparticuz/chromium";
+import { getStore } from "@netlify/blobs";
 
 /**
  * Background function que realiza scraping de Santander
@@ -15,6 +16,8 @@ export default async (req: Request) => {
   console.log("⏱️  Timeout límite: 15 minutos");
 
   let browser;
+  let compra: string | null = null;
+  let venta: string | null = null;
 
   // Variables de entorno
   const DOCUMENTO = process.env.SANTANDER_DOC || "34628547";
@@ -346,42 +349,172 @@ export default async (req: Request) => {
     await page.fill(passwordSelector, PASSWORD);
     console.log("   ✓ Password ingresado");
 
-    console.log("\n🖱️  Paso 7: Haciendo click en botón de login final...");
+    console.log("\n🖱️  Paso 7: Haciendo click en botón 'Siguiente'...");
     const finalLoginStart = Date.now();
 
-    console.log("   → Haciendo click en botón submit...");
+    // Esperar a que el botón se renderice
+    console.log("   → Esperando que el botón 'Siguiente' se renderice...");
+    await page.waitForTimeout(5000);
+
     const urlBefore = page.url();
 
-    // En una SPA, el click NO dispara navegación, solo cambia el estado interno
-    // Hacer click sin esperar navegación
-    await page.click('button[type="submit"]');
-    console.log("   ✓ Click ejecutado");
+    // El botón "Siguiente" es un enlace <a> con clase específica
+    console.log("   → Buscando botón 'Siguiente' (enlace con clase ipswich-main-buttons-link)...");
 
-    // Esperar a que la SPA procese el login (puede mostrar dashboard o error)
-    console.log("   → Esperando respuesta de la SPA...");
-    await page.waitForTimeout(3000);
+    const submitButtonSelectors = [
+      'a.ipswich-main-buttons-link:has-text("Siguiente")',
+      'a:has-text("Siguiente")',
+      'icb-button:has-text("Siguiente")',
+    ];
 
-    const urlAfter = page.url();
-    console.log(`✅ Login procesado en ${Date.now() - finalLoginStart}ms`);
-    console.log("📍 URL antes:", urlBefore);
-    console.log("📍 URL después:", urlAfter);
-
-    // Verificar si hubo cambio en la URL (hash routing en SPA)
-    if (urlBefore !== urlAfter) {
-      console.log("   ✓ URL cambió (navegación en SPA detectada)");
-    } else {
-      console.log("   → URL no cambió, verificando si estamos logueados...");
+    let submitClicked = false;
+    for (const selector of submitButtonSelectors) {
+      try {
+        const btn = await page.$(selector);
+        if (btn && await btn.isVisible()) {
+          console.log(`   → Botón "Siguiente" encontrado con selector: ${selector}`);
+          await btn.click();
+          console.log("   ✓ Click en 'Siguiente' ejecutado");
+          submitClicked = true;
+          break;
+        }
+      } catch (e) {
+        // Intentar siguiente selector
+      }
     }
 
-    console.log("\n✅ LOGIN EXITOSO");
+    if (!submitClicked) {
+      console.log("   ⚠️  No se encontró el botón 'Siguiente'");
+      throw new Error("No se pudo hacer click en botón Siguiente");
+    }
 
-    // TODO: Aquí implementar la lógica de captura
-    console.log("\n📊 Paso 8: Extrayendo datos...");
-    console.log("   ⚠️  TODO: Implementar extracción de saldo y transacciones");
+    console.log("\n   → Esperando que el dashboard cargue...");
+    console.log("   → URL actual:", urlBefore);
+    console.log("   → Esperando redirect a #/home...");
 
-    // TODO: Guardar en Blobs
+    // Esperar a que la URL cambie a #/home (señal de login exitoso)
+    try {
+      await page.waitForFunction(
+        () => window.location.href.includes('#/home'),
+        { timeout: 30000 }
+      );
+      console.log("   ✓ Redirect a #/home detectado");
+    } catch (error) {
+      console.log("   ⚠️  No se detectó redirect a #/home en 30 segundos");
+      console.log("   → URL actual:", page.url());
+
+      // Verificar si hay mensajes de error
+      const pageContent = await page.content();
+      const hasError = pageContent.toLowerCase().includes('error') ||
+                      pageContent.toLowerCase().includes('incorrecto') ||
+                      pageContent.toLowerCase().includes('inválid');
+
+      if (hasError) {
+        console.log("   ❌ Posible error de credenciales detectado en la página");
+        throw new Error("Login fallido - verificar credenciales");
+      }
+
+      throw error;
+    }
+
+    const urlAfter = page.url();
+    console.log("   ✓ URL cambió de:", urlBefore);
+    console.log("   ✓ URL ahora es:", urlAfter);
+
+    // Esperar a que el loader desaparezca
+    console.log("\n   → Esperando que desaparezca el loader de Angular...");
+    try {
+      await page.waitForFunction(
+        () => !document.querySelector('.mesina-loader'),
+        { timeout: 20000 }
+      );
+      console.log("   ✓ Loader desaparecido");
+    } catch (error) {
+      console.log("   ⚠️  Loader sigue visible después de 20 segundos (puede ser normal si la conexión es lenta)");
+    }
+
+    // Esperar a que aparezcan elementos del dashboard
+    console.log("\n   → Esperando elementos del dashboard...");
+    const dashboardSelectors = [
+      '.dashboard',
+      '.cotizaciones',
+      '[class*="home"]',
+      '[class*="widget"]',
+      'main',
+      '.content',
+    ];
+
+    let dashboardFound = false;
+    for (const selector of dashboardSelectors) {
+      try {
+        await page.waitForSelector(selector, { timeout: 5000 });
+        console.log(`   ✓ Dashboard detectado (selector: ${selector})`);
+        dashboardFound = true;
+        break;
+      } catch (e) {
+        // Intentar siguiente selector
+      }
+    }
+
+    if (!dashboardFound) {
+      console.log("   ⚠️  No se encontró selector específico del dashboard");
+      console.log("   → Verificando que haya contenido en la página...");
+
+      const bodyText = await page.$eval('body', el => el.textContent?.trim() || '');
+      console.log(`   → Texto del body (primeros 200 chars): ${bodyText.substring(0, 200)}`);
+
+      if (bodyText.length > 100) {
+        console.log("   ✓ Página tiene contenido (asumiendo dashboard cargado)");
+        dashboardFound = true;
+      }
+    }
+
+    console.log(`\n✅ LOGIN EXITOSO - Dashboard cargado en ${Date.now() - finalLoginStart}ms`);
+
+    // Extraer datos del dashboard
+    console.log("\n📊 Paso 8: Extrayendo cotizaciones de USD/UYU...");
+
+    try {
+      // Esperar un momento para que el widget de cotizaciones cargue completamente
+      await page.waitForTimeout(3000);
+
+      // Extraer compra y venta del widget de cotizaciones
+      compra = await page.$eval('.data-content-middle', el => el.textContent?.trim() || null);
+      venta = await page.$eval('.data-content-right', el => el.textContent?.trim() || null);
+
+      if (compra && venta) {
+        console.log(`   ✓ Compra: ${compra}`);
+        console.log(`   ✓ Venta: ${venta}`);
+      } else {
+        console.log("   ⚠️  No se pudieron extraer las cotizaciones (valores null)");
+      }
+    } catch (extractError) {
+      console.error("   ❌ Error al extraer cotizaciones:", extractError instanceof Error ? extractError.message : extractError);
+      console.log("   → Continuando sin datos de cotización...");
+    }
+
+    // Guardar en Netlify Blobs
     console.log("\n💾 Paso 9: Guardando en Netlify Blobs...");
-    console.log("   ⚠️  TODO: Implementar guardado en Blobs");
+
+    try {
+      const santanderStore = getStore("santander-rates");
+
+      const data = {
+        timestamp: new Date().toISOString(),
+        compra: compra ? parseFloat(compra.replace(',', '.')) : null,
+        venta: venta ? parseFloat(venta.replace(',', '.')) : null,
+        source: "santander",
+        scrapedAt: new Date().toISOString(),
+      };
+
+      console.log("   → Guardando datos:", JSON.stringify(data, null, 2));
+
+      await santanderStore.setJSON("latest", data);
+      console.log("   ✓ Datos guardados en Netlify Blobs (store: santander-rates, key: latest)");
+    } catch (blobError) {
+      console.error("   ❌ Error al guardar en Blobs:", blobError instanceof Error ? blobError.message : blobError);
+      // No lanzar error - el scraping fue exitoso aunque no se guardó
+    }
 
     const totalTime = Date.now() - startTime;
     console.log("\n" + "=".repeat(60));
@@ -393,6 +526,10 @@ export default async (req: Request) => {
       JSON.stringify({
         success: true,
         message: "Scraping completado",
+        data: {
+          compra: compra ? parseFloat(compra.replace(',', '.')) : null,
+          venta: venta ? parseFloat(venta.replace(',', '.')) : null,
+        },
         executionTime: totalTime,
         timestamp: new Date().toISOString()
       }),

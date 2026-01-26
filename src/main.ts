@@ -6,6 +6,7 @@ import { VueQueryPlugin } from '@tanstack/vue-query'
 import { initPostHog } from '@/lib/posthog'
 import { initSentry } from '@/lib/sentry'
 import App from './App.vue'
+import { router } from './router.ts'
 
 const app = createApp(App)
 
@@ -24,5 +25,7 @@ app.use(VueQueryPlugin, {
     }
   }
 })
+
+app.use(router)
 
 app.mount('#app')

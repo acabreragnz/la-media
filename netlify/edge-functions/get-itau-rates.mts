@@ -1,7 +1,7 @@
 import type { Config, Context } from '@netlify/functions';
 import { getStore } from '@netlify/blobs';
-import { scrapeBrouRates } from '../functions/utils/brou-scraper.mts';
-import type { BrouRatesWithMetadata } from '../functions/update-brou-rates.mts';
+import { scrapeItauRates } from '../functions/utils/itau-scraper.mts';
+import type { ExchangeRateRecord } from '../../shared/types/exchange-rates.mts';
 
 /**
  * Edge function que sirve las cotizaciones desde Netlify Blobs
@@ -18,8 +18,8 @@ import type { BrouRatesWithMetadata } from '../functions/update-brou-rates.mts';
 export default async (_request: Request, _context: Context) => {
   try {
     // Intentar leer desde Blobs (rápido, cached en edge)
-    const store = getStore('brou-rates');
-    const cachedRates = await store.get('latest', { type: 'json' }) as BrouRatesWithMetadata | null;
+    const store = getStore('rates');
+    const cachedRates = await store.get('itau-latest', { type: 'json' }) as ExchangeRateRecord | null;
 
     if (cachedRates) {
       return new Response(JSON.stringify(cachedRates), {
@@ -33,8 +33,8 @@ export default async (_request: Request, _context: Context) => {
 
     // Fallback: si Blobs está vacío, hacer scraping directo
     console.warn('⚠️ Blobs vacío, ejecutando scraping de fallback');
-    const rates = await scrapeBrouRates();
-    const dataToStore: BrouRatesWithMetadata = {
+    const rates = await scrapeItauRates();
+    const dataToStore: ExchangeRateRecord = {
       ...rates,
       metadata: {
         scraped_at: new Date().toISOString(),
@@ -43,7 +43,7 @@ export default async (_request: Request, _context: Context) => {
       }
     }
 
-    await store.setJSON('latest', dataToStore);
+    await store.setJSON('itau-latest', dataToStore);
 
     return new Response(JSON.stringify(dataToStore), {
       headers: {
@@ -68,6 +68,6 @@ export default async (_request: Request, _context: Context) => {
 };
 
 export const config: Config = {
-  path: '/api/brou-media',
+  path: '/api/itau',
   cache: 'manual', // Habilitar control manual de cache mediante headers
 };

@@ -1,5 +1,5 @@
 {
-  "name": "media-brou",
+  "name": "lamedia",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -30,11 +30,13 @@
     "@tailwindcss/vite": "4.1.18",
     "@tanstack/vue-query": "5.92.8",
     "@vueuse/core": "14.1.0",
+    "fast-xml-parser": "5.3.3",
     "playwright-core": "1.58.0",
     "posthog-js": "1.334.1",
     "tailwindcss": "4.1.18",
     "vue": "^3.5.26",
-    "vue-currency-input": "3.2.2"
+    "vue-currency-input": "3.2.2",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@netlify/vite-plugin": "2.7.20",
@@ -57,6 +59,7 @@
     "jsdom": "^27.4.0",
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.38.0",
+    "playwright": "1.58.0",
     "prettier": "3.7.4",
     "typescript": "~5.9.3",
     "vite": "beta",

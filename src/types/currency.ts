@@ -1,22 +1,18 @@
-export interface ExchangeRates {
-  compra: number
-  venta: number
-  media: number
-  scraped_at: string
-}
+/**
+ * Frontend-specific types
+ */
 
-export interface ApiResponse {
-  cotizacion_media: number
-  detalle: {
-    compra: number
-    venta: number
-    moneda: string
-  }
-  metadata: {
-    scraped_at: string
-    next_run: string | null
-    source: 'scheduled' | 'fallback' | 'manual'
-  }
-}
+/**
+ * Direction for currency conversion in the UI
+ */
+export type ConversionDirection = 'usdToUyu' | 'uyuToUsd';
 
-export type ConversionDirection = 'usdToUyu' | 'uyuToUsd'
+/**
+ * Simplified exchange rate for UI display (without currency field)
+ */
+export interface ExchangeRateDisplay {
+  buy: number;
+  sell: number;
+  average: number;
+  scrapedAt: string;
+}

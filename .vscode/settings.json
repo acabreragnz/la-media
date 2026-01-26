@@ -11,6 +11,17 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "prettier.prettier-vscode",
   "cSpell.words": [
-    "brou"
-  ]
+    "brou",
+    "compra",
+    "cotizacion",
+    "fecha",
+    "ITAU",
+    "itaú",
+    "Itaú's",
+    "moneda",
+    "venta"
+  ],
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  }
 }

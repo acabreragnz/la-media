@@ -1,11 +1,22 @@
-import type { ExchangeRates, ConversionDirection } from '@/types/currency'
+import type { ConversionDirection, ExchangeRateDisplay } from '@/types/currency'
 import { formatNumber, formatTimestamp } from './formatters'
 
 export interface ConversionShareData {
   inputAmount: number | null
   convertedAmount: number
   direction: ConversionDirection
-  rates: ExchangeRates
+  rates: ExchangeRateDisplay
+}
+
+/**
+ * Formats exchange rates information (DRY helper)
+ */
+function formatRatesInfo(rates: ExchangeRateDisplay): string {
+  return `📊 Tipos de cambio:\n` +
+    `Compra: $${formatNumber(rates.buy)}\n` +
+    `Venta: $${formatNumber(rates.sell)}\n` +
+    `Media: $${formatNumber(rates.average)}\n` +
+    `🕒 Cotización del: ${formatTimestamp(rates.scrapedAt)}`
 }
 
 /**
@@ -18,32 +29,24 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
     return false
   }
 
+  const appUrl = window.location.origin
+  const ratesInfo = formatRatesInfo(data.rates)
+
   let message: string
 
-  // Obtener URL de la aplicación (funciona en dev y production)
-  const appUrl = window.location.origin
-
-  // Si hay un monto, incluir la conversión
   if (data.inputAmount) {
+    // Include conversion details
     const fromCurrency = data.direction === 'usdToUyu' ? 'Dólares' : 'Pesos'
     const toCurrency = data.direction === 'usdToUyu' ? 'Pesos' : 'Dólares'
 
     message = `Media BROU - Conversión\n\n` +
       `${formatNumber(data.inputAmount)} ${fromCurrency} = ${formatNumber(data.convertedAmount)} ${toCurrency}\n\n` +
-      `📊 Cotización BROU:\n` +
-      `Compra: $${formatNumber(data.rates.compra)}\n` +
-      `Venta: $${formatNumber(data.rates.venta)}\n` +
-      `Media: $${formatNumber(data.rates.media)}\n` +
-      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}\n\n` +
+      `${ratesInfo}\n\n` +
       `🔗 ${appUrl}`
   } else {
-    // Si no hay monto, solo compartir las cotizaciones
+    // Rates only
     message = `Media BROU - Cotización\n\n` +
-      `📊 Tipos de cambio:\n` +
-      `Compra: $${formatNumber(data.rates.compra)}\n` +
-      `Venta: $${formatNumber(data.rates.venta)}\n` +
-      `Media: $${formatNumber(data.rates.media)}\n` +
-      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}\n\n` +
+      `${ratesInfo}\n\n` +
       `🔗 ${appUrl}`
   }
 

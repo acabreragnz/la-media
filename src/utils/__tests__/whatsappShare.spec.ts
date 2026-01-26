@@ -34,10 +34,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 0,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        scrapedAt: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -66,10 +66,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        scrapedAt: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -88,10 +88,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 100,
       direction: 'uyuToUsd',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        scrapedAt: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -110,10 +110,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        scrapedAt: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -136,10 +136,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        scrapedAt: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -162,10 +162,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        scrapedAt: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -186,10 +186,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4120.50,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.5,
-        venta: 42.5,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
+        buy: 40.5,
+        sell: 42.5,
+        average: 41.0,
+        scrapedAt: '2024-01-01T00:00:00Z'
       }
     }
 
@@ -208,10 +208,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-22T14:30:00Z'
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        scrapedAt: '2024-01-22T14:30:00Z'
       }
     }
 
@@ -236,10 +236,10 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 0,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-22T14:30:00Z'
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        scrapedAt: '2024-01-22T14:30:00Z'
       }
     }
 

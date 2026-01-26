@@ -1,6 +1,8 @@
 import type { Config } from '@netlify/functions';
 import { getStore } from '@netlify/blobs';
-import { scrapeBrouRates } from './utils/brou-scraper.mts';
+import { scrapeItauRates } from './utils/itau-scraper.mts';
+import type { ExchangeRateRecord } from '../../shared/types/exchange-rates.mts';
+
 /**
  * Scheduled function que actualiza cotizaciones en slots fijos: :00, :15, :30, :45
  */
@@ -11,21 +13,21 @@ export default async (req: Request) => {
 
   try {
     // Ejecutar scraping
-    const rates = await scrapeBrouRates();
+    const rates = await scrapeItauRates();
 
     // Guardar en Netlify Blobs
     const store = getStore('rates');
 
-    const dataToStore: BrouRatesWithMetadata = {
+    const dataToStore: ExchangeRateRecord = {
       ...rates,
       metadata: {
-        scraped_at: new Date().toISOString(),
-        next_run: nextRunIso,
+        scrapedAt: new Date().toISOString(),
+        nextRunAt: nextRunIso,
         source: 'scheduled' as const
       }
     }
 
-    await store.setJSON('brou-latest', dataToStore);
+    await store.setJSON('itau-latest', dataToStore);
 
     console.log('✅ Cotización actualizada:', rates);
     console.log('Próxima ejecución:', nextRunIso ?? 'No programada');

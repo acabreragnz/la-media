@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { ref, type Ref } from 'vue'
 import { useCurrency } from '../useCurrency'
-import type { ApiResponse } from '@/types/currency'
+import type { ExchangeRateRecord } from '@shared/types/exchange-rates.mts'
 
 // Mock para Vue Query
-const mockQueryData: Ref<ApiResponse | undefined> = ref(undefined)
+const mockQueryData: Ref<ExchangeRateRecord | undefined> = ref(undefined)
 const mockIsPending = ref(false)
 const mockIsFetching = ref(false)
 const mockIsError = ref(false)
@@ -78,15 +78,13 @@ describe('useCurrency', () => {
 
       // Simular datos de Vue Query
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }
@@ -95,10 +93,15 @@ describe('useCurrency', () => {
       direction.value = 'usdToUyu'
 
       expect(rates.value).toEqual({
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
+          source: 'scheduled'
+        }
       })
       expect(convertedAmount.value).toBe(4100) // 100 * 41.0 (media)
     })
@@ -107,15 +110,13 @@ describe('useCurrency', () => {
       const { setValue, direction, convertedAmount } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }
@@ -130,15 +131,13 @@ describe('useCurrency', () => {
       const { numberValue, convertedAmount } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }
@@ -152,15 +151,13 @@ describe('useCurrency', () => {
       const { setValue, direction, convertedAmount } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }
@@ -193,15 +190,13 @@ describe('useCurrency', () => {
       const { setValue, numberValue, direction, swapDirection } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }
@@ -221,15 +216,13 @@ describe('useCurrency', () => {
       const { numberValue, swapDirection, direction } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }
@@ -246,15 +239,13 @@ describe('useCurrency', () => {
       const { setValue, numberValue, swapDirection } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }
@@ -307,15 +298,13 @@ describe('useCurrency', () => {
       const now = new Date()
       const nextRun = new Date(now.getTime() + 2 * 60 * 60 * 1000)
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-          next_run: nextRun.toISOString(),
+          scrapedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+          nextRunAt: nextRun.toISOString(),
           source: 'scheduled'
         }
       }
@@ -333,15 +322,13 @@ describe('useCurrency', () => {
       tomorrow.setHours(8, 0, 0, 0)
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-          next_run: tomorrow.toISOString(),
+          scrapedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+          nextRunAt: tomorrow.toISOString(),
           source: 'scheduled'
         }
       }
@@ -359,15 +346,13 @@ describe('useCurrency', () => {
       inThreeDays.setHours(10, 30, 0, 0)
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-          next_run: inThreeDays.toISOString(),
+          scrapedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+          nextRunAt: inThreeDays.toISOString(),
           source: 'scheduled'
         }
       }
@@ -385,15 +370,13 @@ describe('useCurrency', () => {
       tomorrow.setHours(0, 1, 0, 0)
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: new Date().toISOString(),
-          next_run: tomorrow.toISOString(),
+          scrapedAt: new Date().toISOString(),
+          nextRunAt: tomorrow.toISOString(),
           source: 'scheduled'
         }
       }
@@ -415,15 +398,13 @@ describe('useCurrency', () => {
       vi.setSystemTime(friday)
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: friday.toISOString(),
-          next_run: monday.toISOString(),
+          scrapedAt: friday.toISOString(),
+          nextRunAt: monday.toISOString(),
           source: 'scheduled'
         }
       }
@@ -450,15 +431,13 @@ describe('useCurrency', () => {
       vi.setSystemTime(sunday)
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: sunday.toISOString(),
-          next_run: monday.toISOString(),
+          scrapedAt: sunday.toISOString(),
+          nextRunAt: monday.toISOString(),
           source: 'scheduled'
         }
       }
@@ -476,15 +455,13 @@ describe('useCurrency', () => {
       const { nextUpdateTime } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'fallback'
         }
       }
@@ -499,15 +476,13 @@ describe('useCurrency', () => {
       const pastTime = new Date(Date.now() - 60 * 60 * 1000)
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: new Date(Date.now() - 70 * 60 * 1000).toISOString(),
-          next_run: pastTime.toISOString(),
+          scrapedAt: new Date(Date.now() - 70 * 60 * 1000).toISOString(),
+          nextRunAt: pastTime.toISOString(),
           source: 'scheduled'
         }
       }
@@ -536,15 +511,13 @@ describe('useCurrency', () => {
       const { shareViaWhatsApp, numberValue } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }
@@ -566,15 +539,13 @@ describe('useCurrency', () => {
       const { shareViaWhatsApp, setValue, direction } = useCurrency()
 
       mockQueryData.value = {
-        cotizacion_media: 41.0,
-        detalle: {
-          compra: 40.0,
-          venta: 42.0,
-          moneda: 'USD'
-        },
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
         metadata: {
-          scraped_at: '2024-01-01T00:00:00Z',
-          next_run: null,
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
           source: 'scheduled'
         }
       }

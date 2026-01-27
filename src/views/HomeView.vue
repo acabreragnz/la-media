@@ -26,7 +26,7 @@ const isDev = import.meta.env.DEV
           :to="bank.route"
           :data-bank="bank.id"
           class="group relative overflow-hidden bg-white/[0.03] backdrop-blur-lg
-                 border border-white/[0.08] rounded-2xl p-6 md:p-8
+                 rounded-2xl p-6 md:p-8
                  transition-all duration-300
                  hover:bg-white/[0.06] hover:scale-105
                  active:scale-95
@@ -81,7 +81,7 @@ const isDev = import.meta.env.DEV
           :data-bank="bank.id"
           :to="isDev ? bank.route : undefined"
           class="group relative overflow-hidden bg-white/[0.02] backdrop-blur-lg
-                 border border-white/[0.05] rounded-2xl p-6 md:p-8
+                 rounded-2xl p-6 md:p-8
                  transition-all duration-300
                  w-[calc(50%-0.5rem)] md:w-[200px]
                  bank-card-coming-soon"
@@ -164,9 +164,14 @@ const isDev = import.meta.env.DEV
 <style scoped>
 /* ===== Cards de bancos activos ===== */
 
+/* Borde con color del banco (más vívido) */
+.bank-card {
+  border: 2px solid rgba(var(--bank-accent-rgb), 0.3);
+}
+
 /* Transición suave del borde con color del banco al hacer hover */
 .bank-card:hover {
-  border-color: rgba(var(--bank-accent-rgb), 0.4) !important;
+  border-color: rgba(var(--bank-accent-rgb), 0.6) !important;
 }
 
 /* Glow effect usando el color del banco */
@@ -187,9 +192,14 @@ const isDev = import.meta.env.DEV
 
 /* ===== Cards de bancos "coming soon" ===== */
 
+/* Borde con color del banco (más sutil para coming soon) */
+.bank-card-coming-soon {
+  border: 2px solid rgba(var(--bank-accent-rgb), 0.15);
+}
+
 /* Hover del borde en dev mode */
 .bank-card-coming-soon:hover {
-  border-color: rgba(var(--bank-accent-rgb), 0.2) !important;
+  border-color: rgba(var(--bank-accent-rgb), 0.35) !important;
 }
 
 /* Badge con color del banco */

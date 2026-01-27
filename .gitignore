@@ -40,4 +40,3 @@ playwright-report/
 
 # Local Netlify folder
 .netlify
-test-santander-local.mts

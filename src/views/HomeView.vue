@@ -27,7 +27,6 @@ const isDev = import.meta.env.DEV
           :data-bank="bank.id"
           class="group relative overflow-hidden bg-white/[0.03] backdrop-blur-lg
                  rounded-2xl p-6 md:p-8
-                 transition-all duration-300
                  hover:bg-white/[0.06] hover:scale-105
                  active:scale-95
                  w-[calc(50%-0.5rem)] md:w-[200px]
@@ -164,14 +163,15 @@ const isDev = import.meta.env.DEV
 <style scoped>
 /* ===== Cards de bancos activos ===== */
 
-/* Borde con color del banco (más vívido) */
+/* Borde constante en 2px para evitar layout shift */
 .bank-card {
-  border: 2px solid rgba(var(--bank-accent-rgb), 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out, transform 0.3s ease-in-out, scale 0.3s ease-in-out;
 }
 
-/* Transición suave del borde con color del banco al hacer hover */
+/* Hover: borde con color del banco, intensidad alta */
 .bank-card:hover {
-  border-color: rgba(var(--bank-accent-rgb), 0.6) !important;
+  border-color: rgba(var(--bank-accent-rgb), 0.85);
 }
 
 /* Glow effect usando el color del banco */

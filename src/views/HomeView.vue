@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { BANKS_ARRAY } from '@/config/banks'
 import ItauLogo from '@/components/ItauLogo.vue'
-import { rgbaFromBank, getAccentColor, type BankId } from '@/utils/bank-colors'
 
 // En modo dev, los bancos "próximamente" son clickeables
 const isDev = import.meta.env.DEV
@@ -12,9 +11,7 @@ const isDev = import.meta.env.DEV
     <div class="w-full max-w-2xl">
       <!-- Header -->
       <header class="text-center mb-12">
-        <h1 class="text-5xl md:text-6xl font-bold mb-3 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-          🏦 La Media
-        </h1>
+        <img src="/lamedia-logo.webp" alt="La Media" class="h-16 md:h-20 w-auto mx-auto mb-4" />
         <p class="text-white/60 text-base md:text-lg">
           Cotizaciones USD/UYU en tiempo real
         </p>
@@ -27,19 +24,18 @@ const isDev = import.meta.env.DEV
           v-for="bank in BANKS_ARRAY.filter(b => !b.comingSoon)"
           :key="bank.id"
           :to="bank.route"
+          :data-bank="bank.id"
           class="group relative overflow-hidden bg-white/[0.03] backdrop-blur-lg
                  border border-white/[0.08] rounded-2xl p-6 md:p-8
                  transition-all duration-300
-                 hover:bg-white/[0.06] hover:border-white/20 hover:scale-105
+                 hover:bg-white/[0.06] hover:scale-105
                  active:scale-95
-                 w-[calc(50%-0.5rem)] md:w-[200px]"
+                 w-[calc(50%-0.5rem)] md:w-[200px]
+                 bank-card"
         >
           <!-- Glow effect con color del banco -->
           <div
-            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"
-            :style="{
-              background: `radial-gradient(circle at center, ${rgbaFromBank(bank.id as BankId, 0.2)}, transparent 70%)`
-            }"
+            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bank-glow"
           ></div>
 
           <!-- Content -->
@@ -48,11 +44,7 @@ const isDev = import.meta.env.DEV
             <div
               class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/[0.05] border border-white/[0.08]
                      flex items-center justify-center p-3
-                     group-hover:border-white/20 transition-all"
-              :style="{
-                boxShadow: `0 0 20px ${rgbaFromBank(bank.id as BankId, 0.3)}`,
-                color: getAccentColor(bank.id as BankId)
-              }"
+                     group-hover:border-white/20 transition-all bank-logo"
             >
               <!-- Logo inline para Itaú (usa currentColor) -->
               <ItauLogo v-if="bank.id === 'itau'" class="w-full h-full" />
@@ -67,10 +59,7 @@ const isDev = import.meta.env.DEV
             </div>
 
             <!-- Bank Name -->
-            <h3
-              class="text-lg md:text-xl font-bold text-center transition-colors"
-              :style="{ color: getAccentColor(bank.id as BankId) }"
-            >
+            <h3 class="text-lg md:text-xl font-bold text-center transition-colors bank-name">
               {{ bank.name }}
             </h3>
 
@@ -89,37 +78,26 @@ const isDev = import.meta.env.DEV
           :is="isDev ? 'RouterLink' : 'div'"
           v-for="bank in BANKS_ARRAY.filter(b => b.comingSoon)"
           :key="bank.id"
+          :data-bank="bank.id"
           :to="isDev ? bank.route : undefined"
           class="group relative overflow-hidden bg-white/[0.02] backdrop-blur-lg
                  border border-white/[0.05] rounded-2xl p-6 md:p-8
                  transition-all duration-300
-                 w-[calc(50%-0.5rem)] md:w-[200px]"
+                 w-[calc(50%-0.5rem)] md:w-[200px]
+                 bank-card-coming-soon"
           :class="[
             isDev
-              ? 'hover:bg-white/[0.06] hover:border-white/20 hover:scale-105 active:scale-95 cursor-pointer opacity-80'
+              ? 'hover:bg-white/[0.06] hover:scale-105 active:scale-95 cursor-pointer opacity-80'
               : 'cursor-not-allowed opacity-60'
           ]"
         >
           <!-- Badge "Próximamente" o "DEV MODE" -->
-          <div
-            class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md"
-            :style="{
-              background: rgbaFromBank(bank.id as BankId, 0.2),
-              color: getAccentColor(bank.id as BankId),
-              border: `1px solid ${rgbaFromBank(bank.id as BankId, 0.3)}`
-            }"
-          >
+          <div class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bank-badge">
             {{ isDev ? 'Dev Mode' : 'Próximamente' }}
           </div>
 
           <!-- Glow effect en dev mode -->
-          <div
-            v-if="isDev"
-            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"
-            :style="{
-              background: `radial-gradient(circle at center, ${rgbaFromBank(bank.id as BankId, 0.2)}, transparent 70%)`
-            }"
-          ></div>
+          <div v-if="isDev" class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bank-glow"></div>
 
           <!-- Content -->
           <div class="relative z-10 flex flex-col items-center gap-3">
@@ -127,11 +105,7 @@ const isDev = import.meta.env.DEV
             <div
               class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/[0.03] border border-white/[0.05]
                      flex items-center justify-center p-3"
-              :class="[isDev ? 'group-hover:border-white/20' : '']"
-              :style="{
-                boxShadow: `0 0 ${isDev ? '20' : '10'}px ${rgbaFromBank(bank.id as BankId, isDev ? 0.3 : 0.15)}`,
-                color: getAccentColor(bank.id as BankId)
-              }"
+              :class="[isDev ? 'group-hover:border-white/20 bank-logo-dev' : 'bank-logo-disabled']"
             >
               <img
                 :src="bank.logoUrl"
@@ -142,10 +116,7 @@ const isDev = import.meta.env.DEV
             </div>
 
             <!-- Bank Name -->
-            <h3
-              class="text-lg md:text-xl font-bold text-center"
-              :style="{ color: getAccentColor(bank.id as BankId) }"
-            >
+            <h3 class="text-lg md:text-xl font-bold text-center bank-name">
               {{ bank.name }}
             </h3>
 
@@ -189,3 +160,54 @@ const isDev = import.meta.env.DEV
     </div>
   </div>
 </template>
+
+<style scoped>
+/* ===== Cards de bancos activos ===== */
+
+/* Transición suave del borde con color del banco al hacer hover */
+.bank-card:hover {
+  border-color: rgba(var(--bank-accent-rgb), 0.4) !important;
+}
+
+/* Glow effect usando el color del banco */
+.bank-glow {
+  background: radial-gradient(circle at center, rgba(var(--bank-accent-rgb), 0.2), transparent 70%);
+}
+
+/* Logo con shadow y color del banco */
+.bank-logo {
+  box-shadow: 0 0 20px rgba(var(--bank-accent-rgb), 0.3);
+  color: var(--bank-accent);
+}
+
+/* Nombre del banco con color del banco */
+.bank-name {
+  color: var(--bank-accent);
+}
+
+/* ===== Cards de bancos "coming soon" ===== */
+
+/* Hover del borde en dev mode */
+.bank-card-coming-soon:hover {
+  border-color: rgba(var(--bank-accent-rgb), 0.2) !important;
+}
+
+/* Badge con color del banco */
+.bank-badge {
+  background: rgba(var(--bank-accent-rgb), 0.2);
+  color: var(--bank-accent);
+  border: 1px solid rgba(var(--bank-accent-rgb), 0.3);
+}
+
+/* Logo en dev mode */
+.bank-logo-dev {
+  box-shadow: 0 0 20px rgba(var(--bank-accent-rgb), 0.3);
+  color: var(--bank-accent);
+}
+
+/* Logo deshabilitado */
+.bank-logo-disabled {
+  box-shadow: 0 0 10px rgba(var(--bank-accent-rgb), 0.15);
+  color: var(--bank-accent);
+}
+</style>

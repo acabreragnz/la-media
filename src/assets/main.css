@@ -83,3 +83,37 @@ html, body {
     );
   }
 }
+
+/* ============================================
+   BANK-AWARE UTILITY CLASSES
+   Use these instead of inline styles
+   ============================================ */
+
+/* Text colors */
+.bank-accent-color {
+  color: var(--bank-accent);
+}
+
+.bank-accent-faded {
+  color: rgba(var(--bank-accent-rgb), 0.8);
+}
+
+/* Background utilities */
+.bank-primary-gradient {
+  background: linear-gradient(to bottom right, var(--bank-primary), var(--bank-primary-light));
+  opacity: 0.5;
+}
+
+.bank-result-card-gradient {
+  background: linear-gradient(
+    to bottom right,
+    rgba(var(--bank-primary-rgb), 0.1),
+    rgba(var(--bank-primary-light-rgb), 0.08)
+  );
+  border: 1px solid rgba(var(--bank-primary-light-rgb), 0.2);
+}
+
+.bank-subtle-bg {
+  background: rgba(var(--bank-primary-rgb), 0.05);
+  border: 1px solid rgba(var(--bank-primary-light-rgb), 0.2);
+}

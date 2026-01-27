@@ -1,7 +1,7 @@
 {
-  "name": "Media BROU",
-  "short_name": "Media BROU",
-  "description": "Convertí dólares a pesos uruguayos con la cotización oficial del BROU",
+  "name": "La Media - Cotizaciones Multi-Banco",
+  "short_name": "La Media",
+  "description": "Cotizaciones USD/UYU en tiempo real de BROU, Itaú y más bancos uruguayos",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f152f",
@@ -9,10 +9,22 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

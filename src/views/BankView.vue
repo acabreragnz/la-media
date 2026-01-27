@@ -148,16 +148,32 @@ const disclaimerDismissed = useLocalStorage(`${props.bankId}media_disclaimer_dis
         </template>
       </div>
 
-      <!-- Footer Credits -->
-      <div class="text-center mt-6 text-white/60 text-[0.8rem]">
-        Hecho con 💙 por
-        <a href="https://github.com/acabreragnz"
-           target="_blank"
-           rel="noopener"
-           class="no-underline font-medium transition-colors bank-footer-link">
-          @acabreragnz
-        </a>
-      </div>
+      <!-- Footer -->
+      <footer class="mt-8 space-y-4">
+        <!-- Logo con link al home -->
+        <RouterLink
+          to="/"
+          class="block group"
+          aria-label="Volver al inicio"
+        >
+          <img
+            src="/lamedia-logo.webp"
+            alt="La Media"
+            class="h-12 w-auto mx-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+          />
+        </RouterLink>
+
+        <!-- Credits -->
+        <div class="text-center text-white/60 text-[0.8rem]">
+          Hecho con 💙 por
+          <a href="https://github.com/acabreragnz"
+             target="_blank"
+             rel="noopener"
+             class="no-underline font-medium transition-colors bank-footer-link">
+            @acabreragnz
+          </a>
+        </div>
+      </footer>
     </div>
   </div>
 </template>

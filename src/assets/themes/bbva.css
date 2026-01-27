@@ -1,0 +1,16 @@
+/* BBVA Theme - Azul corporativo */
+[data-bank="bbva"] {
+  --bank-primary: #1464a5;          /* Azul BBVA */
+  --bank-primary-light: #2d7dbe;    /* Azul claro */
+  --bank-primary-rgb: 20, 100, 165;
+  --bank-primary-light-rgb: 45, 125, 190;
+
+  --bank-accent: #1464a5;           /* Azul como acento */
+  --bank-accent-rgb: 20, 100, 165;
+
+  /* Mismo gradiente de fondo que BROU */
+  --bank-gradient-from: #0a0e1f;
+  --bank-gradient-stop1: #0f1a2e;
+  --bank-gradient-via: #0d2744;
+  --bank-gradient-to: #08528D;
+}

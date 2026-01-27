@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { BankId } from '@/utils/bank-colors'
+import type { BankId } from '@/types/banks'
 import type { ExchangeRateRecord } from '@shared/types/exchange-rates.mjs'
 import { BANKS } from '@/config/banks'
 import { formatNumber } from '@/utils/formatters'
@@ -38,8 +38,8 @@ const bank = computed(() => {
 
         <!-- Media (centro, destacado) -->
         <div class="flex flex-col items-center">
-          <span class="text-xs uppercase tracking-wider font-medium" style="color: rgba(var(--bank-accent-rgb), 0.8)">Media</span>
-          <span v-if="rates" class="font-bold text-2xl" style="color: var(--bank-accent)">
+          <span class="text-xs uppercase tracking-wider font-medium media-label">Media</span>
+          <span v-if="rates" class="font-bold text-2xl media-value">
             {{ formatNumber(rates.average) }}
           </span>
         </div>
@@ -67,3 +67,13 @@ const bank = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.media-label {
+  color: rgba(var(--bank-accent-rgb), 0.8);
+}
+
+.media-value {
+  color: var(--bank-accent);
+}
+</style>

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import type { BankId } from '@/utils/bank-colors'
+import type { BankId } from '@/types/banks'
 
 import HomeView from './views/HomeView.vue'
 import BankView from './views/BankView.vue'

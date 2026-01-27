@@ -41,7 +41,7 @@ const emit = defineEmits<{
       <div v-if="disclaimerEnabled" class="text-[0.55rem] sm:text-[0.6rem] text-white/60 flex items-start justify-center gap-1 leading-tight">
         <PhWarning :size="12" class="text-yellow-500/70 flex-shrink-0" />
         <span class="text-left sm:text-center">
-          Sitio no oficial. <a :href="websiteUrl" target="_blank" rel="noopener" class="hover:underline font-medium" style="color: rgba(var(--bank-accent-rgb), 0.8)">Verificar en {{ bankName }}</a>
+          Sitio no oficial. <a :href="websiteUrl" target="_blank" rel="noopener" class="font-medium disclaimer-link">Verificar en {{ bankName }}</a>
         </span>
       </div>
 
@@ -70,5 +70,16 @@ const emit = defineEmits<{
 .bank-share-button:hover {
   background: rgba(var(--bank-primary-rgb), 0.1);
   border-color: rgba(var(--bank-primary-light-rgb), 0.6);
+}
+
+/* Disclaimer link */
+.disclaimer-link {
+  color: rgba(var(--bank-accent-rgb), 0.8);
+  transition: color 200ms;
+}
+
+.disclaimer-link:hover {
+  color: var(--bank-accent);
+  text-decoration: underline;
 }
 </style>

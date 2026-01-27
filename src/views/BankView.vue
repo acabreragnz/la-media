@@ -4,7 +4,7 @@ import { useLocalStorage } from '@vueuse/core'
 import { useDeviceDetection } from '@/composables/useDeviceDetection'
 import { BANKS } from '@/config/banks'
 import { useBankCurrency } from '@/composables/currency/useBankCurrency'
-import type { BankId } from '@/utils/bank-colors'
+import type { BankId } from '@/types/banks'
 import { PhArrowLeft } from '@phosphor-icons/vue'
 
 // Components

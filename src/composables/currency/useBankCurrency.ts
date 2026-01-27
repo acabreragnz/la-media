@@ -1,6 +1,6 @@
 import { useBrouCurrency } from './useBrouCurrency'
 import { useItauCurrency } from './useItauCurrency'
-import type { BankId } from '@/utils/bank-colors'
+import type { BankId } from '@/types/banks'
 
 /**
  * Bank-to-composable mapping

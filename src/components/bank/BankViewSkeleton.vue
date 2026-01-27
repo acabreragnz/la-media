@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BankId } from '@/utils/bank-colors'
+import type { BankId } from '@/types/banks'
 
 interface Props {
   bankId: BankId
@@ -53,13 +53,11 @@ defineProps<Props>()
 
     <!-- Swap button skeleton -->
     <div class="flex justify-center my-4">
-      <div class="w-12 h-12 rounded-full animate-pulse"
-           style="background: linear-gradient(to bottom right, var(--bank-primary), var(--bank-primary-light)); opacity: 0.5;"></div>
+      <div class="w-12 h-12 rounded-full animate-pulse skeleton-swap-button"></div>
     </div>
 
     <!-- Result Display skeleton -->
-    <div class="rounded-[20px] p-5 animate-pulse"
-         style="background: linear-gradient(to bottom right, rgba(var(--bank-primary-rgb), 0.1), rgba(var(--bank-primary-light-rgb), 0.08)); border: 1px solid rgba(var(--bank-primary-light-rgb), 0.2);">
+    <div class="rounded-[20px] p-5 animate-pulse skeleton-result-card">
       <div class="flex items-center gap-4">
         <div class="w-9 h-9 bg-white/[0.1] rounded-full"></div>
         <div class="flex-1 space-y-2">
@@ -75,9 +73,29 @@ defineProps<Props>()
         <!-- Stats skeleton (Última / Próxima) -->
         <div class="h-3 bg-white/[0.06] rounded w-48 mx-auto"></div>
         <!-- Share button skeleton -->
-        <div class="h-10 rounded-xl"
-             style="background: rgba(var(--bank-primary-rgb), 0.05); border: 1px solid rgba(var(--bank-primary-light-rgb), 0.2);"></div>
+        <div class="h-10 rounded-xl skeleton-share-button"></div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.skeleton-swap-button {
+  background: linear-gradient(to bottom right, var(--bank-primary), var(--bank-primary-light));
+  opacity: 0.5;
+}
+
+.skeleton-result-card {
+  background: linear-gradient(
+    to bottom right,
+    rgba(var(--bank-primary-rgb), 0.1),
+    rgba(var(--bank-primary-light-rgb), 0.08)
+  );
+  border: 1px solid rgba(var(--bank-primary-light-rgb), 0.2);
+}
+
+.skeleton-share-button {
+  background: rgba(var(--bank-primary-rgb), 0.05);
+  border: 1px solid rgba(var(--bank-primary-light-rgb), 0.2);
+}
+</style>

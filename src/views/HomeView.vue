@@ -87,7 +87,7 @@ const isDev = import.meta.env.DEV
           ]"
         >
           <!-- Badge "Próximamente" o "DEV MODE" -->
-          <div class="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bank-badge">
+          <div class="absolute top-2 right-2 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bank-badge">
             {{ isDev ? 'Dev Mode' : 'Próximamente' }}
           </div>
 

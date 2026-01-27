@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { BankId } from '@/utils/bank-colors'
+import type { BankId } from '@/types/banks'
 import { BANKS } from '@/config/banks'
 import ItauLogo from '@/components/ItauLogo.vue'
 
@@ -23,7 +23,7 @@ const bank = computed(() => {
   <div class="flex items-center justify-center gap-3 mb-7">
     <a :href="bank.websiteUrl" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
       <!-- Logo inline para Itaú (usa currentColor) -->
-      <ItauLogo v-if="bankId === 'itau'" class="h-10 w-auto" style="color: var(--bank-accent)" />
+      <ItauLogo v-if="bankId === 'itau'" class="h-10 w-auto bank-logo" />
       <!-- Logo img para otros bancos -->
       <img v-else :src="bank.logoUrl" :alt="bank.name" class="h-10 w-auto" />
     </a>
@@ -32,3 +32,9 @@ const bank = computed(() => {
     </h1>
   </div>
 </template>
+
+<style scoped>
+.bank-logo {
+  color: var(--bank-accent);
+}
+</style>

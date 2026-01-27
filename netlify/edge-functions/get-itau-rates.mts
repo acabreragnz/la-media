@@ -37,8 +37,8 @@ export default async (_request: Request, _context: Context) => {
     const dataToStore: ExchangeRateRecord = {
       ...rates,
       metadata: {
-        scraped_at: new Date().toISOString(),
-        next_run: null,
+        scrapedAt: new Date().toISOString(),
+        nextRunAt: null,
         source: 'fallback' as const
       }
     }

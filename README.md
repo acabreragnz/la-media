@@ -1,6 +1,6 @@
-# Media BROU - Currency Converter
+# La Media - Multi-Bank Currency Converter
 
-This template should help get you started developing with Vue 3 in Vite.
+A Vue 3 + TypeScript application that displays real-time USD/UYU exchange rates from multiple Uruguayan banks (BROU, Itaú, and more).
 
 ## Recommended IDE Setup
 
@@ -76,12 +76,12 @@ pnpm lint
 
 ### Manually Invoke Scheduled Function
 
-To test the scheduled function that updates BROU rates:
+To test the consolidated scheduled function that updates all bank rates:
 
 ```sh
 # IMPORTANT: pnpm dev must be running first
 # Must specify --port 5173 (Vite's port) instead of default 8888
-netlify functions:invoke update-brou-rates --port 5173
+netlify functions:invoke update-all-rates --port 5173
 ```
 
 ### View Netlify Blobs
@@ -89,5 +89,6 @@ netlify functions:invoke update-brou-rates --port 5173
 To inspect the cached exchange rates:
 
 ```sh
-netlify blobs:get brou-rates latest
+netlify blobs:get rates brou-latest
+netlify blobs:get rates itau-latest
 ```

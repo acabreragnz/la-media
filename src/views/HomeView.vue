@@ -79,15 +79,11 @@ const isDev = import.meta.env.DEV
           :key="bank.id"
           :data-bank="bank.id"
           :to="isDev ? bank.route : undefined"
-          class="group relative overflow-hidden bg-white/[0.02] backdrop-blur-lg
-                 rounded-2xl p-6 md:p-8
-                 transition-all duration-300
-                 w-[calc(50%-0.5rem)] md:w-[200px]
-                 bank-card-coming-soon"
           :class="[
+            'group relative overflow-hidden backdrop-blur-lg rounded-2xl p-6 md:p-8 w-[calc(50%-0.5rem)] md:w-[200px]',
             isDev
-              ? 'hover:bg-white/[0.06] hover:scale-105 active:scale-95 cursor-pointer opacity-80'
-              : 'cursor-not-allowed opacity-60'
+              ? 'bg-white/[0.03] hover:bg-white/[0.06] hover:scale-105 active:scale-95 cursor-pointer bank-card'
+              : 'bg-white/[0.02] cursor-not-allowed opacity-60 bank-card-coming-soon'
           ]"
         >
           <!-- Badge "Próximamente" o "DEV MODE" -->
@@ -102,9 +98,12 @@ const isDev = import.meta.env.DEV
           <div class="relative z-10 flex flex-col items-center gap-3">
             <!-- Logo -->
             <div
-              class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/[0.03] border border-white/[0.05]
-                     flex items-center justify-center p-3"
-              :class="[isDev ? 'group-hover:border-white/20 bank-logo-dev' : 'bank-logo-disabled']"
+              :class="[
+                'w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center p-3',
+                isDev
+                  ? 'bg-white/[0.05] border border-white/[0.08] group-hover:border-white/20 bank-logo'
+                  : 'bg-white/[0.03] border border-white/[0.05] bank-logo-disabled'
+              ]"
             >
               <img
                 :src="bank.logoUrl"

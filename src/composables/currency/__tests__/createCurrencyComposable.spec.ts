@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { ref, type Ref } from 'vue'
-import { useCurrency } from '../useCurrency'
+import { createCurrencyComposable } from '../createCurrencyComposable'
 import type { ExchangeRateRecord } from '@shared/types/exchange-rates.mts'
 
 // Mock para Vue Query
@@ -49,7 +49,7 @@ vi.mock('vue-currency-input', () => ({
   }
 }))
 
-describe('useCurrency', () => {
+describe('createCurrencyComposable', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockNumberValue.value = null
@@ -62,19 +62,25 @@ describe('useCurrency', () => {
 
   describe('Initial State', () => {
     it('should have correct initial state values', () => {
-      const { rates, loading, error, numberValue, direction } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
-      expect(rates.value).toBeNull()
-      expect(loading.value).toBe(false)
-      expect(error.value).toBeNull()
-      expect(numberValue.value).toBeNull()
-      expect(direction.value).toBe('usdToUyu')
+      expect(currency.rates.value).toBeNull()
+      expect(currency.loading.value).toBe(false)
+      expect(currency.error.value).toBeNull()
+      expect(currency.numberValue.value).toBeNull()
+      expect(currency.direction.value).toBe('usdToUyu')
     })
   })
 
   describe('Conversion Logic', () => {
     it('should convert USD to UYU correctly', () => {
-      const { rates, setValue, direction, convertedAmount } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       // Simular datos de Vue Query
       mockQueryData.value = {
@@ -89,10 +95,10 @@ describe('useCurrency', () => {
         }
       }
 
-      setValue(100)
-      direction.value = 'usdToUyu'
+      currency.setValue(100)
+      currency.direction.value = 'usdToUyu'
 
-      expect(rates.value).toEqual({
+      expect(currency.rates.value).toEqual({
         average: 41.0,
         buy: 40.0,
         sell: 42.0,
@@ -103,11 +109,14 @@ describe('useCurrency', () => {
           source: 'scheduled'
         }
       })
-      expect(convertedAmount.value).toBe(4100) // 100 * 41.0 (media)
+      expect(currency.convertedAmount.value).toBe(4100) // 100 * 41.0 (media)
     })
 
     it('should convert UYU to USD correctly', () => {
-      const { setValue, direction, convertedAmount } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = {
         average: 41.0,
@@ -121,14 +130,17 @@ describe('useCurrency', () => {
         }
       }
 
-      setValue(4100)
-      direction.value = 'uyuToUsd'
+      currency.setValue(4100)
+      currency.direction.value = 'uyuToUsd'
 
-      expect(convertedAmount.value).toBe(100) // 4100 / 41.0 (media)
+      expect(currency.convertedAmount.value).toBe(100) // 4100 / 41.0 (media)
     })
 
     it('should return 0 when amount is empty', () => {
-      const { numberValue, convertedAmount } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = {
         average: 41.0,
@@ -142,13 +154,16 @@ describe('useCurrency', () => {
         }
       }
 
-      numberValue.value = null
+      currency.numberValue.value = null
 
-      expect(convertedAmount.value).toBe(0)
+      expect(currency.convertedAmount.value).toBe(0)
     })
 
     it('should handle decimal amounts', () => {
-      const { setValue, direction, convertedAmount } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = {
         average: 41.0,
@@ -162,32 +177,41 @@ describe('useCurrency', () => {
         }
       }
 
-      setValue(100.50)
-      direction.value = 'usdToUyu'
+      currency.setValue(100.50)
+      currency.direction.value = 'usdToUyu'
 
-      expect(convertedAmount.value).toBe(4120.5) // 100.50 * 41.0 (media)
+      expect(currency.convertedAmount.value).toBe(4120.5) // 100.50 * 41.0 (media)
     })
   })
 
   describe('Swap Direction', () => {
     it('should swap direction from usdToUyu to uyuToUsd', () => {
-      const { direction, swapDirection } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
-      expect(direction.value).toBe('usdToUyu')
-      swapDirection()
-      expect(direction.value).toBe('uyuToUsd')
+      expect(currency.direction.value).toBe('usdToUyu')
+      currency.swapDirection()
+      expect(currency.direction.value).toBe('uyuToUsd')
     })
 
     it('should swap direction from uyuToUsd to usdToUyu', () => {
-      const { direction, swapDirection } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
-      direction.value = 'uyuToUsd'
-      swapDirection()
-      expect(direction.value).toBe('usdToUyu')
+      currency.direction.value = 'uyuToUsd'
+      currency.swapDirection()
+      expect(currency.direction.value).toBe('usdToUyu')
     })
 
     it('should update amount to converted value after swap', () => {
-      const { setValue, numberValue, direction, swapDirection } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = {
         average: 41.0,
@@ -201,20 +225,18 @@ describe('useCurrency', () => {
         }
       }
 
-      setValue(100)
-      direction.value = 'usdToUyu'
+      currency.setValue(100)
+      currency.direction.value = 'usdToUyu'
 
-      swapDirection()
+      currency.swapDirection()
 
-      expect(numberValue.value).toBe(4100) // 100 * 41.0 (media)
-      expect(direction.value).toBe('uyuToUsd')
+      expect(currency.numberValue.value).toBe(4100) // 100 * 41.0 (media)
+      expect(currency.direction.value).toBe('uyuToUsd')
     })
   })
 
   describe('Swap Direction Edge Cases', () => {
-    it('should keep input empty when swapping with null value', () => {
-      const { numberValue, swapDirection, direction } = useCurrency()
-
+    it('should handle swap gracefully when value is null', () => {
       mockQueryData.value = {
         average: 41.0,
         buy: 40.0,
@@ -227,16 +249,29 @@ describe('useCurrency', () => {
         }
       }
 
-      expect(numberValue.value).toBeNull()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
-      swapDirection()
+      expect(currency.numberValue.value).toBeNull()
+      const initialDirection = currency.direction.value
 
-      expect(numberValue.value).toBeNull()
-      expect(direction.value).toBe('uyuToUsd')
+      // Swap should not throw an error when value is null
+      expect(() => currency.swapDirection()).not.toThrow()
+
+      // Value should remain null
+      expect(currency.numberValue.value).toBeNull()
+
+      // Direction should have changed (toggle behavior)
+      expect(currency.direction.value).not.toBe(initialDirection)
     })
 
     it('should correctly swap when value is zero', () => {
-      const { setValue, numberValue, swapDirection } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = {
         average: 41.0,
@@ -250,49 +285,61 @@ describe('useCurrency', () => {
         }
       }
 
-      setValue(0)
-      expect(numberValue.value).toBe(0)
+      currency.setValue(0)
+      expect(currency.numberValue.value).toBe(0)
 
-      swapDirection()
+      currency.swapDirection()
 
-      expect(numberValue.value).toBe(0)
+      expect(currency.numberValue.value).toBe(0)
     })
   })
 
   describe('Loading and Error States', () => {
     it('should reflect loading state from Vue Query', () => {
-      const { loading } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
-      expect(loading.value).toBe(false)
+      expect(currency.loading.value).toBe(false)
 
       mockIsPending.value = true
 
-      expect(loading.value).toBe(true)
+      expect(currency.loading.value).toBe(true)
     })
 
     it('should reflect error state from Vue Query', () => {
-      const { error } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
-      expect(error.value).toBeNull()
+      expect(currency.error.value).toBeNull()
 
       mockIsError.value = true
       mockQueryError.value = new Error('Network error')
 
-      expect(error.value).toBe('Network error')
+      expect(currency.error.value).toBe('Network error')
     })
 
     it('should return null rates when query has no data', () => {
-      const { rates } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = undefined
 
-      expect(rates.value).toBeNull()
+      expect(currency.rates.value).toBeNull()
     })
   })
 
   describe('Next Run UI', () => {
     it('should show only time for same day', () => {
-      const { nextUpdateTime } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       // Simular next_run hoy en el futuro (2 horas desde ahora)
       const now = new Date()
@@ -310,11 +357,14 @@ describe('useCurrency', () => {
       }
 
       // Debe formatear como hora fija (ej: "15:45")
-      expect(nextUpdateTime.value).toMatch(/^\d{2}:\d{2}$/)
+      expect(currency.nextUpdateTime.value).toMatch(/^\d{2}:\d{2}$/)
     })
 
     it('should show "mañana HH:MM" for tomorrow', () => {
-      const { nextUpdateTime } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       // Simular next_run mañana a las 08:00
       const tomorrow = new Date()
@@ -334,11 +384,14 @@ describe('useCurrency', () => {
       }
 
       // Debe formatear como "mañana 08:00"
-      expect(nextUpdateTime.value).toMatch(/^mañana \d{2}:\d{2}$/)
+      expect(currency.nextUpdateTime.value).toMatch(/^mañana \d{2}:\d{2}$/)
     })
 
     it('should show "day HH:MM" for this week', () => {
-      const { nextUpdateTime } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       // Simular next_run en 3 días
       const inThreeDays = new Date()
@@ -358,11 +411,14 @@ describe('useCurrency', () => {
       }
 
       // Debe formatear como "lun 10:30" o similar
-      expect(nextUpdateTime.value).toMatch(/^[a-z]{3,4}\.? \d{2}:\d{2}$/)
+      expect(currency.nextUpdateTime.value).toMatch(/^[a-z]{3,4}\.? \d{2}:\d{2}$/)
     })
 
     it('should show "mañana HH:MM" for tomorrow edge case (23:59 → 00:01)', () => {
-      const { nextUpdateTime } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       // Simular que es 23:59 hoy, next_run es 00:01 mañana
       const tomorrow = new Date()
@@ -382,11 +438,14 @@ describe('useCurrency', () => {
       }
 
       // Debe formatear como "mañana 00:01" (no "00:01" del mismo día)
-      expect(nextUpdateTime.value).toMatch(/^mañana \d{2}:\d{2}$/)
+      expect(currency.nextUpdateTime.value).toMatch(/^mañana \d{2}:\d{2}$/)
     })
 
     it('should show "lun HH:MM" for Friday → Monday (weekend)', () => {
-      const { nextUpdateTime } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       // Crear un viernes a las 19:00
       const friday = new Date('2024-01-26T19:00:00Z') // Viernes 26 enero 2024
@@ -409,7 +468,7 @@ describe('useCurrency', () => {
         }
       }
 
-      const result = nextUpdateTime.value
+      const result = currency.nextUpdateTime.value
 
       // Debe formatear como "lun 08:00" (no "mañana" porque hay fin de semana)
       expect(result).toMatch(/^lun\.? \d{2}:\d{2}$/)
@@ -419,7 +478,10 @@ describe('useCurrency', () => {
     })
 
     it('should show "lun HH:MM" for Sunday → Monday', () => {
-      const { nextUpdateTime } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       // Crear un domingo a las 23:00
       const sunday = new Date('2024-01-28T23:00:00Z') // Domingo 28 enero 2024
@@ -442,7 +504,7 @@ describe('useCurrency', () => {
         }
       }
 
-      const result = nextUpdateTime.value
+      const result = currency.nextUpdateTime.value
 
       // Debe formatear como "mañana 08:00" (domingo → lunes es mañana)
       expect(result).toMatch(/^mañana \d{2}:\d{2}$/)
@@ -452,7 +514,10 @@ describe('useCurrency', () => {
     })
 
     it('should show --:-- when next_run is null', () => {
-      const { nextUpdateTime } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = {
         average: 41.0,
@@ -466,11 +531,14 @@ describe('useCurrency', () => {
         }
       }
 
-      expect(nextUpdateTime.value).toBe('--:--')
+      expect(currency.nextUpdateTime.value).toBe('--:--')
     })
 
     it('should show --:-- when next_run is in the past', () => {
-      const { nextUpdateTime } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       // Next run hace 1 hora (en el pasado)
       const pastTime = new Date(Date.now() - 60 * 60 * 1000)
@@ -488,7 +556,7 @@ describe('useCurrency', () => {
       }
 
       // Si next_run está en el pasado, debe mostrar --:--
-      expect(nextUpdateTime.value).toBe('--:--')
+      expect(currency.nextUpdateTime.value).toBe('--:--')
     })
   })
 
@@ -496,10 +564,13 @@ describe('useCurrency', () => {
     it('should not share when rates are null', () => {
       const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
 
-      const { shareViaWhatsApp } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
       mockQueryData.value = undefined
 
-      shareViaWhatsApp()
+      currency.shareViaWhatsApp()
 
       expect(windowOpenSpy).not.toHaveBeenCalled()
       windowOpenSpy.mockRestore()
@@ -508,7 +579,10 @@ describe('useCurrency', () => {
     it('should share rates even when numberValue is null', () => {
       const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
 
-      const { shareViaWhatsApp, numberValue } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = {
         average: 41.0,
@@ -521,9 +595,9 @@ describe('useCurrency', () => {
           source: 'scheduled'
         }
       }
-      numberValue.value = null
+      currency.numberValue.value = null
 
-      shareViaWhatsApp()
+      currency.shareViaWhatsApp()
 
       expect(windowOpenSpy).toHaveBeenCalledWith(
         expect.stringContaining('https://wa.me/?text='),
@@ -536,7 +610,10 @@ describe('useCurrency', () => {
     it('should open WhatsApp when data is valid', () => {
       const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
 
-      const { shareViaWhatsApp, setValue, direction } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
       mockQueryData.value = {
         average: 41.0,
@@ -549,10 +626,10 @@ describe('useCurrency', () => {
           source: 'scheduled'
         }
       }
-      setValue(100)
-      direction.value = 'usdToUyu'
+      currency.setValue(100)
+      currency.direction.value = 'usdToUyu'
 
-      shareViaWhatsApp()
+      currency.shareViaWhatsApp()
 
       expect(windowOpenSpy).toHaveBeenCalledWith(
         expect.stringContaining('https://wa.me/?text='),
@@ -564,10 +641,65 @@ describe('useCurrency', () => {
 
   describe('Refetch', () => {
     it('should expose refetch function from Vue Query', () => {
-      const { refetch } = useCurrency()
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
 
-      expect(refetch).toBeDefined()
-      expect(typeof refetch).toBe('function')
+      expect(currency.refetch).toBeDefined()
+      expect(typeof currency.refetch).toBe('function')
+    })
+  })
+
+  describe('Last Scraped Time', () => {
+    it('should show --:-- when rates are null', () => {
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
+
+      mockQueryData.value = undefined
+
+      expect(currency.lastScrapedAt.value).toBe('--:--')
+    })
+
+    it('should format relative time when rates have scrapedAt', () => {
+      const currency = createCurrencyComposable({
+        endpoint: '/api/test',
+        bankName: 'TEST'
+      })
+
+      // 5 minutos atrás
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
+
+      mockQueryData.value = {
+        average: 41.0,
+        buy: 40.0,
+        sell: 42.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: fiveMinutesAgo.toISOString(),
+          nextRunAt: null,
+          source: 'scheduled'
+        }
+      }
+
+      // Debe mostrar algo como "hace 5 min"
+      expect(currency.lastScrapedAt.value).toMatch(/hace \d+ min/)
+    })
+  })
+
+  describe('Bank Configuration', () => {
+    it('should accept endpoint and bankName configuration', () => {
+      const currency = createCurrencyComposable({
+        endpoint: '/api/custom-bank',
+        bankName: 'CUSTOM'
+      })
+
+      // Verify composable was created successfully
+      expect(currency).toBeDefined()
+      expect(currency.rates).toBeDefined()
+      expect(currency.direction).toBeDefined()
     })
   })
 })

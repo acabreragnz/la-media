@@ -36,11 +36,11 @@ vi.mock('vue-currency-input', async () => {
 
 describe('Currency Input Configuration', () => {
   it('should configure useCurrencyInput with CurrencyDisplay.hidden to hide currency symbols', async () => {
-    // Import useCurrency which will call useCurrencyInput
-    const { useCurrency } = await import('@/composables/useCurrency')
+    // Import useBrouCurrency which will call useCurrencyInput
+    const { useBrouCurrency } = await import('@/composables/currency/useBrouCurrency')
 
     // Call the composable
-    useCurrency()
+    useBrouCurrency()
 
     // Verify useCurrencyInput was called with currencyDisplay: CurrencyDisplay.hidden
     expect(mockUseCurrencyInput).toHaveBeenCalled()

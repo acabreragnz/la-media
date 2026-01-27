@@ -1,7 +1,7 @@
 import { XMLParser } from "fast-xml-parser";
 import { USD_CURRENCY, type ExchangeRate } from "./constants.mts";
 
-const ITAU_USD_CURRENCY = 'US.D';
+const ITAU_USD_CURRENCY = 'LINK';
 
 interface ParsedXmlResponse {
   root: {

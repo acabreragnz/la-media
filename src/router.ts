@@ -1,14 +1,49 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import BrouView from './views/BrouView.vue'
-import ItauView from './views/ItauView.vue'
+import HomeView from './views/HomeView.vue'
+import BankView from './views/BankView.vue'
 
 const routes = [
-  { path: '/', redirect: { name: 'brou' } },
-  { name: 'brou', path: '/brou', component: BrouView },
-  { name: 'itau', path: '/itau', component: ItauView },
-  // catch all
-  { path: '/:pathMatch(.*)*', redirect: { name: 'brou' } },
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView
+  },
+  {
+    path: '/brou',
+    name: 'brou',
+    component: BankView,
+    props: { bankId: 'brou' }
+  },
+  {
+    path: '/itau',
+    name: 'itau',
+    component: BankView,
+    props: { bankId: 'itau' }
+  },
+  {
+    path: '/santander',
+    name: 'santander',
+    component: BankView,
+    props: { bankId: 'santander' }
+  },
+  {
+    path: '/bbva',
+    name: 'bbva',
+    component: BankView,
+    props: { bankId: 'bbva' }
+  },
+  {
+    path: '/bcu',
+    name: 'bcu',
+    component: BankView,
+    props: { bankId: 'bcu' }
+  },
+  // Catch-all
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
+  }
 ]
 
 export const router = createRouter({

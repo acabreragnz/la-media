@@ -4,7 +4,7 @@ import { formatRelativeTime } from '@/utils/formatters'
 import { shareConversionViaWhatsApp } from '@/utils/whatsappShare'
 import type { ExchangeRateRecord } from '@shared/types/exchange-rates.mjs'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, watch, ref, nextTick } from 'vue'
+import { computed, watch } from 'vue'
 import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import { useStorage } from '@vueuse/core'
 

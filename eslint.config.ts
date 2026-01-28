@@ -10,7 +10,7 @@ configureVueProject({
 })
 
 export default defineConfigWithVueTs(
-  // @ts-expect-error - Type compatibility issue between eslint flat config types
+  // @ts-ignore - Type compatibility varies between environments
   ...pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
 

@@ -11,8 +11,8 @@ vi.mock('@tanstack/vue-query', () => ({
     isFetching: ref(false),
     isError: ref(false),
     error: ref(null),
-    refetch: vi.fn()
-  })
+    refetch: vi.fn(),
+  }),
 }))
 
 // Mock to capture useCurrencyInput calls
@@ -28,9 +28,9 @@ vi.mock('vue-currency-input', async () => {
         inputRef: { value: null },
         numberValue: { value: null },
         setValue: vi.fn(),
-        setOptions: vi.fn()
+        setOptions: vi.fn(),
       }
-    }
+    },
   }
 })
 

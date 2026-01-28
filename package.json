@@ -17,7 +17,13 @@
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli src/",
+    "ci:lint": "run-s ci:lint:*",
+    "ci:lint:oxlint": "oxlint .",
+    "ci:lint:eslint": "eslint . --cache --max-warnings 0",
+    "ci:format": "prettier --check --experimental-cli src/",
+    "ci:test:unit": "vitest --run",
+    "ci:test:e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.2.8",
@@ -40,7 +46,7 @@
   },
   "devDependencies": {
     "@netlify/vite-plugin": "2.7.20",
-    "@playwright/test": "^1.57.0",
+    "@playwright/test": "^1.58.0",
     "@tanstack/vue-query-devtools": "6.1.3",
     "@tsconfig/node24": "^24.0.3",
     "@types/jsdom": "^27.0.0",
@@ -59,7 +65,6 @@
     "jsdom": "^27.4.0",
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.38.0",
-    "playwright": "1.58.0",
     "prettier": "3.7.4",
     "typescript": "~5.9.3",
     "vite": "beta",

@@ -7,30 +7,27 @@ const isDev = import.meta.env.DEV
 </script>
 
 <template>
-  <div class="min-h-dvh flex items-center justify-center p-6 bg-gradient-to-br from-dark-bg-1 via-dark-bg-2 to-dark-bg-3">
+  <div class="min-h-dvh flex items-center justify-center p-6 app-gradient">
     <div class="w-full max-w-2xl">
       <!-- Header -->
       <header class="text-center mb-12">
-        <img src="/lamedia-logo.webp" alt="La Media" class="h-16 md:h-20 w-auto mx-auto mb-4" />
-        <p class="text-white/60 text-base md:text-lg">
-          Cotizaciones USD/UYU en tiempo real
-        </p>
+        <img
+          src="/assets/brand/logo-full.webp"
+          alt="La Media"
+          class="h-16 md:h-20 w-auto mx-auto mb-4"
+        />
+        <p class="text-white/60 text-base md:text-lg">Cotizaciones USD/UYU en tiempo real</p>
       </header>
 
       <!-- Grid de Bancos (centrado y balanceado) -->
       <div class="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
         <!-- Bancos activos (con link) -->
         <RouterLink
-          v-for="bank in BANKS_ARRAY.filter(b => !b.comingSoon)"
+          v-for="bank in BANKS_ARRAY.filter((b) => !b.comingSoon)"
           :key="bank.id"
           :to="bank.route"
           :data-bank="bank.id"
-          class="group relative overflow-hidden bg-white/[0.03] backdrop-blur-lg
-                 rounded-2xl p-6 md:p-8
-                 hover:bg-white/[0.06] hover:scale-105
-                 active:scale-95
-                 w-[calc(50%-0.5rem)] md:w-[200px]
-                 bank-card"
+          class="group relative overflow-hidden bg-white/[0.03] backdrop-blur-lg rounded-2xl p-6 md:p-8 hover:bg-white/[0.06] hover:scale-105 active:scale-95 w-[calc(50%-0.5rem)] sm:w-[180px] md:w-[200px] bank-card"
         >
           <!-- Glow effect con color del banco -->
           <div
@@ -41,9 +38,7 @@ const isDev = import.meta.env.DEV
           <div class="relative z-10 flex flex-col items-center gap-3">
             <!-- Logo -->
             <div
-              class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/[0.05] border border-white/[0.08]
-                     flex items-center justify-center p-3
-                     group-hover:border-white/20 transition-all bank-logo"
+              class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center p-3 group-hover:border-white/20 transition-all bank-logo"
             >
               <!-- Logo inline para Itaú (usa currentColor) -->
               <ItauLogo v-if="bank.id === 'itau'" class="w-full h-full" />
@@ -63,10 +58,22 @@ const isDev = import.meta.env.DEV
             </h3>
 
             <!-- CTA -->
-            <div class="text-white/50 text-sm group-hover:text-white/80 transition-colors flex items-center gap-1">
+            <div
+              class="text-white/50 text-sm group-hover:text-white/80 transition-colors flex items-center gap-1"
+            >
               <span>Ver cotización</span>
-              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              <svg
+                class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </div>
           </div>
@@ -75,24 +82,29 @@ const isDev = import.meta.env.DEV
         <!-- Bancos próximamente (clickeables solo en dev) -->
         <component
           :is="isDev ? 'RouterLink' : 'div'"
-          v-for="bank in BANKS_ARRAY.filter(b => b.comingSoon)"
+          v-for="bank in BANKS_ARRAY.filter((b) => b.comingSoon)"
           :key="bank.id"
           :data-bank="bank.id"
           :to="isDev ? bank.route : undefined"
           :class="[
-            'group relative overflow-hidden backdrop-blur-lg rounded-2xl p-6 md:p-8 w-[calc(50%-0.5rem)] md:w-[200px]',
+            'group relative overflow-hidden backdrop-blur-lg rounded-2xl p-6 md:p-8 w-[calc(50%-0.5rem)] sm:w-[180px] md:w-[200px]',
             isDev
               ? 'bg-white/[0.03] hover:bg-white/[0.06] hover:scale-105 active:scale-95 cursor-pointer bank-card'
-              : 'bg-white/[0.02] cursor-not-allowed opacity-60 bank-card-coming-soon'
+              : 'bg-white/[0.02] cursor-not-allowed opacity-60 bank-card-coming-soon',
           ]"
         >
           <!-- Badge "Próximamente" o "DEV MODE" -->
-          <div class="absolute top-2 right-2 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bank-badge">
+          <div
+            class="absolute top-2 right-2 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bank-badge"
+          >
             {{ isDev ? 'Dev Mode' : 'Próximamente' }}
           </div>
 
           <!-- Glow effect en dev mode -->
-          <div v-if="isDev" class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bank-glow"></div>
+          <div
+            v-if="isDev"
+            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bank-glow"
+          ></div>
 
           <!-- Content -->
           <div class="relative z-10 flex flex-col items-center gap-3">
@@ -102,7 +114,7 @@ const isDev = import.meta.env.DEV
                 'w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center p-3',
                 isDev
                   ? 'bg-white/[0.05] border border-white/[0.08] group-hover:border-white/20 bank-logo'
-                  : 'bg-white/[0.03] border border-white/[0.05] bank-logo-disabled'
+                  : 'bg-white/[0.03] border border-white/[0.05] bank-logo-disabled',
               ]"
             >
               <img
@@ -125,14 +137,29 @@ const isDev = import.meta.env.DEV
             >
               <template v-if="isDev">
                 <span>Ver demo</span>
-                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <svg
+                  class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </template>
               <template v-else>
                 <span>Próximamente</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </template>
             </div>
@@ -165,7 +192,11 @@ const isDev = import.meta.env.DEV
 /* Borde constante en 2px para evitar layout shift */
 .bank-card {
   border: 2px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out, transform 0.3s ease-in-out, scale 0.3s ease-in-out;
+  transition:
+    border-color 0.3s ease-in-out,
+    background-color 0.3s ease-in-out,
+    transform 0.3s ease-in-out,
+    scale 0.3s ease-in-out;
 }
 
 /* Hover: borde con color del banco, intensidad alta */

@@ -43,7 +43,7 @@ export function generateRefreshSlots(intervalMinutes: number): number[] {
   if (60 % intervalMinutes !== 0) {
     throw new Error(
       `Invalid refresh interval: ${intervalMinutes}. ` +
-      `Must be a divisor of 60 (valid: 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60)`
+        `Must be a divisor of 60 (valid: 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60)`,
     )
   }
 

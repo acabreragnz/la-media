@@ -1,20 +1,23 @@
-import { REFRESH_DELAY_SECONDS } from "@/config/refresh";
-import type { ConversionDirection } from "@/types/currency";
-import { formatRelativeTime } from "@/utils/formatters";
-import { shareConversionViaWhatsApp } from "@/utils/whatsappShare";
-import type { ExchangeRateRecord } from "@shared/types/exchange-rates.mjs";
-import { useQuery } from "@tanstack/vue-query";
-import { ref, computed, watch } from "vue";
+import { REFRESH_DELAY_SECONDS } from '@/config/refresh'
+import type { ConversionDirection } from '@/types/currency'
+import { formatRelativeTime } from '@/utils/formatters'
+import { shareConversionViaWhatsApp } from '@/utils/whatsappShare'
+import type { ExchangeRateRecord } from '@shared/types/exchange-rates.mjs'
+import { useQuery } from '@tanstack/vue-query'
+import { computed, watch } from 'vue'
 import { useCurrencyInput, CurrencyDisplay } from 'vue-currency-input'
 import { useStorage } from '@vueuse/core'
 
 type CurrencyConfig = {
-  endpoint: string;
-  bankName: string;
+  endpoint: string
+  bankName: string
 }
 
 export function createCurrencyComposable(config: CurrencyConfig) {
-  const direction = useStorage<ConversionDirection>(`${config.bankName.toLowerCase()}_direction`, 'usdToUyu')
+  const direction = useStorage<ConversionDirection>(
+    `${config.bankName.toLowerCase()}_direction`,
+    'usdToUyu',
+  )
 
   // Vue Query con refetchInterval dinámico basado en next_run del backend
   const {
@@ -23,7 +26,7 @@ export function createCurrencyComposable(config: CurrencyConfig) {
     isFetching,
     isError,
     error: queryError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: [config.bankName, 'rates'],
     queryFn: async (): Promise<ExchangeRateRecord> => {
@@ -54,11 +57,11 @@ export function createCurrencyComposable(config: CurrencyConfig) {
       }
 
       // Agregar delay del backend (de la constante de configuración)
-      return msUntilNextRun + (REFRESH_DELAY_SECONDS * 1000)
+      return msUntilNextRun + REFRESH_DELAY_SECONDS * 1000
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    retry: 3
+    retry: 3,
   })
 
   // Transformar apiData a ExchangeRates
@@ -69,20 +72,18 @@ export function createCurrencyComposable(config: CurrencyConfig) {
       buy: apiData.value.buy,
       sell: apiData.value.sell,
       currency: apiData.value.currency,
-      metadata: apiData.value.metadata
+      metadata: apiData.value.metadata,
     }
   })
 
   // Extraer next_run del backend
-  const nextRunFromBackend = computed<string | null>(() =>
-    apiData.value?.metadata?.nextRunAt ?? null
+  const nextRunFromBackend = computed<string | null>(
+    () => apiData.value?.metadata?.nextRunAt ?? null,
   )
 
   // Error transformado a string
   const error = computed<string | null>(() =>
-    isError.value && queryError.value
-      ? queryError.value.message
-      : null
+    isError.value && queryError.value ? queryError.value.message : null,
   )
 
   // Configuración centralizada de vue-currency-input
@@ -94,20 +95,20 @@ export function createCurrencyComposable(config: CurrencyConfig) {
     valueRange: { min: 0, max: 100000000 }, // Máximo 100 millones
     hideGroupingSeparatorOnFocus: false,
     hideNegligibleDecimalDigitsOnFocus: false,
-    autoDecimalDigits: false
+    autoDecimalDigits: false,
   } as const
 
   // Configurar vue-currency-input con locale uruguayo
   const { inputRef, numberValue, setValue, setOptions } = useCurrencyInput({
     currency: 'USD',
-    ...currencyInputConfig
+    ...currencyInputConfig,
   })
 
   // Hacer reactiva la moneda según la dirección
   watch(direction, (newDirection) => {
     setOptions({
       ...currencyInputConfig,
-      currency: newDirection === 'usdToUyu' ? 'USD' : 'UYU'
+      currency: newDirection === 'usdToUyu' ? 'USD' : 'UYU',
     })
   })
 
@@ -142,7 +143,7 @@ export function createCurrencyComposable(config: CurrencyConfig) {
       convertedAmount: convertedAmount.value,
       direction: direction.value,
       rates: rates.value,
-      bankName: config.bankName
+      bankName: config.bankName,
     })
   }
 
@@ -161,12 +162,14 @@ export function createCurrencyComposable(config: CurrencyConfig) {
     // Normalizar fechas a medianoche para comparación de días
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const nextRunStart = new Date(nextRun.getFullYear(), nextRun.getMonth(), nextRun.getDate())
-    const diffDays = Math.floor((nextRunStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24))
+    const diffDays = Math.floor(
+      (nextRunStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24),
+    )
 
     const timeStr = nextRun.toLocaleTimeString('es-UY', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
     })
 
     // Mismo día: solo hora
@@ -188,7 +191,7 @@ export function createCurrencyComposable(config: CurrencyConfig) {
     // Más de una semana: fecha corta
     const dateStr = nextRun.toLocaleDateString('es-UY', {
       day: 'numeric',
-      month: 'numeric'
+      month: 'numeric',
     })
     return `${dateStr} ${timeStr}`
   })
@@ -214,6 +217,6 @@ export function createCurrencyComposable(config: CurrencyConfig) {
 
     // Relative time para UI
     nextUpdateTime,
-    lastScrapedAt
+    lastScrapedAt,
   }
 }

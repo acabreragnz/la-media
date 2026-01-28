@@ -30,7 +30,11 @@ defineProps<Props>()
 <style scoped>
 /* Result card con fondo del banco */
 .bank-result-card {
-  background: linear-gradient(to bottom right, rgba(var(--bank-primary-rgb), 0.1), rgba(var(--bank-primary-light-rgb), 0.08));
+  background: linear-gradient(
+    to bottom right,
+    rgba(var(--bank-primary-rgb), 0.1),
+    rgba(var(--bank-primary-light-rgb), 0.08)
+  );
   border: 1px solid rgba(var(--bank-primary-light-rgb), 0.2);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),

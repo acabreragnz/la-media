@@ -5,7 +5,7 @@
 export function formatNumber(value: number): string {
   return new Intl.NumberFormat('es-UY', {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(value)
 }
 
@@ -19,7 +19,7 @@ export function formatTimestamp(timestamp: string): string {
   return date.toLocaleString('es-UY', {
     dateStyle: 'short',
     timeStyle: 'short',
-    hour12: false
+    hour12: false,
   })
 }
 

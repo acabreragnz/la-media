@@ -15,13 +15,13 @@ describe('shareConversionViaWhatsApp', () => {
   })
 
   it('should return false when rates are null', () => {
-    const data: ConversionShareData = {
+    const data = {
       inputAmount: 100,
       convertedAmount: 4100,
       direction: 'usdToUyu',
-      rates: null as any,
-      bankName: 'BROU'
-    }
+      rates: null,
+      bankName: 'BROU',
+    } as ConversionShareData
 
     const result = shareConversionViaWhatsApp(data)
 
@@ -42,10 +42,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     const result = shareConversionViaWhatsApp(data)
@@ -53,7 +53,7 @@ describe('shareConversionViaWhatsApp', () => {
     expect(result).toBe(true)
     expect(windowOpenSpy).toHaveBeenCalledWith(
       expect.stringContaining('https://wa.me/?text='),
-      '_blank'
+      '_blank',
     )
 
     // Verificar que el mensaje contiene las cotizaciones pero no la conversión
@@ -80,10 +80,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     const result = shareConversionViaWhatsApp(data)
@@ -91,7 +91,7 @@ describe('shareConversionViaWhatsApp', () => {
     expect(result).toBe(true)
     expect(windowOpenSpy).toHaveBeenCalledWith(
       expect.stringContaining('https://wa.me/?text='),
-      '_blank'
+      '_blank',
     )
   })
 
@@ -108,10 +108,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     const result = shareConversionViaWhatsApp(data)
@@ -119,7 +119,7 @@ describe('shareConversionViaWhatsApp', () => {
     expect(result).toBe(true)
     expect(windowOpenSpy).toHaveBeenCalledWith(
       expect.stringContaining('https://wa.me/?text='),
-      '_blank'
+      '_blank',
     )
   })
 
@@ -136,10 +136,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -168,10 +168,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -200,10 +200,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -219,8 +219,8 @@ describe('shareConversionViaWhatsApp', () => {
 
   it('should handle decimal amounts correctly', () => {
     const data: ConversionShareData = {
-      inputAmount: 100.50,
-      convertedAmount: 4120.50,
+      inputAmount: 100.5,
+      convertedAmount: 4120.5,
       direction: 'usdToUyu',
       rates: {
         buy: 40.5,
@@ -230,10 +230,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -258,10 +258,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-22T14:30:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -292,10 +292,10 @@ describe('shareConversionViaWhatsApp', () => {
         metadata: {
           scrapedAt: '2024-01-22T14:30:00Z',
           nextRunAt: null,
-          source: 'scheduled' as const
-        }
+          source: 'scheduled' as const,
+        },
       },
-      bankName: 'BROU'
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -327,10 +327,10 @@ describe('shareConversionViaWhatsApp', () => {
           metadata: {
             scrapedAt: '2024-01-01T00:00:00Z',
             nextRunAt: null,
-            source: 'scheduled' as const
-          }
+            source: 'scheduled' as const,
+          },
         },
-        bankName: 'BROU'
+        bankName: 'BROU',
       }
 
       shareConversionViaWhatsApp(data)
@@ -354,10 +354,10 @@ describe('shareConversionViaWhatsApp', () => {
           metadata: {
             scrapedAt: '2024-01-01T00:00:00Z',
             nextRunAt: null,
-            source: 'scheduled' as const
-          }
+            source: 'scheduled' as const,
+          },
         },
-        bankName: 'Itaú'
+        bankName: 'Itaú',
       }
 
       shareConversionViaWhatsApp(data)
@@ -381,10 +381,10 @@ describe('shareConversionViaWhatsApp', () => {
           metadata: {
             scrapedAt: '2024-01-01T00:00:00Z',
             nextRunAt: null,
-            source: 'scheduled' as const
-          }
+            source: 'scheduled' as const,
+          },
         },
-        bankName: 'Santander'
+        bankName: 'Santander',
       }
 
       shareConversionViaWhatsApp(data)
@@ -408,10 +408,10 @@ describe('shareConversionViaWhatsApp', () => {
           metadata: {
             scrapedAt: '2024-01-01T00:00:00Z',
             nextRunAt: null,
-            source: 'scheduled' as const
-          }
+            source: 'scheduled' as const,
+          },
         },
-        bankName: 'Itaú'
+        bankName: 'Itaú',
       }
 
       shareConversionViaWhatsApp(data)

@@ -5,4 +5,4 @@
 /**
  * Direction for currency conversion in the UI
  */
-export type ConversionDirection = 'usdToUyu' | 'uyuToUsd';
+export type ConversionDirection = 'usdToUyu' | 'uyuToUsd'

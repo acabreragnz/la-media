@@ -20,10 +20,10 @@ app.use(VueQueryPlugin, {
       queries: {
         staleTime: 5 * 60 * 1000, // 5 minutos
         retry: 3,
-        refetchOnWindowFocus: true
-      }
-    }
-  }
+        refetchOnWindowFocus: true,
+      },
+    },
+  },
 })
 
 app.use(router)

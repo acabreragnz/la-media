@@ -13,7 +13,9 @@ defineProps<Props>()
   <div class="space-y-5">
     <!-- Exchange Rates skeleton -->
     <div class="space-y-2">
-      <div class="bg-white/[0.04] rounded-xl px-5 py-3 border border-white/[0.05] animate-pulse relative">
+      <div
+        class="bg-white/[0.04] rounded-xl px-5 py-3 border border-white/[0.05] animate-pulse relative"
+      >
         <div class="flex items-center justify-center gap-3">
           <!-- Compra skeleton -->
           <div class="flex flex-col items-center gap-1">
@@ -68,7 +70,9 @@ defineProps<Props>()
     </div>
 
     <!-- Footer skeleton -->
-    <div class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-4 border border-white/[0.08] animate-pulse">
+    <div
+      class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-4 border border-white/[0.08] animate-pulse"
+    >
       <div class="space-y-3">
         <!-- Stats skeleton (Última / Próxima) -->
         <div class="h-3 bg-white/[0.06] rounded w-48 mx-auto"></div>

@@ -1,16 +1,10 @@
 /* BROU Theme */
-[data-bank="brou"] {
-  --bank-primary: #08528D;
+[data-bank='brou'] {
+  --bank-primary: #08528d;
   --bank-primary-light: #0d5ea1;
   --bank-primary-rgb: 8, 82, 141;
   --bank-primary-light-rgb: 13, 94, 161;
 
-  --bank-accent: #FFCB05;
+  --bank-accent: #ffcb05;
   --bank-accent-rgb: 255, 203, 5;
-
-  /* Gradiente original de BROU (preservado exactamente) */
-  --bank-gradient-from: #0a0e1f;    /* 0% */
-  --bank-gradient-stop1: #0f1a2e;   /* 30% */
-  --bank-gradient-via: #0d2744;     /* 60% */
-  --bank-gradient-to: #08528D;      /* 100% */
 }

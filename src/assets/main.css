@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Custom theme configuration using @theme directive (Tailwind v4 syntax) */
 @theme {
@@ -9,15 +9,15 @@
   --color-dark-bg-4: #0f3460;
 
   /* Official BROU Brand Colors (from Brandfetch) */
-  --color-brou-blue: #005ca8;           /* Endeavour - Primary brand blue */
-  --color-brou-blue-light: #0b64a0;    /* Website blue for text/links */
-  --color-brou-blue-dark: #004066;     /* Regal Blue - Darker gradient */
-  --color-brou-yellow: #FFCB05;        /* Vis Vis - Softer yellow accent */
+  --color-brou-blue: #005ca8; /* Endeavour - Primary brand blue */
+  --color-brou-blue-light: #0b64a0; /* Website blue for text/links */
+  --color-brou-blue-dark: #004066; /* Regal Blue - Darker gradient */
+  --color-brou-yellow: #ffcb05; /* Vis Vis - Softer yellow accent */
 
   /* Itaú Brand Colors (Colores oficiales del Design System) */
-  --color-itau-orange: #ff6200;        /* Primary (naranja principal) */
-  --color-itau-orange-light: #ffc099;  /* Primary Light (naranja claro/melocotón) */
-  --color-itau-orange-dark: #e55800;   /* Primary Variant (naranja oscuro) */
+  --color-itau-orange: #ff6200; /* Primary (naranja principal) */
+  --color-itau-orange-light: #ffc099; /* Primary Light (naranja claro/melocotón) */
+  --color-itau-orange-dark: #e55800; /* Primary Variant (naranja oscuro) */
 
   /* WhatsApp green */
   --color-whatsapp: #25d366;
@@ -27,22 +27,28 @@
 }
 
 /* Custom utilities for number input styling (hide spin arrows) */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
 
 /* Force Inter Variable globally and fix mobile viewport issues */
-html, body {
-  font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  /* Solid dark blue background - prevents white space on mobile */
-  background: hsl(228, 52% , 12%);
+html,
+body {
+  font-family:
+    'Inter Variable',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  /* Dark blue background to match app gradient - prevents white space on mobile overscroll */
+  background: #0a0e1f;
   /* Ensure full viewport coverage */
   min-height: 100dvh;
   min-height: -webkit-fill-available;
@@ -55,32 +61,20 @@ html, body {
    Each bank theme is in a separate file for Open/Closed Principle
    ============================================ */
 
-@import "./themes/brou.css";
-@import "./themes/itau.css";
-@import "./themes/santander.css";
-@import "./themes/bbva.css";
-@import "./themes/bcu.css";
+@import './themes/brou.css';
+@import './themes/itau.css';
+@import './themes/santander.css';
+@import './themes/bbva.css';
+@import './themes/bcu.css';
 
-/* Generic bank gradient backgrounds (usa 4 stops personalizables) */
-[data-bank].app-gradient {
-  background: linear-gradient(
-    to top right,
-    var(--bank-gradient-from) 0%,
-    var(--bank-gradient-stop1) 30%,
-    var(--bank-gradient-via) 60%,
-    var(--bank-gradient-to) 100%
-  );
+/* Generic app gradient (used for home and other non-bank pages) */
+/* Uses same gradient as banks for consistency */
+.app-gradient {
+  background: linear-gradient(to top right, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528d 100%);
 }
 
 @media (min-width: 768px) {
-  [data-bank].app-gradient {
-    background: linear-gradient(
-      135deg,
-      var(--bank-gradient-from) 0%,
-      var(--bank-gradient-stop1) 30%,
-      var(--bank-gradient-via) 60%,
-      var(--bank-gradient-to) 100%
-    );
+  .app-gradient {
+    background: linear-gradient(135deg, #0a0e1f 0%, #0f1a2e 30%, #0d2744 60%, #08528d 100%);
   }
 }
-

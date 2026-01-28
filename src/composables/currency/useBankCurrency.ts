@@ -12,8 +12,8 @@ const BANK_COMPOSABLE_MAP: Record<BankId, () => ReturnType<typeof useBrouCurrenc
 
   // Fallback for "coming soon" banks (dev mode only)
   santander: useBrouCurrency, // Uses BROU data
-  bbva: useItauCurrency,       // Uses Itaú data
-  bcu: useBrouCurrency         // Uses BROU data
+  bbva: useItauCurrency, // Uses Itaú data
+  bcu: useBrouCurrency, // Uses BROU data
 }
 
 /**

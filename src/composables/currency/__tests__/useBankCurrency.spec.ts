@@ -39,6 +39,8 @@ describe('useBankCurrency', () => {
 
   it('should throw for invalid bank ID', () => {
     // @ts-expect-error Testing runtime error
-    expect(() => useBankCurrency('invalid')).toThrow('No currency composable configured for bank: invalid')
+    expect(() => useBankCurrency('invalid')).toThrow(
+      'No currency composable configured for bank: invalid',
+    )
   })
 })

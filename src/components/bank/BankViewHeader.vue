@@ -21,13 +21,20 @@ const bank = computed(() => {
 
 <template>
   <div class="flex items-center justify-center gap-3 mb-7">
-    <a :href="bank.websiteUrl" target="_blank" rel="noopener noreferrer" class="hover:opacity-80 transition-opacity">
+    <a
+      :href="bank.websiteUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="hover:opacity-80 transition-opacity"
+    >
       <!-- Logo inline para Itaú (usa currentColor) -->
       <ItauLogo v-if="bankId === 'itau'" class="h-10 w-auto bank-logo" />
       <!-- Logo img para otros bancos -->
       <img v-else :src="bank.logoUrl" :alt="bank.name" class="h-10 w-auto" />
     </a>
-    <h1 class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+    <h1
+      class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent"
+    >
       {{ bank.displayName }}
     </h1>
   </div>

@@ -46,7 +46,7 @@ const {
   swapDirection,
   shareViaWhatsApp,
   nextUpdateTime,
-  lastScrapedAt
+  lastScrapedAt,
 } = useBankCurrency(props.bankId)
 
 // Detectar dispositivos de baja gama
@@ -58,12 +58,16 @@ function selectInputText() {
 }
 
 // Autofocus cuando los datos se cargan (para navegación SPA)
-watch(() => rates.value, async (newRates) => {
-  if (newRates && inputRef.value) {
-    await nextTick()
-    inputRef.value.focus()
-  }
-}, { immediate: true })
+watch(
+  () => rates.value,
+  async (newRates) => {
+    if (newRates && inputRef.value) {
+      await nextTick()
+      inputRef.value.focus()
+    }
+  },
+  { immediate: true },
+)
 
 // Feature flags
 const DISCLAIMER_ENABLED = false
@@ -77,10 +81,7 @@ const disclaimerDismissed = useLocalStorage(`${props.bankId}media_disclaimer_dis
     <!-- Back button -->
     <RouterLink
       to="/"
-      class="fixed top-4 left-4 z-40 inline-flex items-center gap-2 px-3 py-2
-             bg-white/[0.08] hover:bg-white/[0.12] backdrop-blur-lg rounded-full
-             text-white/70 hover:text-white text-sm transition-all hover:scale-105
-             border border-white/10 hover:border-[rgba(var(--bank-accent-rgb),0.3)]"
+      class="fixed top-4 left-4 z-40 inline-flex items-center gap-2 px-3 py-2 bg-white/[0.08] hover:bg-white/[0.12] backdrop-blur-lg rounded-full text-white/70 hover:text-white text-sm transition-all hover:scale-105 border border-white/10 hover:border-[rgba(var(--bank-accent-rgb),0.3)]"
     >
       <PhArrowLeft :size="16" weight="bold" />
       <span class="hidden sm:inline">Otros bancos</span>
@@ -122,11 +123,18 @@ const disclaimerDismissed = useLocalStorage(`${props.bankId}media_disclaimer_dis
 
           <ExchangeRatesDisplay :rates="rates" :bank-id="bankId" />
 
-          <CurrencyInput
-            :direction="direction"
-            :input-ref="inputRef"
-            @click="selectInputText"
-          />
+          <CurrencyInput :direction="direction" @click="selectInputText">
+            <template #input>
+              <input
+                ref="inputRef"
+                type="text"
+                inputmode="decimal"
+                autofocus
+                class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
+                placeholder="0,00"
+              />
+            </template>
+          </CurrencyInput>
 
           <SwapButton @swap="swapDirection" />
 
@@ -151,13 +159,9 @@ const disclaimerDismissed = useLocalStorage(`${props.bankId}media_disclaimer_dis
       <!-- Footer -->
       <footer class="mt-8 space-y-4">
         <!-- Logo con link al home -->
-        <RouterLink
-          to="/"
-          class="block group"
-          aria-label="Volver al inicio"
-        >
+        <RouterLink to="/" class="block group" aria-label="Volver al inicio">
           <img
-            src="/lamedia-logo.webp"
+            src="/assets/brand/logo-full.webp"
             alt="La Media"
             class="h-12 w-auto mx-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
           />
@@ -166,10 +170,12 @@ const disclaimerDismissed = useLocalStorage(`${props.bankId}media_disclaimer_dis
         <!-- Credits -->
         <div class="text-center text-white/60 text-[0.8rem]">
           Hecho con 💙 por
-          <a href="https://github.com/acabreragnz"
-             target="_blank"
-             rel="noopener"
-             class="no-underline font-medium transition-colors bank-footer-link">
+          <a
+            href="https://github.com/acabreragnz"
+            target="_blank"
+            rel="noopener"
+            class="no-underline font-medium transition-colors bank-footer-link"
+          >
             @acabreragnz
           </a>
         </div>

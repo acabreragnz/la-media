@@ -14,11 +14,13 @@ export interface ConversionShareData {
  * Formats exchange rates information (DRY helper)
  */
 function formatRatesInfo(rates: ExchangeRateRecord): string {
-  return `📊 Tipos de cambio:\n` +
+  return (
+    `📊 Tipos de cambio:\n` +
     `Compra: $${formatNumber(rates.buy)}\n` +
     `Venta: $${formatNumber(rates.sell)}\n` +
     `Media: $${formatNumber(rates.average)}\n` +
     `🕒 Cotización del: ${formatTimestamp(rates.metadata.scrapedAt)}`
+  )
 }
 
 /**
@@ -41,15 +43,14 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
     const fromCurrency = data.direction === 'usdToUyu' ? 'Dólares' : 'Pesos'
     const toCurrency = data.direction === 'usdToUyu' ? 'Pesos' : 'Dólares'
 
-    message = `Media ${data.bankName} - Conversión\n\n` +
+    message =
+      `Media ${data.bankName} - Conversión\n\n` +
       `${formatNumber(data.inputAmount)} ${fromCurrency} = ${formatNumber(data.convertedAmount)} ${toCurrency}\n\n` +
       `${ratesInfo}\n\n` +
       `🔗 ${appUrl}`
   } else {
     // Rates only
-    message = `Media ${data.bankName} - Cotización\n\n` +
-      `${ratesInfo}\n\n` +
-      `🔗 ${appUrl}`
+    message = `Media ${data.bankName} - Cotización\n\n` + `${ratesInfo}\n\n` + `🔗 ${appUrl}`
   }
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`

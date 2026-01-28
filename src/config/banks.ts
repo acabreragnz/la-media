@@ -15,17 +15,17 @@ export const BANKS: Record<string, BankConfig> = {
     id: 'brou',
     name: 'BROU',
     displayName: 'La Media BROU',
-    logoUrl: '/brou-logo.webp',
+    logoUrl: '/assets/banks/brou.webp',
     websiteUrl: 'https://www.brou.com.uy/cotizaciones',
-    route: '/brou'
+    route: '/brou',
   },
   itau: {
     id: 'itau',
     name: 'Itaú',
     displayName: 'La Media Itaú',
-    logoUrl: '/itau-logo.svg',
+    logoUrl: '/assets/banks/itau.svg',
     websiteUrl: 'https://www.itau.com.uy/inst/aci/cotiz.xml',
-    route: '/itau'
+    route: '/itau',
   },
   santander: {
     id: 'santander',
@@ -34,7 +34,7 @@ export const BANKS: Record<string, BankConfig> = {
     logoUrl: 'https://cdn.brandfetch.io/idWPmUE5JO/w/399/h/399/theme/dark/icon.jpeg',
     websiteUrl: 'https://www.santander.com.uy',
     route: '/santander',
-    comingSoon: true
+    comingSoon: true,
   },
   bbva: {
     id: 'bbva',
@@ -43,17 +43,17 @@ export const BANKS: Record<string, BankConfig> = {
     logoUrl: 'https://cdn.brandfetch.io/idQW_ZOF8l/w/400/h/400/theme/dark/icon.png',
     websiteUrl: 'https://www.bbva.com.uy',
     route: '/bbva',
-    comingSoon: true
+    comingSoon: true,
   },
   bcu: {
     id: 'bcu',
     name: 'BCU',
     displayName: 'La Media BCU',
-    logoUrl: '/bcu-logo.svg',
+    logoUrl: '/assets/banks/bcu.svg',
     websiteUrl: 'https://www.bcu.gub.uy',
     route: '/bcu',
-    comingSoon: true
-  }
+    comingSoon: true,
+  },
 }
 
 export const BANKS_ARRAY = Object.values(BANKS)

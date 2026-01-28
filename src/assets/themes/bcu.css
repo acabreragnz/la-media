@@ -1,16 +1,10 @@
 /* BCU Theme - Dorado institucional */
-[data-bank="bcu"] {
-  --bank-primary: #D4941C;          /* Dorado BCU */
-  --bank-primary-light: #E8A830;    /* Dorado claro */
+[data-bank='bcu'] {
+  --bank-primary: #d4941c; /* Dorado BCU */
+  --bank-primary-light: #e8a830; /* Dorado claro */
   --bank-primary-rgb: 212, 148, 28;
   --bank-primary-light-rgb: 232, 168, 48;
 
-  --bank-accent: #D4941C;           /* Dorado como acento */
+  --bank-accent: #d4941c; /* Dorado como acento */
   --bank-accent-rgb: 212, 148, 28;
-
-  /* Mismo gradiente de fondo que BROU */
-  --bank-gradient-from: #0a0e1f;
-  --bank-gradient-stop1: #0f1a2e;
-  --bank-gradient-via: #0d2744;
-  --bank-gradient-to: #08528D;
 }

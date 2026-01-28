@@ -27,12 +27,24 @@ const emit = defineEmits<{
     <div class="flex items-start gap-3 pr-8">
       <PhWarning :size="24" class="text-yellow-500 flex-shrink-0 mt-0.5" />
       <div class="flex-1">
-        <h3 class="text-yellow-400 font-bold text-[0.9rem] mb-1">Sitio NO oficial de {{ bankName }}</h3>
+        <h3 class="text-yellow-400 font-bold text-[0.9rem] mb-1">
+          Sitio NO oficial de {{ bankName }}
+        </h3>
         <p class="text-white/80 text-[0.75rem] leading-relaxed mb-2">
-          Este conversor <strong>no está afiliado, asociado ni respaldado</strong> por {{ bankName }}.
+          Este conversor <strong>no está afiliado, asociado ni respaldado</strong> por
+          {{ bankName }}.
         </p>
         <p class="text-white/80 text-[0.75rem] leading-relaxed">
-          Los datos pueden contener errores o estar desactualizados. <strong>No nos hacemos responsables</strong> por pérdidas derivadas del uso de esta información. Verifica siempre en <a :href="websiteUrl" target="_blank" rel="noopener" class="text-yellow-400 underline font-semibold">{{ bankName }}</a>
+          Los datos pueden contener errores o estar desactualizados.
+          <strong>No nos hacemos responsables</strong> por pérdidas derivadas del uso de esta
+          información. Verifica siempre en
+          <a
+            :href="websiteUrl"
+            target="_blank"
+            rel="noopener"
+            class="text-yellow-400 underline font-semibold"
+            >{{ bankName }}</a
+          >
         </p>
       </div>
     </div>

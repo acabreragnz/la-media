@@ -19,8 +19,8 @@ vi.mock('@tanstack/vue-query', () => ({
     isFetching: mockIsFetching,
     isError: mockIsError,
     error: mockQueryError,
-    refetch: mockRefetch
-  })
+    refetch: mockRefetch,
+  }),
 }))
 
 // Mock vue-currency-input
@@ -45,8 +45,8 @@ vi.mock('vue-currency-input', () => ({
     symbol: 'symbol',
     narrowSymbol: 'narrowSymbol',
     code: 'code',
-    name: 'name'
-  }
+    name: 'name',
+  },
 }))
 
 describe('createCurrencyComposable', () => {
@@ -64,7 +64,7 @@ describe('createCurrencyComposable', () => {
     it('should have correct initial state values', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       expect(currency.rates.value).toBeNull()
@@ -79,7 +79,7 @@ describe('createCurrencyComposable', () => {
     it('should convert USD to UYU correctly', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // Simular datos de Vue Query
@@ -91,8 +91,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       currency.setValue(100)
@@ -106,8 +106,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       })
       expect(currency.convertedAmount.value).toBe(4100) // 100 * 41.0 (media)
     })
@@ -115,7 +115,7 @@ describe('createCurrencyComposable', () => {
     it('should convert UYU to USD correctly', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = {
@@ -126,8 +126,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       currency.setValue(4100)
@@ -139,7 +139,7 @@ describe('createCurrencyComposable', () => {
     it('should return 0 when amount is empty', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = {
@@ -150,8 +150,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       currency.numberValue.value = null
@@ -162,7 +162,7 @@ describe('createCurrencyComposable', () => {
     it('should handle decimal amounts', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = {
@@ -173,11 +173,11 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
-      currency.setValue(100.50)
+      currency.setValue(100.5)
       currency.direction.value = 'usdToUyu'
 
       expect(currency.convertedAmount.value).toBe(4120.5) // 100.50 * 41.0 (media)
@@ -188,7 +188,7 @@ describe('createCurrencyComposable', () => {
     it('should swap direction from usdToUyu to uyuToUsd', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       expect(currency.direction.value).toBe('usdToUyu')
@@ -199,7 +199,7 @@ describe('createCurrencyComposable', () => {
     it('should swap direction from uyuToUsd to usdToUyu', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       currency.direction.value = 'uyuToUsd'
@@ -210,7 +210,7 @@ describe('createCurrencyComposable', () => {
     it('should update amount to converted value after swap', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = {
@@ -221,8 +221,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       currency.setValue(100)
@@ -245,13 +245,13 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       expect(currency.numberValue.value).toBeNull()
@@ -270,7 +270,7 @@ describe('createCurrencyComposable', () => {
     it('should correctly swap when value is zero', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = {
@@ -281,8 +281,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       currency.setValue(0)
@@ -298,7 +298,7 @@ describe('createCurrencyComposable', () => {
     it('should reflect loading state from Vue Query', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       expect(currency.loading.value).toBe(false)
@@ -311,7 +311,7 @@ describe('createCurrencyComposable', () => {
     it('should reflect error state from Vue Query', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       expect(currency.error.value).toBeNull()
@@ -325,7 +325,7 @@ describe('createCurrencyComposable', () => {
     it('should return null rates when query has no data', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = undefined
@@ -338,7 +338,7 @@ describe('createCurrencyComposable', () => {
     it('should show only time for same day', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // Simular next_run hoy en el futuro (2 horas desde ahora)
@@ -352,8 +352,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
           nextRunAt: nextRun.toISOString(),
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       // Debe formatear como hora fija (ej: "15:45")
@@ -363,7 +363,7 @@ describe('createCurrencyComposable', () => {
     it('should show "mañana HH:MM" for tomorrow', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // Simular next_run mañana a las 08:00
@@ -379,8 +379,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
           nextRunAt: tomorrow.toISOString(),
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       // Debe formatear como "mañana 08:00"
@@ -390,7 +390,7 @@ describe('createCurrencyComposable', () => {
     it('should show "day HH:MM" for this week', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // Simular next_run en 3 días
@@ -406,8 +406,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
           nextRunAt: inThreeDays.toISOString(),
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       // Debe formatear como "lun 10:30" o similar
@@ -417,7 +417,7 @@ describe('createCurrencyComposable', () => {
     it('should show "mañana HH:MM" for tomorrow edge case (23:59 → 00:01)', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // Simular que es 23:59 hoy, next_run es 00:01 mañana
@@ -433,8 +433,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: new Date().toISOString(),
           nextRunAt: tomorrow.toISOString(),
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       // Debe formatear como "mañana 00:01" (no "00:01" del mismo día)
@@ -444,7 +444,7 @@ describe('createCurrencyComposable', () => {
     it('should show "lun HH:MM" for Friday → Monday (weekend)', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // Crear un viernes a las 19:00
@@ -464,8 +464,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: friday.toISOString(),
           nextRunAt: monday.toISOString(),
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       const result = currency.nextUpdateTime.value
@@ -480,7 +480,7 @@ describe('createCurrencyComposable', () => {
     it('should show "lun HH:MM" for Sunday → Monday', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // Crear un domingo a las 23:00
@@ -500,8 +500,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: sunday.toISOString(),
           nextRunAt: monday.toISOString(),
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       const result = currency.nextUpdateTime.value
@@ -516,7 +516,7 @@ describe('createCurrencyComposable', () => {
     it('should show --:-- when next_run is null', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = {
@@ -527,8 +527,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'fallback'
-        }
+          source: 'fallback',
+        },
       }
 
       expect(currency.nextUpdateTime.value).toBe('--:--')
@@ -537,7 +537,7 @@ describe('createCurrencyComposable', () => {
     it('should show --:-- when next_run is in the past', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // Next run hace 1 hora (en el pasado)
@@ -551,8 +551,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: new Date(Date.now() - 70 * 60 * 1000).toISOString(),
           nextRunAt: pastTime.toISOString(),
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       // Si next_run está en el pasado, debe mostrar --:--
@@ -566,7 +566,7 @@ describe('createCurrencyComposable', () => {
 
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
       mockQueryData.value = undefined
 
@@ -581,7 +581,7 @@ describe('createCurrencyComposable', () => {
 
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = {
@@ -592,8 +592,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
       currency.numberValue.value = null
 
@@ -601,7 +601,7 @@ describe('createCurrencyComposable', () => {
 
       expect(windowOpenSpy).toHaveBeenCalledWith(
         expect.stringContaining('https://wa.me/?text='),
-        '_blank'
+        '_blank',
       )
 
       windowOpenSpy.mockRestore()
@@ -612,7 +612,7 @@ describe('createCurrencyComposable', () => {
 
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = {
@@ -623,8 +623,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: '2024-01-01T00:00:00Z',
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
       currency.setValue(100)
       currency.direction.value = 'usdToUyu'
@@ -633,7 +633,7 @@ describe('createCurrencyComposable', () => {
 
       expect(windowOpenSpy).toHaveBeenCalledWith(
         expect.stringContaining('https://wa.me/?text='),
-        '_blank'
+        '_blank',
       )
       windowOpenSpy.mockRestore()
     })
@@ -643,7 +643,7 @@ describe('createCurrencyComposable', () => {
     it('should expose refetch function from Vue Query', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       expect(currency.refetch).toBeDefined()
@@ -655,7 +655,7 @@ describe('createCurrencyComposable', () => {
     it('should show --:-- when rates are null', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       mockQueryData.value = undefined
@@ -666,7 +666,7 @@ describe('createCurrencyComposable', () => {
     it('should format relative time when rates have scrapedAt', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/test',
-        bankName: 'TEST'
+        bankName: 'TEST',
       })
 
       // 5 minutos atrás
@@ -680,8 +680,8 @@ describe('createCurrencyComposable', () => {
         metadata: {
           scrapedAt: fiveMinutesAgo.toISOString(),
           nextRunAt: null,
-          source: 'scheduled'
-        }
+          source: 'scheduled',
+        },
       }
 
       // Debe mostrar algo como "hace 5 min"
@@ -693,7 +693,7 @@ describe('createCurrencyComposable', () => {
     it('should accept endpoint and bankName configuration', () => {
       const currency = createCurrencyComposable({
         endpoint: '/api/custom-bank',
-        bankName: 'CUSTOM'
+        bankName: 'CUSTOM',
       })
 
       // Verify composable was created successfully

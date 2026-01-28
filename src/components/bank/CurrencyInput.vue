@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import type { Ref } from 'vue'
 import type { ConversionDirection } from '@/types/currency'
 
 interface Props {
   direction: ConversionDirection
-  inputRef: Ref<HTMLInputElement | undefined>
 }
 
 defineProps<Props>()
@@ -24,13 +22,7 @@ const emit = defineEmits<{
       <span class="text-white/60 text-[0.7rem] uppercase tracking-wider font-medium">
         {{ direction === 'usdToUyu' ? 'Dólares' : 'Pesos' }}
       </span>
-      <input
-        :ref="inputRef"
-        type="text"
-        autofocus
-        class="w-full bg-transparent border-none text-white text-[1.75rem] font-semibold tracking-tight outline-none"
-        placeholder="0,00"
-      />
+      <slot name="input" />
     </span>
   </label>
 </template>

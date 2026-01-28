@@ -29,31 +29,45 @@ const bank = computed(() => {
         <!-- Compra -->
         <div class="flex flex-col flex-1 items-end pl-2 pr-3">
           <span class="text-[0.65rem] text-white/50 uppercase tracking-wider">Compra</span>
-          <span v-if="rates" class="text-white/90 text-base font-semibold">{{ formatNumber(rates.buy) }}</span>
+          <span v-if="rates" class="text-white/90 text-base font-semibold">{{
+            formatNumber(rates.buy)
+          }}</span>
         </div>
 
         <!-- Divider vertical con gradiente sutil -->
         <div class="relative w-[1px] h-12 overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent blur-[1px]"></div>
-          <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent blur-[1px]"
+          ></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent"
+          ></div>
         </div>
 
         <!-- Media (centro, destacado) -->
         <div class="flex flex-col items-center px-4 py-1">
           <span class="text-sm uppercase tracking-wider font-medium media-label">Media</span>
-          <span v-if="rates" class="font-bold text-3xl media-value">{{ formatNumber(rates.average) }}</span>
+          <span v-if="rates" class="font-bold text-3xl media-value">{{
+            formatNumber(rates.average)
+          }}</span>
         </div>
 
         <!-- Divider vertical con gradiente sutil -->
         <div class="relative w-[1px] h-12 overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent blur-[1px]"></div>
-          <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent blur-[1px]"
+          ></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent"
+          ></div>
         </div>
 
         <!-- Venta -->
         <div class="flex flex-col flex-1 items-start pl-3 pr-2">
           <span class="text-[0.65rem] text-white/50 uppercase tracking-wider">Venta</span>
-          <span v-if="rates" class="text-white/90 text-base font-semibold">{{ formatNumber(rates.sell) }}</span>
+          <span v-if="rates" class="text-white/90 text-base font-semibold">{{
+            formatNumber(rates.sell)
+          }}</span>
         </div>
       </div>
 

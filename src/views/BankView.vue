@@ -178,10 +178,18 @@ const disclaimerDismissed = useLocalStorage(`${props.bankId}media_disclaimer_dis
           <!-- Dynamic Rate Display (between inputs) -->
           <div v-if="rates" class="text-center text-white/50 text-sm py-2">
             <span v-if="direction === 'usdToUyu'">
-              1 USD = <span class="text-[var(--bank-accent)] font-medium">{{ formatNumber(rates.average) }}</span> UYU
+              1 USD =
+              <span class="text-[var(--bank-accent)] font-medium">{{
+                formatNumber(rates.average)
+              }}</span>
+              UYU
             </span>
             <span v-else>
-              1 UYU = <span class="text-[var(--bank-accent)] font-medium">{{ formatNumber(1 / rates.average) }}</span> USD
+              1 UYU =
+              <span class="text-[var(--bank-accent)] font-medium">{{
+                formatNumber(1 / rates.average)
+              }}</span>
+              USD
             </span>
           </div>
 

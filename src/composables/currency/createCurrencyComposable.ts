@@ -99,12 +99,20 @@ export function createCurrencyComposable(config: CurrencyConfig) {
   } as const
 
   // Dual input configuration: USD and UYU inputs
-  const { inputRef: usdInputRef, numberValue: usdValue, setValue: setUsdValue } = useCurrencyInput({
+  const {
+    inputRef: usdInputRef,
+    numberValue: usdValue,
+    setValue: setUsdValue,
+  } = useCurrencyInput({
     currency: 'USD',
     ...currencyInputConfig,
   })
 
-  const { inputRef: uyuInputRef, numberValue: uyuValue, setValue: setUyuValue } = useCurrencyInput({
+  const {
+    inputRef: uyuInputRef,
+    numberValue: uyuValue,
+    setValue: setUyuValue,
+  } = useCurrencyInput({
     currency: 'UYU',
     ...currencyInputConfig,
   })
@@ -150,12 +158,12 @@ export function createCurrencyComposable(config: CurrencyConfig) {
         const convertedValue = uyuValue.value / newRates.average
         setUsdValue(convertedValue)
       }
-    }
+    },
   )
 
   // Simplified convertedAmount: just reads from the opposite input
   const convertedAmount = computed(() => {
-    return direction.value === 'usdToUyu' ? uyuValue.value ?? 0 : usdValue.value ?? 0
+    return direction.value === 'usdToUyu' ? (uyuValue.value ?? 0) : (usdValue.value ?? 0)
   })
 
   // inputAmount for WhatsApp sharing

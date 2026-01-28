@@ -1,6 +1,40 @@
 # La Media - Multi-Bank Currency Converter
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A Vue 3 + TypeScript application that displays real-time USD/UYU exchange rates from multiple Uruguayan banks (BROU, Itaú, and more).
+
+🔗 **Live Site:** [media-brou.tonicabrera.dev](https://media-brou.tonicabrera.dev)
+
+## ⚠️ Disclaimer
+
+**This is an unofficial, independent project.** It is not affiliated with, associated with, or endorsed by any of the banks whose data it displays. Bank names, logos, and trademarks are property of their respective owners and are used here solely for informational purposes.
+
+This tool:
+- ✅ Displays publicly available exchange rate data
+- ✅ Does NOT collect user credentials or personal information
+- ✅ Does NOT have login forms or authentication
+- ✅ Is NOT a phishing site - it's a read-only comparison tool
+
+## 🚀 Features
+
+- Real-time USD/UYU exchange rates from multiple Uruguayan banks
+- Responsive design optimized for mobile and desktop
+- Automatic updates every 15 minutes via Netlify Scheduled Functions
+- Bidirectional currency conversion (USD ↔ UYU)
+- WhatsApp sharing functionality
+- PWA support for offline access
+
+## 🏗️ Tech Stack
+
+- **Frontend:** Vue 3 + TypeScript + Vite
+- **Styling:** Tailwind CSS v4
+- **State Management:** Vue Composition API
+- **Backend:** Netlify Edge Functions + Scheduled Functions
+- **Caching:** Netlify Blobs
+- **Deployment:** Netlify
+- **Testing:** Vitest + Playwright
+- **Analytics:** PostHog + Sentry
 
 ## Recommended IDE Setup
 
@@ -92,3 +126,32 @@ To inspect the cached exchange rates:
 netlify blobs:get rates brou-latest
 netlify blobs:get rates itau-latest
 ```
+
+## 🤝 Contributing
+
+Contributions are welcome! This is an open source project maintained by [@acabreragnz](https://github.com/acabreragnz).
+
+If you'd like to add a new bank, see the guide: [`docs/adding-new-bank.md`](docs/adding-new-bank.md)
+
+### How to Contribute
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Agustín Cabrera**
+- GitHub: [@acabreragnz](https://github.com/acabreragnz)
+
+## ⚖️ Legal
+
+This project is provided "as is" without warranty of any kind. Exchange rate data may contain errors or be temporarily outdated. Always verify rates on official bank websites before making financial decisions.
+
+Bank names, logos, and trademarks are property of their respective owners. Their use in this project is solely for informational purposes and does not imply endorsement.

@@ -7,7 +7,7 @@ const isDev = import.meta.env.DEV
 </script>
 
 <template>
-  <div class="min-h-dvh flex items-center justify-center p-6 bg-gradient-to-br from-dark-bg-1 via-dark-bg-2 to-dark-bg-3">
+  <div data-bank="home" class="min-h-dvh flex items-center justify-center p-6 app-gradient">
     <div class="w-full max-w-2xl">
       <!-- Header -->
       <header class="text-center mb-12">

@@ -55,6 +55,7 @@ html, body {
    Each bank theme is in a separate file for Open/Closed Principle
    ============================================ */
 
+@import "./themes/home.css";
 @import "./themes/brou.css";
 @import "./themes/itau.css";
 @import "./themes/santander.css";

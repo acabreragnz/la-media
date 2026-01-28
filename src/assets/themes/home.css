@@ -1,0 +1,7 @@
+/* Home Theme - Default dark gradient */
+[data-bank="home"] {
+  --bank-gradient-from: #0f0f1a;    /* 0% - dark-bg-1 */
+  --bank-gradient-stop1: #1a1a2e;   /* 30% - dark-bg-2 */
+  --bank-gradient-via: #16213e;     /* 60% - dark-bg-3 */
+  --bank-gradient-to: #0f3460;      /* 100% - dark-bg-4 */
+}

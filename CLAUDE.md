@@ -45,6 +45,114 @@ netlify blobs:get rates brou-latest
 netlify blobs:get rates itau-latest
 ```
 
+## Quick Reference: Project Structure
+
+```
+├── netlify/
+│   ├── edge-functions/
+│   │   ├── get-brou-rates.mts      # BROU API endpoint (/api/brou)
+│   │   └── get-itau-rates.mts      # Itaú API endpoint (/api/itau)
+│   └── functions/
+│       ├── update-all-rates.mts    # Scheduled function (runs every 15 min)
+│       └── utils/
+│           ├── brou-scraper.mts    # BROU website scraper
+│           ├── itau-scraper.mts    # Itaú website scraper
+│           ├── scraper-registry.mts # Central registry of all scrapers
+│           └── constants.mts       # Shared constants (USD_CURRENCY, etc.)
+│
+├── shared/
+│   └── types/
+│       └── exchange-rates.mts      # Types shared between frontend and backend
+│
+├── src/
+│   ├── views/
+│   │   ├── HomeView.vue            # Bank selection landing page
+│   │   └── BankView.vue            # Bank-specific converter (orchestrates 10 components)
+│   │
+│   ├── components/
+│   │   ├── bank/
+│   │   │   ├── BankViewSkeleton.vue       # Loading states
+│   │   │   ├── BankViewHeader.vue         # Logo + title
+│   │   │   ├── BankAccentStripe.vue       # Decorative stripe
+│   │   │   ├── ExchangeRatesDisplay.vue   # Buy/media/sell rates
+│   │   │   ├── ErrorBanner.vue            # Error display with retry
+│   │   │   ├── CurrencyInput.vue          # Formatted input
+│   │   │   ├── SwapButton.vue             # Direction toggle
+│   │   │   ├── ConversionResult.vue       # Output with animations
+│   │   │   ├── BankFooter.vue             # Stats, timestamps, share
+│   │   │   └── DisclaimerBanner.vue       # Legal notice
+│   │   ├── CurrencyValue.vue       # Animated number display (@number-flow/vue)
+│   │   └── ItauLogo.vue            # Itaú SVG logo component
+│   │
+│   ├── composables/
+│   │   ├── currency/
+│   │   │   ├── createCurrencyComposable.ts # Factory for bank composables
+│   │   │   ├── useBankCurrency.ts          # Registry: maps bankId → composable
+│   │   │   ├── useBrouCurrency.ts          # BROU-specific composable
+│   │   │   └── useItauCurrency.ts          # Itaú-specific composable
+│   │   └── useDeviceDetection.ts   # Mobile/desktop detection
+│   │
+│   ├── config/
+│   │   ├── banks.ts                # Bank metadata (name, logo, URL, colors)
+│   │   └── refresh.ts              # Query refetch intervals
+│   │
+│   ├── types/
+│   │   ├── banks.ts                # BankId type + type guard
+│   │   └── currency.ts             # ConversionDirection enum
+│   │
+│   ├── utils/
+│   │   ├── formatters.ts           # Number/date formatting utilities
+│   │   └── whatsappShare.ts        # WhatsApp share URL generator
+│   │
+│   ├── lib/
+│   │   ├── posthog.ts              # PostHog analytics setup
+│   │   └── sentry.ts               # Sentry error tracking setup
+│   │
+│   ├── assets/
+│   │   ├── themes/
+│   │   │   ├── brou.css            # BROU CSS variables (colors, gradients)
+│   │   │   ├── itau.css            # Itaú CSS variables
+│   │   │   ├── santander.css       # Santander CSS variables
+│   │   │   ├── bbva.css            # BBVA CSS variables
+│   │   │   └── bcu.css             # BCU CSS variables
+│   │   └── main.css                # Global styles + theme imports
+│   │
+│   ├── App.vue                     # Root component (router-view)
+│   ├── main.ts                     # App entry point (Vue, router, analytics)
+│   └── router.ts                   # Vue Router config (routes for each bank)
+│
+├── public/
+│   ├── assets/
+│   │   ├── banks/                  # Bank logos (brou.webp, itau.svg, etc.)
+│   │   ├── brand/                  # La Media branding assets
+│   │   ├── icons/                  # App icons (PWA)
+│   │   └── social/                 # Open Graph images
+│   └── manifest.json               # PWA manifest
+│
+├── docs/
+│   └── adding-new-bank.md          # Step-by-step guide for adding banks
+│
+├── e2e/
+│   └── vue.spec.ts                 # Playwright E2E tests
+│
+├── vite.config.ts                  # Vite config (aliases, plugins)
+├── netlify.toml                    # Netlify build config
+├── package.json                    # Dependencies and scripts
+└── tsconfig.json                   # TypeScript config
+```
+
+## Development Guidelines
+
+### Visual/Style Changes Validation
+
+Always validate visual and style changes in a browser before completing the task:
+
+1. Start dev server: `pnpm dev`
+2. Open affected page(s) in a browser
+3. Capture visual state before and after changes
+4. For responsive changes, test viewport sizes: 375px, 768px, 1024px (use browser DevTools)
+5. Check browser console for errors
+
 ## Architecture
 
 ### Frontend Structure
@@ -76,7 +184,8 @@ The backend uses a **scheduled function + caching** architecture to minimize scr
    - Registered in `scraper-registry.mts` for centralized management
 
 2. **`netlify/functions/update-all-rates.mts`**: Consolidated Scheduled Function (TypeScript)
-   - Runs automatically every 15 minutes (`0,15,30,45 11-22 * * 1-5` cron, Mon-Fri 8am-7pm Uruguay time)
+   - Runs every 15 minutes: Mon-Fri 8am-7pm Uruguay time (UTC-3 = 11am-10pm UTC)
+   - Cron: `0,15,30,45 11-22 * * 1-5`
    - Updates **all active banks in parallel** using scraper registry
    - Stores results in **Netlify Blobs** (keys: `brou-latest`, `itau-latest`, etc. in store: `rates`)
    - Error handling: preserves previous data if scraping fails (doesn't overwrite Blobs)
@@ -153,88 +262,16 @@ export const BANK_SCRAPER_MAP: Record<BankId, () => Promise<ExchangeRate>> = {
 
 ### Adding a New Bank
 
-**Time to add new bank**: ~1 hour (down from ~4 hours)
+**Time to add**: ~1 hour (down from ~4 hours with previous architecture)
 
-**1. Backend Scraper**:
-```typescript
-// netlify/functions/utils/newbank-scraper.mts
-export async function scrapeNewBankRates(): Promise<ExchangeRate> {
-  // Scraping logic here
-}
+The multi-bank architecture makes adding new banks straightforward through centralized registries and factory patterns.
 
-// netlify/functions/utils/scraper-registry.mts
-export const BANK_SCRAPER_MAP = {
-  // ...existing
-  newbank: scrapeNewBankRates
-}
+**📖 Detailed Guide**: See [`docs/adding-new-bank.md`](docs/adding-new-bank.md) for complete step-by-step instructions with code examples, troubleshooting tips, and best practices.
 
-export function getActiveBanks() {
-  return ['brou', 'itau', 'newbank']
-}
-```
-
-**2. Frontend Config**:
-```typescript
-// src/config/banks.ts
-export const BANKS = {
-  // ...existing
-  newbank: {
-    id: 'newbank',
-    name: 'New Bank',
-    displayName: 'La Media New Bank',
-    logoUrl: '/newbank-logo.svg',
-    websiteUrl: 'https://www.newbank.com.uy',
-    route: '/newbank'
-  }
-}
-
-// src/utils/bank-colors.ts
-export const BANK_COLORS = {
-  // ...existing
-  newbank: { accent: { r: 255, g: 100, b: 50 } }
-}
-```
-
-**3. CSS Variables** (`src/assets/main.css`):
-```css
-[data-bank='newbank'] {
-  --bank-accent: rgb(255, 100, 50);
-  --bank-accent-rgb: 255, 100, 50;
-  --bank-primary: rgb(200, 80, 40);
-  --bank-primary-rgb: 200, 80, 40;
-  --bank-primary-light: rgb(255, 120, 70);
-  --bank-primary-light-rgb: 255, 120, 70;
-}
-```
-
-**4. Composable**:
-```typescript
-// src/composables/currency/useNewBankCurrency.ts
-export function useNewBankCurrency() {
-  return createCurrencyComposable({
-    endpoint: '/api/newbank',
-    bankName: 'New Bank'
-  })
-}
-
-// src/composables/currency/useBankCurrency.ts
-const BANK_COMPOSABLE_MAP = {
-  // ...existing
-  newbank: useNewBankCurrency
-}
-```
-
-**5. Edge Function**: Copy `get-brou-rates.mts`, update bank ID and Blobs key to `newbank-latest`
-
-**6. Router**: Add route in `src/router.ts`:
-```typescript
-{
-  path: '/newbank',
-  name: 'newbank',
-  component: BankView,
-  props: { bankId: 'newbank' as BankId }
-}
-```
+**Quick Overview**:
+- **Backend**: Create scraper → Register in `scraper-registry.mts` → Create edge function (copy template)
+- **Frontend**: Add to `banks.ts` config → Create CSS theme → Create composable → Register composable → Add route
+- **Automatic**: Scheduled function picks up new banks from registry and scrapes them every 15 minutes
 
 ### Styling
 
@@ -278,6 +315,7 @@ The `createCurrencyComposable` factory creates bank-specific composables that ha
 ### Path Aliases
 
 - `@/` maps to `./src/` via Vite configuration
+- `@shared/` maps to `./shared/` for types shared between frontend and backend
 
 ## Testing
 
@@ -293,7 +331,7 @@ This project is configured for **Netlify deployment**:
 - Edge Functions are automatically deployed from `netlify/edge-functions/*.mts`
 - Scheduled Functions are automatically deployed from `netlify/functions/*.mts`
 - Netlify Blobs is provisioned automatically (zero configuration)
-- Schedule defined inline via `export const config: Config = { schedule: '*/15 * * * *' }`
+- Schedule defined inline via `export const config: Config = { schedule: '0,15,30,45 11-22 * * 1-5' }`
 - No CORS needed: frontend and backend share same origin (Netlify domain)
 
 **Post-deployment testing:**

@@ -169,7 +169,10 @@ const isDev = import.meta.env.DEV
 
       <!-- Footer -->
       <footer class="text-center mt-12 text-white/40 text-sm">
-        <p>Datos obtenidos de los sitios oficiales de cada banco</p>
+        <p class="text-white/50 text-xs mb-1">
+          <strong>Sitio no oficial.</strong> Las marcas y logotipos son propiedad de sus
+          respectivos titulares.
+        </p>
         <p class="mt-2">
           Hecho con 💙 por
           <a

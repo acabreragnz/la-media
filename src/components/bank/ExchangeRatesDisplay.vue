@@ -24,7 +24,7 @@ const bank = computed(() => {
 
 <template>
   <div class="space-y-2">
-    <div class="rounded-xl px-4 py-3 relative">
+    <div class="rounded-xl px-4 relative">
       <div class="flex items-center">
         <!-- Compra -->
         <div class="flex flex-col flex-1 items-end pl-2 pr-3">

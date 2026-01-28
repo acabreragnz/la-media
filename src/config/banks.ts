@@ -14,7 +14,7 @@ export const BANKS: Record<string, BankConfig> = {
   brou: {
     id: 'brou',
     name: 'BROU',
-    displayName: 'La Media BROU',
+    displayName: 'BROU',
     logoUrl: '/assets/banks/brou.webp',
     websiteUrl: 'https://www.brou.com.uy/cotizaciones',
     route: '/brou',
@@ -22,7 +22,7 @@ export const BANKS: Record<string, BankConfig> = {
   itau: {
     id: 'itau',
     name: 'Itaú',
-    displayName: 'La Media Itaú',
+    displayName: 'Itaú',
     logoUrl: '/assets/banks/itau.svg',
     websiteUrl: 'https://www.itau.com.uy/inst/aci/cotiz.xml',
     route: '/itau',
@@ -30,7 +30,7 @@ export const BANKS: Record<string, BankConfig> = {
   santander: {
     id: 'santander',
     name: 'Santander',
-    displayName: 'La Media Santander',
+    displayName: 'Santander',
     logoUrl: 'https://cdn.brandfetch.io/idWPmUE5JO/w/399/h/399/theme/dark/icon.jpeg',
     websiteUrl: 'https://www.santander.com.uy',
     route: '/santander',
@@ -39,7 +39,7 @@ export const BANKS: Record<string, BankConfig> = {
   bbva: {
     id: 'bbva',
     name: 'BBVA',
-    displayName: 'La Media BBVA',
+    displayName: 'BBVA',
     logoUrl: 'https://cdn.brandfetch.io/idQW_ZOF8l/w/400/h/400/theme/dark/icon.png',
     websiteUrl: 'https://www.bbva.com.uy',
     route: '/bbva',
@@ -48,7 +48,7 @@ export const BANKS: Record<string, BankConfig> = {
   bcu: {
     id: 'bcu',
     name: 'BCU',
-    displayName: 'La Media BCU',
+    displayName: 'BCU',
     logoUrl: '/assets/banks/bcu.svg',
     websiteUrl: 'https://www.bcu.gub.uy',
     route: '/bcu',

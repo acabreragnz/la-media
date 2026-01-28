@@ -10,6 +10,9 @@ export interface ConversionShareData {
   bankName: string
 }
 
+// Production URL for sharing (always use this in WhatsApp messages)
+const SHARE_URL = 'https://la-media.tonicabrera.dev'
+
 /**
  * Formats exchange rates information (DRY helper)
  */
@@ -35,7 +38,7 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
 
   // After validation, rates is guaranteed to be non-null
   const rates = data.rates
-  const appUrl = window.location.origin
+  const appUrl = SHARE_URL
   const ratesInfo = formatRatesInfo(rates)
 
   let message: string

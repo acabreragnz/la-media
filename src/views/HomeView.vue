@@ -16,7 +16,7 @@ const isDev = import.meta.env.DEV
           alt="La Media"
           class="h-16 md:h-20 w-auto mx-auto mb-4"
         />
-        <p class="text-white/60 text-base md:text-lg">Cotizaciones USD/UYU en tiempo real</p>
+        <p class="text-white/60 text-base md:text-lg">Cotizaciones USD/UYU actualizadas</p>
       </header>
 
       <!-- Grid de Bancos (centrado y balanceado) -->
@@ -27,7 +27,7 @@ const isDev = import.meta.env.DEV
           :key="bank.id"
           :to="bank.route"
           :data-bank="bank.id"
-          class="group relative overflow-hidden bg-white/[0.03] backdrop-blur-lg rounded-2xl p-6 md:p-8 hover:bg-white/[0.06] hover:scale-105 active:scale-95 w-[calc(50%-0.5rem)] sm:w-[180px] md:w-[200px] bank-card"
+          class="group relative overflow-hidden bank-card-gradient backdrop-blur-lg rounded-2xl p-6 md:p-8 hover:scale-105 active:scale-95 w-[calc(50%-0.5rem)] sm:w-[180px] md:w-[200px] bank-card"
         >
           <!-- Glow effect con color del banco -->
           <div
@@ -89,8 +89,8 @@ const isDev = import.meta.env.DEV
           :class="[
             'group relative overflow-hidden backdrop-blur-lg rounded-2xl p-6 md:p-8 w-[calc(50%-0.5rem)] sm:w-[180px] md:w-[200px]',
             isDev
-              ? 'bg-white/[0.03] hover:bg-white/[0.06] hover:scale-105 active:scale-95 cursor-pointer bank-card'
-              : 'bg-white/[0.02] cursor-not-allowed opacity-60 bank-card-coming-soon',
+              ? 'bank-card-gradient hover:scale-105 active:scale-95 cursor-pointer bank-card'
+              : 'bank-card-gradient-muted cursor-not-allowed opacity-60 bank-card-coming-soon',
           ]"
         >
           <!-- Badge "Próximamente" o "DEV MODE" -->
@@ -169,7 +169,10 @@ const isDev = import.meta.env.DEV
 
       <!-- Footer -->
       <footer class="text-center mt-12 text-white/40 text-sm">
-        <p>Datos obtenidos de los sitios oficiales de cada banco</p>
+        <p class="text-white/50 text-xs mb-1">
+          <strong>Sitio no oficial.</strong> Las marcas y logotipos son propiedad de sus
+          respectivos titulares.
+        </p>
         <p class="mt-2">
           Hecho con 💙 por
           <a
@@ -188,6 +191,23 @@ const isDev = import.meta.env.DEV
 
 <style scoped>
 /* ===== Cards de bancos activos ===== */
+
+/* Gradiente sutil para cards (consistent con otras cards) */
+.bank-card-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--bank-primary-rgb), 0.05) 0%,
+    rgba(var(--bank-primary-light-rgb), 0.03) 100%
+  );
+}
+
+.bank-card-gradient-muted {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--bank-primary-rgb), 0.02) 0%,
+    rgba(var(--bank-primary-light-rgb), 0.01) 100%
+  );
+}
 
 /* Borde constante en 2px para evitar layout shift */
 .bank-card {

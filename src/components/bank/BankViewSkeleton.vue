@@ -14,7 +14,7 @@ defineProps<Props>()
     <!-- Exchange Rates skeleton -->
     <div class="space-y-2">
       <div
-        class="bg-white/[0.04] rounded-xl px-5 py-3 border border-white/[0.05] animate-pulse relative"
+        class="bg-white/[0.04] rounded-xl px-5 border border-white/[0.05] animate-pulse relative"
       >
         <div class="flex items-center justify-center gap-3">
           <!-- Compra skeleton -->
@@ -26,8 +26,8 @@ defineProps<Props>()
           <div class="h-4 bg-white/[0.05] rounded w-1"></div>
           <!-- Media skeleton -->
           <div class="flex flex-col items-center gap-1">
-            <div class="h-2.5 bg-white/[0.08] rounded w-10"></div>
-            <div class="h-7 bg-[rgba(var(--bank-accent-rgb),0.2)] rounded w-16"></div>
+            <div class="h-3.5 bg-white/[0.08] rounded w-10"></div>
+            <div class="h-8 bg-[rgba(var(--bank-accent-rgb),0.2)] rounded w-16"></div>
           </div>
           <!-- Separador -->
           <div class="h-4 bg-white/[0.05] rounded w-1"></div>
@@ -42,29 +42,34 @@ defineProps<Props>()
       </div>
     </div>
 
-    <!-- Currency Input skeleton -->
-    <div class="bg-white/[0.05] border border-white/[0.08] rounded-[20px] p-5 animate-pulse">
+    <!-- Accent Stripe skeleton -->
+    <div class="stripe-skeleton"></div>
+
+    <!-- USD Input skeleton -->
+    <div class="card-gradient border border-white/[0.08] rounded-[20px] p-5 animate-pulse">
       <div class="flex items-center gap-4">
-        <div class="w-9 h-9 bg-white/[0.1] rounded-full"></div>
+        <!-- Flag emoji placeholder -->
+        <span class="text-[2.25rem] leading-none opacity-30">🇺🇸</span>
         <div class="flex-1 space-y-2">
-          <div class="h-3 bg-white/[0.08] rounded w-20"></div>
+          <div class="h-3 bg-white/[0.08] rounded w-16"></div>
           <div class="h-7 bg-white/[0.1] rounded w-32"></div>
         </div>
       </div>
     </div>
 
-    <!-- Swap button skeleton -->
-    <div class="flex justify-center my-4">
-      <div class="w-12 h-12 rounded-full animate-pulse skeleton-swap-button"></div>
+    <!-- Rate display skeleton (between inputs) -->
+    <div class="text-center py-2">
+      <div class="h-4 bg-white/[0.06] rounded w-48 mx-auto animate-pulse"></div>
     </div>
 
-    <!-- Result Display skeleton -->
-    <div class="rounded-[20px] p-5 animate-pulse skeleton-result-card">
+    <!-- UYU Input skeleton -->
+    <div class="card-gradient border border-white/[0.08] rounded-[20px] p-5 animate-pulse">
       <div class="flex items-center gap-4">
-        <div class="w-9 h-9 bg-white/[0.1] rounded-full"></div>
+        <!-- Flag emoji placeholder -->
+        <span class="text-[2.25rem] leading-none opacity-30">🇺🇾</span>
         <div class="flex-1 space-y-2">
-          <div class="h-3 bg-white/[0.08] rounded w-20"></div>
-          <div class="h-7 bg-white/[0.1] rounded w-40"></div>
+          <div class="h-3 bg-white/[0.08] rounded w-16"></div>
+          <div class="h-7 bg-white/[0.1] rounded w-32"></div>
         </div>
       </div>
     </div>
@@ -84,18 +89,27 @@ defineProps<Props>()
 </template>
 
 <style scoped>
-.skeleton-swap-button {
-  background: linear-gradient(to bottom right, var(--bank-primary), var(--bank-primary-light));
-  opacity: 0.5;
+/* Card gradient matching BankView inputs */
+.card-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--bank-primary-rgb), 0.05) 0%,
+    rgba(var(--bank-primary-light-rgb), 0.03) 100%
+  );
 }
 
-.skeleton-result-card {
+/* Accent stripe skeleton */
+.stripe-skeleton {
+  height: 2px;
+  width: 100%;
   background: linear-gradient(
-    to bottom right,
-    rgba(var(--bank-primary-rgb), 0.1),
-    rgba(var(--bank-primary-light-rgb), 0.08)
+    90deg,
+    transparent 0%,
+    rgba(var(--bank-accent-rgb), 0.5) 50%,
+    transparent 100%
   );
-  border: 1px solid rgba(var(--bank-primary-light-rgb), 0.2);
+  border-radius: 2px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .skeleton-share-button {

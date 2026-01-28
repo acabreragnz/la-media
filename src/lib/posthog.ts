@@ -16,7 +16,16 @@ export function initPostHog(): void {
     autocapture: true, // Trackea clicks automáticamente
     capture_pageview: true, // Trackea pageviews
     capture_pageleave: true, // Trackea cuando el usuario sale
-    disable_session_recording: true, // Deshabilitado por ahora, puedes habilitarlo cambiando a false
+    __add_tracing_headers: ['la-media.tonicabrera.dev', 'media-brou.tonicabrera.dev'],
+
+    // Session Replay: habilitado con configuraciones de privacidad
+    // El sampling rate (ej: 20%) se configura en PostHog UI → Project Settings → Replay
+    disable_session_recording: false,
+    session_recording: {
+      recordCrossOriginIframes: false, // No grabar iframes externos
+      maskAllInputs: false, // Permite ver cantidades ingresadas (no hay datos sensibles en la app)
+      maskTextSelector: '', // No enmascarar texto (es una app pública sin datos privados)
+    },
   })
 
   initialized = true

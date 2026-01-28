@@ -35,7 +35,8 @@ const emit = defineEmits<{
           {{ bankName }}.
         </p>
         <p class="text-white/80 text-[0.75rem] leading-relaxed">
-          Los datos pueden contener errores o estar desactualizados.
+          Los datos se obtienen automáticamente de la web oficial de {{ bankName }}, pero pueden
+          contener errores de procesamiento o estar temporalmente desactualizados.
           <strong>No nos hacemos responsables</strong> por pérdidas derivadas del uso de esta
           información. Verifica siempre en
           <a
@@ -45,6 +46,10 @@ const emit = defineEmits<{
             class="text-yellow-400 underline font-semibold"
             >{{ bankName }}</a
           >
+        </p>
+        <p class="text-white/80 text-[0.75rem] leading-relaxed mt-2">
+          Las marcas, logotipos y nombres comerciales mostrados son propiedad de sus respectivos
+          titulares. Su uso aquí es únicamente informativo y no implica afiliación o respaldo.
         </p>
       </div>
     </div>

@@ -98,48 +98,89 @@ export function createCurrencyComposable(config: CurrencyConfig) {
     autoDecimalDigits: false,
   } as const
 
-  // Configurar vue-currency-input con locale uruguayo
-  const { inputRef, numberValue, setValue, setOptions } = useCurrencyInput({
+  // Dual input configuration: USD and UYU inputs
+  const {
+    inputRef: usdInputRef,
+    numberValue: usdValue,
+    setValue: setUsdValue,
+  } = useCurrencyInput({
     currency: 'USD',
     ...currencyInputConfig,
   })
 
-  // Hacer reactiva la moneda según la dirección
-  watch(direction, (newDirection) => {
-    setOptions({
-      ...currencyInputConfig,
-      currency: newDirection === 'usdToUyu' ? 'USD' : 'UYU',
-    })
+  const {
+    inputRef: uyuInputRef,
+    numberValue: uyuValue,
+    setValue: setUyuValue,
+  } = useCurrencyInput({
+    currency: 'UYU',
+    ...currencyInputConfig,
   })
 
-  const convertedAmount = computed(() => {
-    if (!rates.value || !numberValue.value) return 0
+  // Watch USD input: update UYU (only when USD is the active direction)
+  watch(usdValue, (newUsdValue) => {
+    // Only update if this is the active direction
+    if (direction.value !== 'usdToUyu') return
 
-    const inputAmount = numberValue.value
-    if (isNaN(inputAmount)) return 0
-
-    return direction.value === 'usdToUyu'
-      ? inputAmount * rates.value.average
-      : inputAmount / rates.value.average
-  })
-
-  const swapDirection = () => {
-    // Si el input está vacío, solo cambiar dirección
-    if (numberValue.value === null) {
-      direction.value = direction.value === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu'
+    if (!rates.value || newUsdValue === null) {
+      setUyuValue(null)
       return
     }
 
-    const newAmount = convertedAmount.value
-    direction.value = direction.value === 'usdToUyu' ? 'uyuToUsd' : 'usdToUyu'
-    setValue(newAmount)
+    const convertedValue = newUsdValue * rates.value.average
+    setUyuValue(convertedValue)
+  })
+
+  // Watch UYU input: update USD (only when UYU is the active direction)
+  watch(uyuValue, (newUyuValue) => {
+    // Only update if this is the active direction
+    if (direction.value !== 'uyuToUsd') return
+
+    if (!rates.value || newUyuValue === null) {
+      setUsdValue(null)
+      return
+    }
+
+    const convertedValue = newUyuValue / rates.value.average
+    setUsdValue(convertedValue)
+  })
+
+  // Watch rates changes: recalculate based on current direction
+  watch(
+    () => rates.value,
+    (newRates) => {
+      if (!newRates) return
+
+      if (direction.value === 'usdToUyu' && usdValue.value !== null) {
+        const convertedValue = usdValue.value * newRates.average
+        setUyuValue(convertedValue)
+      } else if (direction.value === 'uyuToUsd' && uyuValue.value !== null) {
+        const convertedValue = uyuValue.value / newRates.average
+        setUsdValue(convertedValue)
+      }
+    },
+  )
+
+  // Simplified convertedAmount: just reads from the opposite input
+  const convertedAmount = computed(() => {
+    return direction.value === 'usdToUyu' ? (uyuValue.value ?? 0) : (usdValue.value ?? 0)
+  })
+
+  // inputAmount for WhatsApp sharing
+  const inputAmount = computed(() => {
+    return direction.value === 'usdToUyu' ? usdValue.value : uyuValue.value
+  })
+
+  // Manual direction setter
+  const setDirection = (newDirection: ConversionDirection) => {
+    direction.value = newDirection
   }
 
   const shareViaWhatsApp = () => {
     if (!rates.value) return
 
     shareConversionViaWhatsApp({
-      inputAmount: numberValue.value || null,
+      inputAmount: inputAmount.value || null,
       convertedAmount: convertedAmount.value,
       direction: direction.value,
       rates: rates.value,
@@ -206,13 +247,17 @@ export function createCurrencyComposable(config: CurrencyConfig) {
     loading,
     isFetching,
     error,
-    inputRef,
-    numberValue,
-    setValue,
+    usdInputRef,
+    usdValue,
+    setUsdValue,
+    uyuInputRef,
+    uyuValue,
+    setUyuValue,
+    setDirection,
+    inputAmount,
     direction,
     convertedAmount,
     refetch,
-    swapDirection,
     shareViaWhatsApp,
 
     // Relative time para UI

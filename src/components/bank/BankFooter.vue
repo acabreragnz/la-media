@@ -18,7 +18,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="bg-white/[0.03] backdrop-blur-lg rounded-2xl p-3 sm:p-4">
+  <div class="footer-gradient backdrop-blur-lg rounded-2xl p-3 sm:p-4">
     <div class="text-center space-y-2.5">
       <!-- Stats inline con pipes (flex-wrap para móviles muy pequeños) -->
       <div
@@ -81,6 +81,16 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
+/* Footer gradient background (consistent with other cards) */
+.footer-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--bank-primary-rgb), 0.05) 0%,
+    rgba(var(--bank-primary-light-rgb), 0.03) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* Share button */
 .bank-share-button {
   background: rgba(var(--bank-primary-rgb), 0.05);

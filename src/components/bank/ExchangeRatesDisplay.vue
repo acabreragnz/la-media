@@ -24,37 +24,54 @@ const bank = computed(() => {
 
 <template>
   <div class="space-y-2">
-    <div class="bg-white/[0.04] rounded-xl px-5 py-3 text-sm border border-white/[0.05] relative">
-      <!-- Tres columnas: Compra • Media • Venta -->
-      <div class="flex items-center justify-center gap-3">
+    <div class="rounded-xl px-4 relative">
+      <div class="flex items-center">
         <!-- Compra -->
-        <div class="flex flex-col items-center text-xs text-white/70">
-          <span class="text-white/50 text-[0.65rem] uppercase tracking-wider">Compra</span>
-          <strong v-if="rates" class="text-white text-sm">{{ formatNumber(rates.buy) }}</strong>
+        <div class="flex flex-col flex-1 items-end pl-2 pr-3">
+          <span class="text-[0.65rem] text-white/50 uppercase tracking-wider">Compra</span>
+          <span v-if="rates" class="text-white/90 text-base font-semibold">{{
+            formatNumber(rates.buy)
+          }}</span>
         </div>
 
-        <!-- Separador -->
-        <span class="text-white/20 text-lg">•</span>
+        <!-- Divider vertical con gradiente sutil -->
+        <div class="relative w-[1px] h-12 overflow-hidden">
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent blur-[1px]"
+          ></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent"
+          ></div>
+        </div>
 
         <!-- Media (centro, destacado) -->
-        <div class="flex flex-col items-center">
-          <span class="text-xs uppercase tracking-wider font-medium media-label">Media</span>
-          <span v-if="rates" class="font-bold text-2xl media-value">
-            {{ formatNumber(rates.average) }}
-          </span>
+        <div class="flex flex-col items-center px-4 py-1">
+          <span class="text-sm uppercase tracking-wider font-medium media-label">Media</span>
+          <span v-if="rates" class="font-bold text-3xl media-value">{{
+            formatNumber(rates.average)
+          }}</span>
         </div>
 
-        <!-- Separador -->
-        <span class="text-white/20 text-lg">•</span>
+        <!-- Divider vertical con gradiente sutil -->
+        <div class="relative w-[1px] h-12 overflow-hidden">
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent blur-[1px]"
+          ></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent"
+          ></div>
+        </div>
 
         <!-- Venta -->
-        <div class="flex flex-col items-center text-xs text-white/70">
-          <span class="text-white/50 text-[0.65rem] uppercase tracking-wider">Venta</span>
-          <strong v-if="rates" class="text-white text-sm">{{ formatNumber(rates.sell) }}</strong>
+        <div class="flex flex-col flex-1 items-start pl-3 pr-2">
+          <span class="text-[0.65rem] text-white/50 uppercase tracking-wider">Venta</span>
+          <span v-if="rates" class="text-white/90 text-base font-semibold">{{
+            formatNumber(rates.sell)
+          }}</span>
         </div>
       </div>
 
-      <!-- Enlace banco -->
+      <!-- Enlace banco (absolute, esquina inferior derecha) -->
       <a
         :href="bank.websiteUrl"
         target="_blank"
@@ -75,5 +92,13 @@ const bank = computed(() => {
 
 .media-value {
   color: var(--bank-accent);
+}
+
+.option4-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--bank-primary-rgb), 0.05) 0%,
+    rgba(var(--bank-primary-light-rgb), 0.03) 100%
+  );
 }
 </style>

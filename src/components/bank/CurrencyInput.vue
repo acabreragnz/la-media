@@ -30,8 +30,8 @@ const emit = defineEmits<{
 <style scoped>
 /* Focus states usando CSS variables del banco */
 .bank-input-focus:focus-within {
-  border-color: rgba(var(--bank-primary-light-rgb), 0.6) !important;
-  background-color: rgba(var(--bank-primary-rgb), 0.06) !important;
-  box-shadow: 0 0 30px rgba(var(--bank-primary-rgb), 0.25) !important;
+  border-color: rgba(var(--bank-primary-light-rgb), 0.6);
+  background-color: rgba(var(--bank-primary-rgb), 0.06);
+  box-shadow: 0 0 30px rgba(var(--bank-primary-rgb), 0.25);
 }
 </style>

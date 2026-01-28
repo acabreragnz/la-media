@@ -229,7 +229,7 @@ const isDev = import.meta.env.DEV
 
 /* Hover del borde en dev mode */
 .bank-card-coming-soon:hover {
-  border-color: rgba(var(--bank-accent-rgb), 0.35) !important;
+  border-color: rgba(var(--bank-accent-rgb), 0.35);
 }
 
 /* Badge con color del banco */

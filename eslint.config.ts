@@ -10,6 +10,7 @@ configureVueProject({
 })
 
 export default defineConfigWithVueTs(
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore - Type compatibility varies between environments
   ...pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,

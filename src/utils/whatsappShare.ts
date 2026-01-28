@@ -6,7 +6,7 @@ export interface ConversionShareData {
   inputAmount: number | null
   convertedAmount: number
   direction: ConversionDirection
-  rates: ExchangeRateRecord
+  rates: ExchangeRateRecord | null
   bankName: string
 }
 
@@ -33,8 +33,10 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
     return false
   }
 
+  // After validation, rates is guaranteed to be non-null
+  const rates = data.rates
   const appUrl = window.location.origin
-  const ratesInfo = formatRatesInfo(data.rates)
+  const ratesInfo = formatRatesInfo(rates)
 
   let message: string
 

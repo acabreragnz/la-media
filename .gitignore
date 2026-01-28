@@ -40,3 +40,13 @@ playwright-report/
 
 # Local Netlify folder
 .netlify
+
+# Experimental/WIP scrapers (not integrated with registry architecture)
+netlify/functions/santander-scraper*.mts
+test-santander-local.mts
+
+# Playwright
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

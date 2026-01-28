@@ -16,7 +16,7 @@ export function initPostHog(): void {
     autocapture: true, // Trackea clicks automáticamente
     capture_pageview: true, // Trackea pageviews
     capture_pageleave: true, // Trackea cuando el usuario sale
-    disable_session_recording: true // Deshabilitado por ahora, puedes habilitarlo cambiando a false
+    disable_session_recording: true, // Deshabilitado por ahora, puedes habilitarlo cambiando a false
   })
 
   initialized = true

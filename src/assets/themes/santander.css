@@ -1,0 +1,10 @@
+/* Santander Theme - Rojo corporativo */
+[data-bank='santander'] {
+  --bank-primary: #ea1d25; /* Rojo Santander */
+  --bank-primary-light: #ff3b43; /* Rojo claro */
+  --bank-primary-rgb: 234, 29, 37;
+  --bank-primary-light-rgb: 255, 59, 67;
+
+  --bank-accent: #ea1d25; /* Rojo como acento */
+  --bank-accent-rgb: 234, 29, 37;
+}

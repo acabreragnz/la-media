@@ -1,0 +1,10 @@
+/* BROU Theme */
+[data-bank='brou'] {
+  --bank-primary: #08528d;
+  --bank-primary-light: #0d5ea1;
+  --bank-primary-rgb: 8, 82, 141;
+  --bank-primary-light-rgb: 13, 94, 161;
+
+  --bank-accent: #ffcb05;
+  --bank-accent-rgb: 255, 203, 5;
+}

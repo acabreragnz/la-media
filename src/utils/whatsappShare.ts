@@ -1,11 +1,26 @@
-import type { ExchangeRates, ConversionDirection } from '@/types/currency'
+import type { ConversionDirection } from '@/types/currency'
+import type { ExchangeRateRecord } from '@shared/types/exchange-rates.mts'
 import { formatNumber, formatTimestamp } from './formatters'
 
 export interface ConversionShareData {
   inputAmount: number | null
   convertedAmount: number
   direction: ConversionDirection
-  rates: ExchangeRates
+  rates: ExchangeRateRecord | null
+  bankName: string
+}
+
+/**
+ * Formats exchange rates information (DRY helper)
+ */
+function formatRatesInfo(rates: ExchangeRateRecord): string {
+  return (
+    `📊 Tipos de cambio:\n` +
+    `Compra: $${formatNumber(rates.buy)}\n` +
+    `Venta: $${formatNumber(rates.sell)}\n` +
+    `Media: $${formatNumber(rates.average)}\n` +
+    `🕒 Cotización del: ${formatTimestamp(rates.metadata.scrapedAt)}`
+  )
 }
 
 /**
@@ -18,33 +33,26 @@ export function shareConversionViaWhatsApp(data: ConversionShareData): boolean {
     return false
   }
 
+  // After validation, rates is guaranteed to be non-null
+  const rates = data.rates
+  const appUrl = window.location.origin
+  const ratesInfo = formatRatesInfo(rates)
+
   let message: string
 
-  // Obtener URL de la aplicación (funciona en dev y production)
-  const appUrl = window.location.origin
-
-  // Si hay un monto, incluir la conversión
   if (data.inputAmount) {
+    // Include conversion details
     const fromCurrency = data.direction === 'usdToUyu' ? 'Dólares' : 'Pesos'
     const toCurrency = data.direction === 'usdToUyu' ? 'Pesos' : 'Dólares'
 
-    message = `Media BROU - Conversión\n\n` +
+    message =
+      `Media ${data.bankName} - Conversión\n\n` +
       `${formatNumber(data.inputAmount)} ${fromCurrency} = ${formatNumber(data.convertedAmount)} ${toCurrency}\n\n` +
-      `📊 Cotización BROU:\n` +
-      `Compra: $${formatNumber(data.rates.compra)}\n` +
-      `Venta: $${formatNumber(data.rates.venta)}\n` +
-      `Media: $${formatNumber(data.rates.media)}\n` +
-      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}\n\n` +
+      `${ratesInfo}\n\n` +
       `🔗 ${appUrl}`
   } else {
-    // Si no hay monto, solo compartir las cotizaciones
-    message = `Media BROU - Cotización\n\n` +
-      `📊 Tipos de cambio:\n` +
-      `Compra: $${formatNumber(data.rates.compra)}\n` +
-      `Venta: $${formatNumber(data.rates.venta)}\n` +
-      `Media: $${formatNumber(data.rates.media)}\n` +
-      `🕒 Cotización del: ${formatTimestamp(data.rates.scraped_at)}\n\n` +
-      `🔗 ${appUrl}`
+    // Rates only
+    message = `Media ${data.bankName} - Cotización\n\n` + `${ratesInfo}\n\n` + `🔗 ${appUrl}`
   }
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`

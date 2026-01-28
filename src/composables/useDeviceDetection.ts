@@ -12,7 +12,7 @@ export function useDeviceDetection() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     // 2. Network Information API - Conexión lenta (2G/slow-2G)
-    // @ts-ignore
+    // @ts-expect-error - connection API no está en todos los navegadores
     const effectiveType = navigator.connection?.effectiveType || '4g'
     const slowConnection = effectiveType === 'slow-2g' || effectiveType === '2g'
 
@@ -20,7 +20,7 @@ export function useDeviceDetection() {
     const lowCPU = navigator.hardwareConcurrency ? navigator.hardwareConcurrency < 4 : false
 
     // 4. RAM disponible (< 4GB = gama baja)
-    // @ts-ignore - deviceMemory no está en todos los navegadores
+    // @ts-expect-error - deviceMemory no está en todos los navegadores
     const lowMemory = navigator.deviceMemory ? navigator.deviceMemory < 4 : false
 
     // Detectar si es dispositivo de baja gama
@@ -33,12 +33,12 @@ export function useDeviceDetection() {
       effectiveType,
       slowConnection,
       cpuCores: navigator.hardwareConcurrency,
-      // @ts-ignore
-      memory: navigator.deviceMemory
+      // @ts-expect-error - deviceMemory no está en todos los navegadores
+      memory: navigator.deviceMemory,
     })
   })
 
   return {
-    isLowEndDevice
+    isLowEndDevice,
   }
 }

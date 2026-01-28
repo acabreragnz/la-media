@@ -11,7 +11,8 @@ const { value, prefix = '' } = defineProps<Props>()
 
 <template>
   <span>
-    {{ prefix }}<NumberFlow
+    {{ prefix
+    }}<NumberFlow
       :value="value"
       :format="{ minimumFractionDigits: 2, maximumFractionDigits: 2 }"
       locales="es-UY"

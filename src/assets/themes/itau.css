@@ -1,0 +1,42 @@
+/* Itaú Theme - Naranja NEON con fondo igual a BROU */
+[data-bank='itau'] {
+  --bank-primary: #ff5500; /* Naranja neon fuerte */
+  --bank-primary-light: #ff7733; /* Naranja neon claro */
+  --bank-primary-rgb: 255, 85, 0;
+  --bank-primary-light-rgb: 255, 119, 51;
+
+  --bank-accent: #ff5500; /* Naranja neon como acento */
+  --bank-accent-rgb: 255, 85, 0;
+}
+
+/* OPCIÓN 2: Flat Orange (Descomenta para probar)
+[data-bank="itau"] {
+  --bank-primary: #ff6200;
+  --bank-primary-light: #ff6200;
+  --bank-primary-rgb: 255, 98, 0;
+  --bank-primary-light-rgb: 255, 98, 0;
+
+  --bank-accent: #ff6200;
+  --bank-accent-rgb: 255, 98, 0;
+
+  --bank-gradient-from: #0a0e1f;
+  --bank-gradient-via: #0f1426;
+  --bank-gradient-to: #141929;
+}
+*/
+
+/* OPCIÓN 3: Orange + Deep Blue (Descomenta para probar)
+[data-bank="itau"] {
+  --bank-primary: #ff6200;
+  --bank-primary-light: #ff8533;
+  --bank-primary-rgb: 255, 98, 0;
+  --bank-primary-light-rgb: 255, 133, 51;
+
+  --bank-accent: #ff6200;
+  --bank-accent-rgb: 255, 98, 0;
+
+  --bank-gradient-from: #0a1128;
+  --bank-gradient-via: #1a2847;
+  --bank-gradient-to: #ff6200;
+}
+*/

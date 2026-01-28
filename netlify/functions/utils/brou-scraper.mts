@@ -1,19 +1,11 @@
-// Tipos para la respuesta de scraping
-export interface BrouRates {
-  cotizacion_media: number;
-  detalle: {
-    compra: number;
-    venta: number;
-    moneda: string;
-  };
-}
+import { USD_CURRENCY, type ExchangeRate } from "./constants.mts";
 
 /**
- * Función pura que hace scraping del sitio de BROU
- * @returns Cotizaciones del dólar eBROU
- * @throws Error si no se encuentra la cotización en el HTML
+ * Pure function that scrapes BROU's website for USD exchange rates
+ * @returns USD exchange rates (eBROU)
+ * @throws Error if exchange rate not found in HTML
  */
-export async function scrapeBrouRates(): Promise<BrouRates> {
+export async function scrapeBrouRates(): Promise<ExchangeRate> {
   const url = 'https://www.brou.com.uy/c/portal/render_portlet?p_l_id=20593&p_p_id=cotizacionfull_WAR_broutmfportlet_INSTANCE_otHfewh1klyS&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view';
 
   const response = await fetch(url, {
@@ -25,15 +17,17 @@ export async function scrapeBrouRates(): Promise<BrouRates> {
   const match = html.match(regex);
 
   if (!match) {
-    throw new Error('No se encontró cotización en HTML');
+    throw new Error('USD exchange rate not found in HTML');
   }
 
-  const compra = parseFloat(match[1].trim().replace(',', '.'));
-  const venta = parseFloat(match[2].trim().replace(',', '.'));
-  const media = parseFloat(((compra + venta) / 2).toFixed(2));
+  const buy = parseFloat(match[1].trim().replace(',', '.'));
+  const sell = parseFloat(match[2].trim().replace(',', '.'));
+  const average = parseFloat(((buy + sell) / 2).toFixed(2));
 
   return {
-    cotizacion_media: media,
-    detalle: { compra, venta, moneda: "Dólar eBROU" }
+    average,
+    buy,
+    sell,
+    currency: USD_CURRENCY
   };
 }

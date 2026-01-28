@@ -15,12 +15,13 @@ describe('shareConversionViaWhatsApp', () => {
   })
 
   it('should return false when rates are null', () => {
-    const data: ConversionShareData = {
+    const data = {
       inputAmount: 100,
       convertedAmount: 4100,
       direction: 'usdToUyu',
-      rates: null as any
-    }
+      rates: null,
+      bankName: 'BROU',
+    } as ConversionShareData
 
     const result = shareConversionViaWhatsApp(data)
 
@@ -34,11 +35,17 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 0,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
-      }
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     const result = shareConversionViaWhatsApp(data)
@@ -46,7 +53,7 @@ describe('shareConversionViaWhatsApp', () => {
     expect(result).toBe(true)
     expect(windowOpenSpy).toHaveBeenCalledWith(
       expect.stringContaining('https://wa.me/?text='),
-      '_blank'
+      '_blank',
     )
 
     // Verificar que el mensaje contiene las cotizaciones pero no la conversión
@@ -66,11 +73,17 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
-      }
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     const result = shareConversionViaWhatsApp(data)
@@ -78,7 +91,7 @@ describe('shareConversionViaWhatsApp', () => {
     expect(result).toBe(true)
     expect(windowOpenSpy).toHaveBeenCalledWith(
       expect.stringContaining('https://wa.me/?text='),
-      '_blank'
+      '_blank',
     )
   })
 
@@ -88,11 +101,17 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 100,
       direction: 'uyuToUsd',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
-      }
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     const result = shareConversionViaWhatsApp(data)
@@ -100,7 +119,7 @@ describe('shareConversionViaWhatsApp', () => {
     expect(result).toBe(true)
     expect(windowOpenSpy).toHaveBeenCalledWith(
       expect.stringContaining('https://wa.me/?text='),
-      '_blank'
+      '_blank',
     )
   })
 
@@ -110,11 +129,17 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
-      }
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -136,11 +161,17 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
-      }
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -162,11 +193,17 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
-      }
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -182,15 +219,21 @@ describe('shareConversionViaWhatsApp', () => {
 
   it('should handle decimal amounts correctly', () => {
     const data: ConversionShareData = {
-      inputAmount: 100.50,
-      convertedAmount: 4120.50,
+      inputAmount: 100.5,
+      convertedAmount: 4120.5,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.5,
-        venta: 42.5,
-        media: 41.0,
-        scraped_at: '2024-01-01T00:00:00Z'
-      }
+        buy: 40.5,
+        sell: 42.5,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-01T00:00:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -208,11 +251,17 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 4100,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-22T14:30:00Z'
-      }
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-22T14:30:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -236,11 +285,17 @@ describe('shareConversionViaWhatsApp', () => {
       convertedAmount: 0,
       direction: 'usdToUyu',
       rates: {
-        compra: 40.0,
-        venta: 42.0,
-        media: 41.0,
-        scraped_at: '2024-01-22T14:30:00Z'
-      }
+        buy: 40.0,
+        sell: 42.0,
+        average: 41.0,
+        currency: 'USD',
+        metadata: {
+          scrapedAt: '2024-01-22T14:30:00Z',
+          nextRunAt: null,
+          source: 'scheduled' as const,
+        },
+      },
+      bankName: 'BROU',
     }
 
     shareConversionViaWhatsApp(data)
@@ -256,5 +311,116 @@ describe('shareConversionViaWhatsApp', () => {
 
     // Verificar que incluye el emoji del reloj
     expect(decodedUrl).toContain('🕒')
+  })
+
+  describe('Bank name in message', () => {
+    it('should include bank name "BROU" when sharing BROU rates', () => {
+      const data: ConversionShareData = {
+        inputAmount: 100,
+        convertedAmount: 4100,
+        direction: 'usdToUyu',
+        rates: {
+          buy: 40.0,
+          sell: 42.0,
+          average: 41.0,
+          currency: 'USD',
+          metadata: {
+            scrapedAt: '2024-01-01T00:00:00Z',
+            nextRunAt: null,
+            source: 'scheduled' as const,
+          },
+        },
+        bankName: 'BROU',
+      }
+
+      shareConversionViaWhatsApp(data)
+
+      const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
+      const decodedUrl = decodeURIComponent(callArg)
+
+      expect(decodedUrl).toContain('Media BROU - Conversión')
+    })
+
+    it('should include bank name "Itaú" when sharing Itaú rates', () => {
+      const data: ConversionShareData = {
+        inputAmount: 100,
+        convertedAmount: 4100,
+        direction: 'usdToUyu',
+        rates: {
+          buy: 40.0,
+          sell: 42.0,
+          average: 41.0,
+          currency: 'USD',
+          metadata: {
+            scrapedAt: '2024-01-01T00:00:00Z',
+            nextRunAt: null,
+            source: 'scheduled' as const,
+          },
+        },
+        bankName: 'Itaú',
+      }
+
+      shareConversionViaWhatsApp(data)
+
+      const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
+      const decodedUrl = decodeURIComponent(callArg)
+
+      expect(decodedUrl).toContain('Media Itaú - Conversión')
+    })
+
+    it('should include bank name "Santander" when sharing Santander rates', () => {
+      const data: ConversionShareData = {
+        inputAmount: null,
+        convertedAmount: 0,
+        direction: 'usdToUyu',
+        rates: {
+          buy: 40.0,
+          sell: 42.0,
+          average: 41.0,
+          currency: 'USD',
+          metadata: {
+            scrapedAt: '2024-01-01T00:00:00Z',
+            nextRunAt: null,
+            source: 'scheduled' as const,
+          },
+        },
+        bankName: 'Santander',
+      }
+
+      shareConversionViaWhatsApp(data)
+
+      const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
+      const decodedUrl = decodeURIComponent(callArg)
+
+      expect(decodedUrl).toContain('Media Santander - Cotización')
+    })
+
+    it('should include bank name in rates-only message', () => {
+      const data: ConversionShareData = {
+        inputAmount: null,
+        convertedAmount: 0,
+        direction: 'usdToUyu',
+        rates: {
+          buy: 40.0,
+          sell: 42.0,
+          average: 41.0,
+          currency: 'USD',
+          metadata: {
+            scrapedAt: '2024-01-01T00:00:00Z',
+            nextRunAt: null,
+            source: 'scheduled' as const,
+          },
+        },
+        bankName: 'Itaú',
+      }
+
+      shareConversionViaWhatsApp(data)
+
+      const callArg = windowOpenSpy.mock.calls[0]?.[0] as string
+      const decodedUrl = decodeURIComponent(callArg)
+
+      expect(decodedUrl).toContain('Media Itaú - Cotización')
+      expect(decodedUrl).not.toContain('Media BROU')
+    })
   })
 })

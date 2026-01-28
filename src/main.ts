@@ -6,6 +6,7 @@ import { VueQueryPlugin } from '@tanstack/vue-query'
 import { initPostHog } from '@/lib/posthog'
 import { initSentry } from '@/lib/sentry'
 import App from './App.vue'
+import { router } from './router.ts'
 
 const app = createApp(App)
 
@@ -19,10 +20,12 @@ app.use(VueQueryPlugin, {
       queries: {
         staleTime: 5 * 60 * 1000, // 5 minutos
         retry: 3,
-        refetchOnWindowFocus: true
-      }
-    }
-  }
+        refetchOnWindowFocus: true,
+      },
+    },
+  },
 })
+
+app.use(router)
 
 app.mount('#app')

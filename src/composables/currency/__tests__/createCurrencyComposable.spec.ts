@@ -410,8 +410,8 @@ describe('createCurrencyComposable', () => {
         },
       }
 
-      // Debe formatear como "lun 10:30" o similar
-      expect(currency.nextUpdateTime.value).toMatch(/^[a-z]{3,4}\.? \d{2}:\d{2}$/)
+      // Debe formatear como "lun 10:30" o similar (acepta tildes como en "sáb")
+      expect(currency.nextUpdateTime.value).toMatch(/^[\p{L}]{3,4}\.? \d{2}:\d{2}$/u)
     })
 
     it('should show "mañana HH:MM" for tomorrow edge case (23:59 → 00:01)', () => {

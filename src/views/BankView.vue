@@ -93,7 +93,7 @@ function onUyuBlur() {
 }
 
 // Feature flags
-const DISCLAIMER_ENABLED = false
+const DISCLAIMER_ENABLED = true
 
 // Estado del disclaimer con VueUse (único por banco)
 const disclaimerDismissed = useLocalStorage(`${props.bankId}media_disclaimer_dismissed`, false)

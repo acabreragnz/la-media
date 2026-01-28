@@ -32,11 +32,18 @@ const bank = computed(() => {
       <!-- Logo img para otros bancos -->
       <img v-else :src="bank.logoUrl" :alt="bank.name" class="h-10 w-auto" />
     </a>
-    <h1
-      class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent"
-    >
-      {{ bank.displayName }}
-    </h1>
+    <div class="flex items-center gap-2">
+      <h1
+        class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent"
+      >
+        {{ bank.displayName }}
+      </h1>
+      <span
+        class="text-[0.65rem] text-white/50 font-medium uppercase tracking-wide px-2 py-0.5 rounded bg-white/5 border border-white/10"
+      >
+        No oficial
+      </span>
+    </div>
   </div>
 </template>
 

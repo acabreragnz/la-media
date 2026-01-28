@@ -14,7 +14,7 @@ defineProps<Props>()
     <!-- Exchange Rates skeleton -->
     <div class="space-y-2">
       <div
-        class="bg-white/[0.04] rounded-xl px-5 py-3 border border-white/[0.05] animate-pulse relative"
+        class="bg-white/[0.04] rounded-xl px-5 border border-white/[0.05] animate-pulse relative"
       >
         <div class="flex items-center justify-center gap-3">
           <!-- Compra skeleton -->
@@ -26,8 +26,8 @@ defineProps<Props>()
           <div class="h-4 bg-white/[0.05] rounded w-1"></div>
           <!-- Media skeleton -->
           <div class="flex flex-col items-center gap-1">
-            <div class="h-2.5 bg-white/[0.08] rounded w-10"></div>
-            <div class="h-7 bg-[rgba(var(--bank-accent-rgb),0.2)] rounded w-16"></div>
+            <div class="h-3.5 bg-white/[0.08] rounded w-10"></div>
+            <div class="h-8 bg-[rgba(var(--bank-accent-rgb),0.2)] rounded w-16"></div>
           </div>
           <!-- Separador -->
           <div class="h-4 bg-white/[0.05] rounded w-1"></div>
@@ -100,12 +100,12 @@ defineProps<Props>()
 
 /* Accent stripe skeleton */
 .stripe-skeleton {
-  height: 3px;
+  height: 2px;
   width: 100%;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(var(--bank-accent-rgb), 0.15) 50%,
+    rgba(var(--bank-accent-rgb), 0.5) 50%,
     transparent 100%
   );
   border-radius: 2px;

@@ -50,9 +50,8 @@ export const BANKS: Record<string, BankConfig> = {
     name: 'BCU',
     displayName: 'BCU',
     logoUrl: '/assets/banks/bcu.svg',
-    websiteUrl: 'https://www.bcu.gub.uy',
+    websiteUrl: 'https://www.bcu.gub.uy/Estadisticas-e-Indicadores/Paginas/Cotizaciones.aspx',
     route: '/bcu',
-    comingSoon: true,
   },
 }
 

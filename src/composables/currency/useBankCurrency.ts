@@ -1,5 +1,6 @@
 import { useBrouCurrency } from './useBrouCurrency'
 import { useItauCurrency } from './useItauCurrency'
+import { useBcuCurrency } from './useBcuCurrency'
 import type { BankId } from '@/types/banks'
 
 /**
@@ -9,11 +10,11 @@ import type { BankId } from '@/types/banks'
 const BANK_COMPOSABLE_MAP: Record<BankId, () => ReturnType<typeof useBrouCurrency>> = {
   brou: useBrouCurrency,
   itau: useItauCurrency,
+  bcu: useBcuCurrency,
 
   // Fallback for "coming soon" banks (dev mode only)
   santander: useBrouCurrency, // Uses BROU data
   bbva: useItauCurrency, // Uses Itaú data
-  bcu: useBrouCurrency, // Uses BROU data
 }
 
 /**

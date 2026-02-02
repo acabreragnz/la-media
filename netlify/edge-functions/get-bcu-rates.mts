@@ -1,23 +1,24 @@
 import type { Config, Context } from '@netlify/functions';
 import { getStore } from '@netlify/blobs';
-import { scrapeBcuRates } from '../functions/utils/bcu-scraper.mts';
 import type { ExchangeRateRecord } from '../../shared/types/exchange-rates.mts';
 
 /**
  * Edge function que sirve las cotizaciones del BCU desde Netlify Blobs
- * Fallback: scraping directo si Blobs está vacío
+ *
+ * IMPORTANTE: A diferencia de otros bancos, BCU NO tiene fallback de scraping directo.
+ * El scraper de BCU usa Node.js https module con rejectUnauthorized: false
+ * para bypass SSL issues, que NO está disponible en Edge Functions (Deno runtime).
+ *
+ * Los datos son actualizados por el scheduled function (update-all-rates.mts)
+ * que corre cada 15 minutos en Node.js runtime donde el scraper funciona correctamente.
  *
  * Estrategia de caching:
  * - Respuestas exitosas desde Blobs: 5 minutos (s-maxage=300)
- * - Respuestas de fallback: sin cache (pueden ser errores temporales)
- * - Respuestas de error: sin cache
- *
- * Los datos se actualizan cada 15 minutos, así que un cache de 5 min
- * balancea performance con frescura de datos.
+ * - Si no hay datos en Blobs: retorna error 503 (datos no disponibles aún)
  */
 export default async (_request: Request, _context: Context) => {
   try {
-    // Intentar leer desde Blobs (rápido, cached en edge)
+    // Leer desde Blobs (rápido, cached en edge)
     const store = getStore('rates');
     const cachedRates = await store.get('bcu-latest', { type: 'json' }) as ExchangeRateRecord | null;
 
@@ -31,24 +32,16 @@ export default async (_request: Request, _context: Context) => {
       });
     }
 
-    // Fallback: si Blobs está vacío, hacer scraping directo
-    console.warn('⚠️ Blobs vacío, ejecutando scraping de fallback');
-    const rates = await scrapeBcuRates();
-    const dataToStore: ExchangeRateRecord = {
-      ...rates,
-      metadata: {
-        scrapedAt: new Date().toISOString(),
-        nextRunAt: null,
-        source: 'fallback' as const
-      }
-    }
-
-    await store.setJSON('bcu-latest', dataToStore);
-
-    return new Response(JSON.stringify(dataToStore), {
+    // No hay fallback para BCU - el scraper usa Node.js https module que no está en Deno
+    // Los datos serán poblados por el scheduled function
+    return new Response(JSON.stringify({
+      error: 'BCU rates not available yet. Data will be populated by scheduled function.',
+      retryAfter: 900 // 15 minutes
+    }), {
+      status: 503,
       headers: {
         'Content-Type': 'application/json',
-        // No cachear respuestas de fallback (pueden ser errores temporales)
+        'Retry-After': '900',
         'Cache-Control': 'no-cache, no-store, must-revalidate'
       }
     });
@@ -60,7 +53,6 @@ export default async (_request: Request, _context: Context) => {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
-        // No cachear respuestas de error
         'Cache-Control': 'no-cache, no-store, must-revalidate'
       }
     });
@@ -69,5 +61,5 @@ export default async (_request: Request, _context: Context) => {
 
 export const config: Config = {
   path: '/api/bcu',
-  cache: 'manual', // Habilitar control manual de cache mediante headers
+  cache: 'manual',
 };

@@ -2,6 +2,10 @@
   command = "pnpm build"
   publish = "dist"
 
+# En deploy-preview, mostrar los bancos "coming soon" clickeables
+[context.deploy-preview.environment]
+  VITE_SHOW_COMING_SOON_BANKS = "true"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

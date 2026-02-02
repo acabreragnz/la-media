@@ -18,7 +18,7 @@ const emit = defineEmits<{
     <!-- Botón cerrar -->
     <button
       @click="emit('dismiss')"
-      class="absolute top-3 right-3 text-white/50 hover:text-white/90 transition-colors"
+      class="absolute top-3 right-3 text-white/50 hover:text-white/90 transition-colors cursor-pointer"
       aria-label="Cerrar aviso"
     >
       <PhX :size="20" />

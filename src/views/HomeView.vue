@@ -2,8 +2,9 @@
 import { BANKS_ARRAY } from '@/config/banks'
 import ItauLogo from '@/components/ItauLogo.vue'
 
-// En modo dev, los bancos "próximamente" son clickeables
-const isDev = import.meta.env.DEV
+// En modo dev o en deploy-preview, los bancos "próximamente" son clickeables
+const showComingSoonBanks =
+  import.meta.env.DEV || import.meta.env.VITE_SHOW_COMING_SOON_BANKS === 'true'
 </script>
 
 <template>
@@ -81,14 +82,14 @@ const isDev = import.meta.env.DEV
 
         <!-- Bancos próximamente (clickeables solo en dev) -->
         <component
-          :is="isDev ? 'RouterLink' : 'div'"
+          :is="showComingSoonBanks ? 'RouterLink' : 'div'"
           v-for="bank in BANKS_ARRAY.filter((b) => b.comingSoon)"
           :key="bank.id"
           :data-bank="bank.id"
-          :to="isDev ? bank.route : undefined"
+          :to="showComingSoonBanks ? bank.route : undefined"
           :class="[
             'group relative overflow-hidden backdrop-blur-lg rounded-2xl p-6 md:p-8 w-[calc(50%-0.5rem)] sm:w-[180px] md:w-[200px]',
-            isDev
+            showComingSoonBanks
               ? 'bank-card-gradient hover:scale-105 active:scale-95 cursor-pointer bank-card'
               : 'bank-card-gradient-muted cursor-not-allowed opacity-60 bank-card-coming-soon',
           ]"
@@ -97,12 +98,12 @@ const isDev = import.meta.env.DEV
           <div
             class="absolute top-2 right-2 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bank-badge"
           >
-            {{ isDev ? 'Dev Mode' : 'Próximamente' }}
+            {{ showComingSoonBanks ? 'Dev Mode' : 'Próximamente' }}
           </div>
 
           <!-- Glow effect en dev mode -->
           <div
-            v-if="isDev"
+            v-if="showComingSoonBanks"
             class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bank-glow"
           ></div>
 
@@ -112,7 +113,7 @@ const isDev = import.meta.env.DEV
             <div
               :class="[
                 'w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center p-3',
-                isDev
+                showComingSoonBanks
                   ? 'bg-white/[0.05] border border-white/[0.08] group-hover:border-white/20 bank-logo'
                   : 'bg-white/[0.03] border border-white/[0.05] bank-logo-disabled',
               ]"
@@ -121,7 +122,7 @@ const isDev = import.meta.env.DEV
                 :src="bank.logoUrl"
                 :alt="bank.name"
                 class="w-full h-full object-contain"
-                :class="[isDev ? '' : 'grayscale-[30%] opacity-70']"
+                :class="[showComingSoonBanks ? '' : 'grayscale-[30%] opacity-70']"
               />
             </div>
 
@@ -133,9 +134,9 @@ const isDev = import.meta.env.DEV
             <!-- CTA -->
             <div
               class="text-sm flex items-center gap-1"
-              :class="[isDev ? 'text-white/50 group-hover:text-white/80' : 'text-white/30']"
+              :class="[showComingSoonBanks ? 'text-white/50 group-hover:text-white/80' : 'text-white/30']"
             >
-              <template v-if="isDev">
+              <template v-if="showComingSoonBanks">
                 <span>Ver demo</span>
                 <svg
                   class="w-4 h-4 group-hover:translate-x-1 transition-transform"

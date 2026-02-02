@@ -14,7 +14,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="bg-yellow-500/10 border-l-4 border-yellow-500 rounded-lg p-4 mb-5 relative">
+  <div class="disclaimer-banner rounded-lg p-4 mb-5 relative">
     <!-- Botón cerrar -->
     <button
       @click="emit('dismiss')"
@@ -25,9 +25,9 @@ const emit = defineEmits<{
     </button>
 
     <div class="flex items-start gap-3 pr-8">
-      <PhWarning :size="24" class="text-yellow-500 flex-shrink-0 mt-0.5" />
+      <PhWarning :size="24" class="disclaimer-icon flex-shrink-0 mt-0.5" />
       <div class="flex-1">
-        <h3 class="text-yellow-400 font-bold text-[0.9rem] mb-1">
+        <h3 class="disclaimer-title font-bold text-[0.9rem] mb-1">
           Sitio NO oficial de {{ bankName }}
         </h3>
         <p class="text-white/80 text-[0.75rem] leading-relaxed mb-2">
@@ -43,7 +43,7 @@ const emit = defineEmits<{
             :href="websiteUrl"
             target="_blank"
             rel="noopener"
-            class="text-yellow-400 underline font-semibold"
+            class="disclaimer-link underline font-semibold"
             >{{ bankName }}</a
           >
         </p>
@@ -55,3 +55,22 @@ const emit = defineEmits<{
     </div>
   </div>
 </template>
+
+<style scoped>
+.disclaimer-banner {
+  background: rgba(var(--bank-accent-rgb), 0.1);
+  border-left: 4px solid var(--bank-accent);
+}
+
+.disclaimer-icon {
+  color: var(--bank-accent);
+}
+
+.disclaimer-title {
+  color: var(--bank-accent);
+}
+
+.disclaimer-link {
+  color: var(--bank-accent);
+}
+</style>

@@ -51,7 +51,7 @@ const emit = defineEmits<{
       >
         <PhWarning :size="12" class="text-yellow-500/70 flex-shrink-0" />
         <span class="text-left sm:text-center">
-          Sitio no oficial. Las marcas y logotipos son propiedad de sus respectivos titulares.
+          Sitio no oficial.
           <a :href="websiteUrl" target="_blank" rel="noopener" class="font-medium disclaimer-link"
             >Verificar en {{ bankName }}</a
           >

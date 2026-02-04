@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import type { BankId } from '@/types/banks'
 import { BANKS } from '@/config/banks'
-import ItauLogo from '@/components/ItauLogo.vue'
+import { PhWarning } from '@phosphor-icons/vue'
 
 interface Props {
   bankId: BankId
@@ -21,34 +21,21 @@ const bank = computed(() => {
 
 <template>
   <div class="flex items-center justify-center gap-3 mb-7">
-    <a
-      :href="bank.websiteUrl"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="hover:opacity-80 transition-opacity"
-    >
-      <!-- Logo inline para Itaú (usa currentColor) -->
-      <ItauLogo v-if="bankId === 'itau'" class="h-10 w-auto bank-logo" />
-      <!-- Logo img para otros bancos -->
-      <img v-else :src="bank.logoUrl" :alt="bank.name" class="h-10 w-auto" />
-    </a>
+    <RouterLink to="/" class="hover:opacity-80 transition-opacity">
+      <!-- Todos los bancos: usa headerLogoUrl si existe, sino logoUrl por defecto -->
+      <img :src="bank.headerLogoUrl || bank.logoUrl" alt="La Media" class="h-10 w-auto" />
+    </RouterLink>
     <div class="flex items-center gap-2">
-      <h1
-        class="text-[1.6rem] font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent"
-      >
+      <h1 class="text-2xl font-bold tracking-tight text-white/80">
         {{ bank.displayName }}
       </h1>
       <span
-        class="text-[0.65rem] text-white/50 font-medium uppercase tracking-wide px-2 py-0.5 rounded bg-white/5 border border-white/10"
+        class="inline-flex items-center gap-1 text-[0.65rem] text-white/65 font-semibold uppercase tracking-wide px-2 py-0.5 rounded bg-white/8 border border-white/12"
       >
+        <PhWarning :size="12" weight="bold" />
         No oficial
       </span>
     </div>
   </div>
 </template>
 
-<style scoped>
-.bank-logo {
-  color: var(--bank-accent);
-}
-</style>

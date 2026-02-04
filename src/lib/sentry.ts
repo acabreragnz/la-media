@@ -13,8 +13,8 @@ export function initSentry(app: App): void {
     dsn: 'https://30bc01019d104d0391784776a65ba2f0@o313399.ingest.us.sentry.io/1784872',
     environment: import.meta.env.MODE, // 'production', 'development', etc.
 
-    // Adds request headers and IP for users
-    sendDefaultPii: true,
+    // No recolectar información personal identificable (IPs, headers)
+    sendDefaultPii: false,
 
     // Configuración adicional recomendada para producción
     tracesSampleRate: 1.0, // 100% de las transacciones (ajustar si hay mucho tráfico)

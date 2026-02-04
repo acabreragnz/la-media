@@ -45,6 +45,12 @@ const routes: RouteRecordRaw[] = [
     props: { bankId: 'bcu' as BankId },
     meta: { title: 'La Media - Cotización BCU (No Oficial)' },
   },
+  {
+    path: '/privacidad',
+    name: 'privacy',
+    component: () => import('./views/PrivacyPolicyView.vue'),
+    meta: { title: 'La Media - Política de Privacidad' },
+  },
   // Catch-all
   {
     path: '/:pathMatch(.*)*',

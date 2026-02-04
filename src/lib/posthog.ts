@@ -23,8 +23,8 @@ export function initPostHog(): void {
     disable_session_recording: false,
     session_recording: {
       recordCrossOriginIframes: false, // No grabar iframes externos
-      maskAllInputs: false, // Permite ver cantidades ingresadas (no hay datos sensibles en la app)
-      maskTextSelector: '', // No enmascarar texto (es una app pública sin datos privados)
+      maskAllInputs: true, // Enmascarar valores ingresados (privacidad del usuario)
+      maskTextSelector: '[data-sensitive]', // Enmascarar elementos sensibles
     },
   })
 

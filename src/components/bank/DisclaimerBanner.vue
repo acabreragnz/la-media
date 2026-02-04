@@ -45,19 +45,10 @@ const emit = defineEmits<{
             rel="noopener"
             class="disclaimer-link underline font-semibold"
             >{{ bankName }}</a
-          >
-        </p>
-        <p class="text-white/80 text-[0.75rem] leading-relaxed mt-2">
-          <strong>Recolección de datos:</strong> Este sitio utiliza herramientas de análisis para
-          mejorar la experiencia de usuario. Ver nuestra
+          >. Las marcas y logotipos son propiedad de sus respectivos titulares. Ver
           <RouterLink to="/privacidad" class="disclaimer-link underline font-semibold">
             Política de Privacidad
-          </RouterLink>
-          para más detalles.
-        </p>
-        <p class="text-white/80 text-[0.75rem] leading-relaxed mt-2">
-          Las marcas, logotipos y nombres comerciales mostrados son propiedad de sus respectivos
-          titulares. Su uso aquí es únicamente informativo y no implica afiliación o respaldo.
+          </RouterLink>.
         </p>
       </div>
     </div>
